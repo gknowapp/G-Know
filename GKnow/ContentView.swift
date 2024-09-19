@@ -3,8 +3,9 @@ import SwiftUI
 struct ContentView: View {
     let isTherapist: Bool
     
-    // Example client data
-    let clients = ["Client 1", "Client 2", "Client 3"]
+    // Dynamic client data
+    @State private var clients = ["John Smith Doe"]
+    @State private var showNewClientView = false
     
     var body: some View {
         NavigationStack {
@@ -21,6 +22,22 @@ struct ContentView: View {
                     List(clients, id: \.self) { client in
                         NavigationLink(destination: PatientInfoInput(isTherapist: true, clientName: client)) {
                             Text(client)
+                        }
+                    }
+                    
+                    Button(action: {
+                        showNewClientView = true
+                    }) {
+                        Text("Add New Client")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .padding()
+                    .sheet(isPresented: $showNewClientView) {
+                        NewClientView { newClient in
+                            clients.append(newClient)
                         }
                     }
                 } else {
