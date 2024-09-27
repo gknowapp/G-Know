@@ -15,6 +15,7 @@
 		624BE9B22C810E3900612D23 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624BE9B12C810E3900612D23 /* ContentView.swift */; };
 		624BE9B42C810E3A00612D23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 624BE9B32C810E3A00612D23 /* Assets.xcassets */; };
 		624BE9B72C810E3A00612D23 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 624BE9B62C810E3A00612D23 /* Preview Assets.xcassets */; };
+		629F54732C9CC553000C95E5 /* NewClientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 629F54722C9CC553000C95E5 /* NewClientView.swift */; };
 		62CE7B862C8FD78A00D9467A /* PatientInfoInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62CE7B852C8FD78A00D9467A /* PatientInfoInput.swift */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +29,7 @@
 		624BE9B12C810E3900612D23 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		624BE9B32C810E3A00612D23 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		624BE9B62C810E3A00612D23 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		629F54722C9CC553000C95E5 /* NewClientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewClientView.swift; sourceTree = "<group>"; };
 		62CE7B852C8FD78A00D9467A /* PatientInfoInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientInfoInput.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -62,6 +64,7 @@
 			isa = PBXGroup;
 			children = (
 				624BE9AF2C810E3900612D23 /* GKnowApp.swift */,
+				629F54722C9CC553000C95E5 /* NewClientView.swift */,
 				62CE7B852C8FD78A00D9467A /* PatientInfoInput.swift */,
 				142F98882C93DEE8006F5D48 /* ClientCodeEntryView.swift */,
 				624BE9B12C810E3900612D23 /* ContentView.swift */,
@@ -154,6 +157,7 @@
 			files = (
 				624BE9B22C810E3900612D23 /* ContentView.swift in Sources */,
 				142F988B2C93E0FE006F5D48 /* PatientCardView.swift in Sources */,
+				629F54732C9CC553000C95E5 /* NewClientView.swift in Sources */,
 				142F98872C93DEC7006F5D48 /* UserTypeSelection.swift in Sources */,
 				624BE9B02C810E3900612D23 /* GKnowApp.swift in Sources */,
 				62CE7B862C8FD78A00D9467A /* PatientInfoInput.swift in Sources */,
