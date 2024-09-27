@@ -1,6 +1,11 @@
 import SwiftUI
 
 struct GenogramBuilder: View {
+    struct Client {
+        var name: String
+        var genogram: [GenogramShape]
+    }
+
     @State var client: Client
     @State private var activeShape: GenogramShape? = nil
     @State private var selectedImage: String? = nil // Holds the selected image
