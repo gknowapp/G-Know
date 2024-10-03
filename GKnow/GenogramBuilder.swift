@@ -1,23 +1,29 @@
 import SwiftUI
 
-struct GenogramBuilder: View {
-    struct Client {
-        var name: String
-        var genogram: [GenogramShape]
-    }
+// Model to represent the shape with an image and notes
+struct GenogramShape: Identifiable {
+    var id: UUID
+    var imageName: String
+    var position: CGPoint
+    var notes: String = "" // Store notes for the shape
+}
 
-    @State var client: Client
+struct GenogramData {
+    var genogram: [GenogramShape] // The array of shapes in the genogram
+}
+
+struct GenogramBuilder: View {
+    @State var genogramData: GenogramData // Use the new model
     @State private var activeShape: GenogramShape? = nil
-    @State private var selectedImage: String? = nil // Holds the selected image
-    @State private var showNotesPopup: Bool = false // Controls the popup visibility
-    @State private var dragOffset: CGSize = .zero
-    
+    @State private var selectedImage: String? = nil
+    @State private var showNotesPopup: Bool = false
+
     let isEditable: Bool
     var imageOptions = ["MaleIcon", "FemaleIcon"]
-    
+
     var body: some View {
         VStack {
-            Text("\(client.name)'s Genogram")
+            Text("Genogram Builder") // No client name here
                 .font(.largeTitle)
                 .padding()
 
@@ -26,7 +32,7 @@ struct GenogramBuilder: View {
                 HStack {
                     Text("Pick an Icon")
                         .font(.headline)
-                    
+
                     ForEach(imageOptions, id: \.self) { imageName in
                         Image(imageName)
                             .resizable()
@@ -35,20 +41,19 @@ struct GenogramBuilder: View {
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(10)
                             .onTapGesture {
-                                // Store the selected image to "pick it up"
                                 selectedImage = imageName
                             }
                     }
-                    
+
                     Spacer()
                 }
                 .padding(.horizontal)
                 .background(Color.gray.opacity(0.3))
             }
-            
-            // Genogram canvas (click to place the image)
+
+            // Genogram canvas
             ZStack {
-                ForEach(client.genogram) { shape in
+                ForEach(genogramData.genogram) { shape in
                     Image(shape.imageName)
                         .resizable()
                         .frame(width: 50, height: 50)
@@ -70,20 +75,19 @@ struct GenogramBuilder: View {
             .background(Color.gray.opacity(0.1))
             .border(Color.gray, width: 2)
             .onTapGesture { location in
-                // Place the selected image at the clicked location
                 if let imageName = selectedImage, isEditable {
                     addNewShape(withImage: imageName, at: location)
-                    selectedImage = nil // Clear the selected image after placing
+                    selectedImage = nil
                 }
             }
-            
+
             Spacer()
-            
+
             // Show "Notes" and "Delete" buttons if a shape is selected
             if let selectedShape = activeShape {
                 HStack {
                     Button(action: {
-                        showNotesPopup = true // Show the popup when "Notes" is clicked
+                        showNotesPopup = true
                     }) {
                         Text("Notes")
                             .padding()
@@ -91,7 +95,7 @@ struct GenogramBuilder: View {
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
-                    
+
                     if isEditable {
                         Button(action: {
                             deleteActiveShape()
@@ -109,100 +113,59 @@ struct GenogramBuilder: View {
         .padding()
         .sheet(isPresented: $showNotesPopup) {
             if let shape = activeShape {
-                // Pass the active shape to the NotesPopupView
                 NotesPopupView(shape: Binding(
                     get: {
-                        if let index = client.genogram.firstIndex(where: { $0.id == shape.id }) {
-                            return client.genogram[index]
+                        if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
+                            return genogramData.genogram[index]
                         }
                         return shape
                     },
                     set: { updatedShape in
-                        if let index = client.genogram.firstIndex(where: { $0.id == updatedShape.id }) {
-                            client.genogram[index] = updatedShape
+                        if let index = genogramData.genogram.firstIndex(where: { $0.id == updatedShape.id }) {
+                            genogramData.genogram[index] = updatedShape
                         }
                     }
                 ), isEditable: isEditable)
             }
         }
     }
-    
-    // Add a new shape at the clicked location
+
     private func addNewShape(withImage imageName: String, at location: CGPoint) {
         let newShape = GenogramShape(id: UUID(), imageName: imageName, position: location)
-        client.genogram.append(newShape)
+        genogramData.genogram.append(newShape)
     }
-    
-    // Move an existing shape to a new location
+
     private func moveShape(shape: GenogramShape, newLocation: CGPoint) {
-        if let index = client.genogram.firstIndex(where: { $0.id == shape.id }) {
-            client.genogram[index].position = newLocation
+        if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
+            genogramData.genogram[index].position = newLocation
         }
     }
-    
-    // Delete the active shape from the canvas
+
     private func deleteActiveShape() {
-        if let activeShape = activeShape, let index = client.genogram.firstIndex(where: { $0.id == activeShape.id }) {
-            client.genogram.remove(at: index)
+        if let activeShape = activeShape, let index = genogramData.genogram.firstIndex(where: { $0.id == activeShape.id }) {
+            genogramData.genogram.remove(at: index)
             self.activeShape = nil
         }
     }
 }
 
-// Model to represent the shape with an image and notes
-struct GenogramShape: Identifiable {
-    var id: UUID
-    var imageName: String
-    var position: CGPoint
-    var notes: String = "" // Store notes for the shape
-}
 
-// Popup View for viewing and editing notes
 struct NotesPopupView: View {
-    @Binding var shape: GenogramShape // Pass the shape to edit/view
-    let isEditable: Bool
-    @State private var tempNotes: String = "" // Temporary storage for editing notes
-    
+    @Binding var shape: GenogramShape // Use Binding to get the current shape
+    var isEditable: Bool // A flag to determine if editing is allowed
+
     var body: some View {
-        VStack {
-            Text("Notes for \(shape.imageName)")
-                .font(.headline)
-                .padding()
-            
-            TextEditor(text: $tempNotes)
-                .frame(height: 150)
-                .border(Color.gray)
-                .padding()
-                .disabled(!isEditable) // Disable editing if not in editable mode
-            
-            if isEditable {
-                Button(action: {
-                    // Save the edited notes back to the shape
-                    shape.notes = tempNotes
-                }) {
-                    Text("Save")
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+        NavigationView {
+            Form {
+                Section(header: Text("Notes")) {
+                    TextEditor(text: $shape.notes) // TextEditor for editing notes
+                        .frame(height: 200)
                 }
             }
-            
-            Button(action: {
-                // Close the popup
-                shape = shape // Trigger state change
-            }) {
-                Text("Close")
-                    .padding()
-                    .background(Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }
-        }
-        .padding()
-        .onAppear {
-            // Load the existing notes into the text editor
-            tempNotes = shape.notes
+            .navigationTitle("Edit Notes")
+            .navigationBarItems(trailing: Button("Done") {
+                // Dismiss the popup when done
+            })
         }
     }
 }

@@ -4,7 +4,7 @@ struct PatientCardView: View {
     @Binding var firstName: String
     @Binding var middleName: String
     @Binding var lastName: String
-    @Binding var age: String
+//    @Binding var age: String
     @Binding var isEditing: Bool
     @Binding var showPatientCard: Bool
 
@@ -15,9 +15,9 @@ struct PatientCardView: View {
             Text("First: \(firstName)")
             Text("Middle: \(middleName)")
             Text("Last:  \(lastName)")
-            Text("Age: \(age)")
+           // Text("Age: \(age)")
             
-            HStack {
+          /*  HStack {
                 Button(action: {
                     isEditing = true // Set to editing mode
                 }) {
@@ -42,7 +42,7 @@ struct PatientCardView: View {
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
-            }
+            } */
             .padding(.top, 10)
         }
         .padding()
