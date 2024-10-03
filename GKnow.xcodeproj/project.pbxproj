@@ -15,7 +15,13 @@
 		624BE9B22C810E3900612D23 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624BE9B12C810E3900612D23 /* ContentView.swift */; };
 		624BE9B42C810E3A00612D23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 624BE9B32C810E3A00612D23 /* Assets.xcassets */; };
 		624BE9B72C810E3A00612D23 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 624BE9B62C810E3A00612D23 /* Preview Assets.xcassets */; };
-		629F54732C9CC553000C95E5 /* NewClientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 629F54722C9CC553000C95E5 /* NewClientView.swift */; };
+		62AE18B02CAE2EF800F64150 /* TherapistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AE18AF2CAE2EF800F64150 /* TherapistView.swift */; };
+		62AE18B72CAE32FE00F64150 /* TherapistLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AE18B62CAE32FE00F64150 /* TherapistLoginView.swift */; };
+		62AE18BA2CAE394F00F64150 /* PatientInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AE18B92CAE394F00F64150 /* PatientInformation.swift */; };
+		62AE18BD2CAE399D00F64150 /* PatientDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AE18BC2CAE399D00F64150 /* PatientDataService.swift */; };
+		62AE18C32CAE474C00F64150 /* AirTableService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AE18C22CAE474C00F64150 /* AirTableService.swift */; };
+		62AE18C52CAE47A200F64150 /* AddNewPatient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AE18C42CAE47A200F64150 /* AddNewPatient.swift */; };
+		62AE18C92CAE4D9700F64150 /* GenogramModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62AE18C82CAE4D9700F64150 /* GenogramModels.swift */; };
 		62CE7B862C8FD78A00D9467A /* PatientInfoInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62CE7B852C8FD78A00D9467A /* PatientInfoInput.swift */; };
 /* End PBXBuildFile section */
 
@@ -29,7 +35,13 @@
 		624BE9B12C810E3900612D23 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		624BE9B32C810E3A00612D23 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		624BE9B62C810E3A00612D23 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		629F54722C9CC553000C95E5 /* NewClientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewClientView.swift; sourceTree = "<group>"; };
+		62AE18AF2CAE2EF800F64150 /* TherapistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TherapistView.swift; sourceTree = "<group>"; };
+		62AE18B62CAE32FE00F64150 /* TherapistLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TherapistLoginView.swift; sourceTree = "<group>"; };
+		62AE18B92CAE394F00F64150 /* PatientInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientInformation.swift; sourceTree = "<group>"; };
+		62AE18BC2CAE399D00F64150 /* PatientDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientDataService.swift; sourceTree = "<group>"; };
+		62AE18C22CAE474C00F64150 /* AirTableService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirTableService.swift; sourceTree = "<group>"; };
+		62AE18C42CAE47A200F64150 /* AddNewPatient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewPatient.swift; sourceTree = "<group>"; };
+		62AE18C82CAE4D9700F64150 /* GenogramModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenogramModels.swift; sourceTree = "<group>"; };
 		62CE7B852C8FD78A00D9467A /* PatientInfoInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientInfoInput.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -63,13 +75,13 @@
 		624BE9AE2C810E3900612D23 /* GKnow */ = {
 			isa = PBXGroup;
 			children = (
+				62AE18C12CAE472E00F64150 /* Airtable */,
+				62AE18BF2CAE46A500F64150 /* TBD */,
+				62AE18B32CAE312800F64150 /* Patient */,
 				624BE9AF2C810E3900612D23 /* GKnowApp.swift */,
-				629F54722C9CC553000C95E5 /* NewClientView.swift */,
-				62CE7B852C8FD78A00D9467A /* PatientInfoInput.swift */,
-				142F98882C93DEE8006F5D48 /* ClientCodeEntryView.swift */,
-				624BE9B12C810E3900612D23 /* ContentView.swift */,
+				62AE18B12CAE30E900F64150 /* Therapist */,
 				142F98842C9383B9006F5D48 /* GenogramBuilder.swift */,
-				142F988A2C93E0FE006F5D48 /* PatientCardView.swift */,
+				62AE18C82CAE4D9700F64150 /* GenogramModels.swift */,
 				142F98862C93DEC7006F5D48 /* UserTypeSelection.swift */,
 				624BE9B32C810E3A00612D23 /* Assets.xcassets */,
 				624BE9B52C810E3A00612D23 /* Preview Content */,
@@ -83,6 +95,44 @@
 				624BE9B62C810E3A00612D23 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		62AE18B12CAE30E900F64150 /* Therapist */ = {
+			isa = PBXGroup;
+			children = (
+				62CE7B852C8FD78A00D9467A /* PatientInfoInput.swift */,
+				62AE18AF2CAE2EF800F64150 /* TherapistView.swift */,
+				62AE18C42CAE47A200F64150 /* AddNewPatient.swift */,
+			);
+			path = Therapist;
+			sourceTree = "<group>";
+		};
+		62AE18B32CAE312800F64150 /* Patient */ = {
+			isa = PBXGroup;
+			children = (
+				142F988A2C93E0FE006F5D48 /* PatientCardView.swift */,
+				142F98882C93DEE8006F5D48 /* ClientCodeEntryView.swift */,
+				62AE18B92CAE394F00F64150 /* PatientInformation.swift */,
+			);
+			path = Patient;
+			sourceTree = "<group>";
+		};
+		62AE18BF2CAE46A500F64150 /* TBD */ = {
+			isa = PBXGroup;
+			children = (
+				62AE18B62CAE32FE00F64150 /* TherapistLoginView.swift */,
+				624BE9B12C810E3900612D23 /* ContentView.swift */,
+			);
+			path = TBD;
+			sourceTree = "<group>";
+		};
+		62AE18C12CAE472E00F64150 /* Airtable */ = {
+			isa = PBXGroup;
+			children = (
+				62AE18BC2CAE399D00F64150 /* PatientDataService.swift */,
+				62AE18C22CAE474C00F64150 /* AirTableService.swift */,
+			);
+			path = Airtable;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -156,13 +206,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				624BE9B22C810E3900612D23 /* ContentView.swift in Sources */,
+				62AE18B02CAE2EF800F64150 /* TherapistView.swift in Sources */,
 				142F988B2C93E0FE006F5D48 /* PatientCardView.swift in Sources */,
-				629F54732C9CC553000C95E5 /* NewClientView.swift in Sources */,
+				62AE18BD2CAE399D00F64150 /* PatientDataService.swift in Sources */,
 				142F98872C93DEC7006F5D48 /* UserTypeSelection.swift in Sources */,
 				624BE9B02C810E3900612D23 /* GKnowApp.swift in Sources */,
 				62CE7B862C8FD78A00D9467A /* PatientInfoInput.swift in Sources */,
 				142F98852C9383B9006F5D48 /* GenogramBuilder.swift in Sources */,
 				142F98892C93DEE8006F5D48 /* ClientCodeEntryView.swift in Sources */,
+				62AE18B72CAE32FE00F64150 /* TherapistLoginView.swift in Sources */,
+				62AE18C32CAE474C00F64150 /* AirTableService.swift in Sources */,
+				62AE18C52CAE47A200F64150 /* AddNewPatient.swift in Sources */,
+				62AE18C92CAE4D9700F64150 /* GenogramModels.swift in Sources */,
+				62AE18BA2CAE394F00F64150 /* PatientInformation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

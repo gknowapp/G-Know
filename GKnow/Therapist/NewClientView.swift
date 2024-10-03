@@ -1,13 +1,15 @@
+// when therapist adds new client
 import SwiftUI
 
 struct NewClientView: View {
-    @Environment(\.dismiss) var dismiss // Dismiss the sheet when done
+    @Environment(\.dismiss) var dismiss
     @State private var firstName: String = ""
     @State private var middleName: String = ""
     @State private var lastName: String = ""
     
     var onSave: (String) -> Void
-    
+    private let airtableService = AirTableService() // Instantiate the Airtable service
+
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 20) {
@@ -48,8 +50,19 @@ struct NewClientView: View {
     
     private func saveClient() {
         let newClient = "\(firstName) \(middleName) \(lastName)"
-        onSave(newClient.trimmingCharacters(in: .whitespaces))
-        dismiss()
+        let trimmedClient = newClient.trimmingCharacters(in: .whitespaces)
+
+        airtableService.addClient(firstName: firstName, middleName: middleName, lastName: lastName) { success in
+            if success {
+                DispatchQueue.main.async {
+                    onSave(trimmedClient)
+                    dismiss()
+                }
+            } else {
+                // Handle error (e.g., show an alert)
+                print("Error saving client.")
+            }
+        }
     }
 }
 
