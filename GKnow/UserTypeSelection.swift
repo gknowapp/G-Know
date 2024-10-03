@@ -1,3 +1,5 @@
+// Homepage - initial screen users see when they launch the app
+// asks users to pick between client and therapist 
 import SwiftUI
 
 struct UserTypeSelection: View {
