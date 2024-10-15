@@ -6,12 +6,22 @@
 
 import Foundation
 
+let iso8601Formatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    return formatter
+}()
+
+
 struct AirTableService {
     let apiKey = "pat21tabkcDu3jCzi.1a3edc80390b51ae038a1aa3963a2eef472fcd208591d615c8d4e69b6b3c8e4d"
     let baseId = "appUqouJ9CVWLO228"
     let tableName = "Patient"
 
-    func addPatient(firstName: String, middleName: String, lastName: String, completion: @escaping (Bool) -> Void) {
+    
+    func addPatient(firstName: String, middleName: String, lastName: String, dob: Date, role: [String], birthOrder: [String], completion: @escaping (Bool) -> Void)  {
         let urlString = "https://api.airtable.com/v0/\(baseId)/\(tableName)"
         guard let url = URL(string: urlString) else {
             completion(false)
@@ -24,12 +34,16 @@ struct AirTableService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let patientData: [String: Any] = [
-            "fields": [
-                "First Name": firstName,
-                "Middle Name": middleName,
-                "Last Name": lastName
+                "fields": [
+                    "firstName": firstName,
+                    "middleName": middleName,
+                    "lastName": lastName,
+                    "dob": iso8601Formatter.string(from: dob),
+                    "role": role,
+                    "birthOrder": birthOrder
+                ]
             ]
-        ]
+            
 
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: patientData, options: [])
