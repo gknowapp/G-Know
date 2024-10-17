@@ -1,21 +1,10 @@
 import SwiftUI
 
-// Model to represent the shape with an image and notes
-struct GenogramShape: Identifiable {
-    var id: UUID
-    var imageName: String
-    var position: CGPoint
-    var notes: String = "" // Store notes for the shape
-}
-
-struct GenogramData {
-    var genogram: [GenogramShape] // The array of shapes in the genogram
-}
-
 struct GenogramBuilder: View {
-    @State var genogramData: GenogramData // Use the new model
+    @Binding var genogramData: GenogramData
+    @Binding var selectedIcon: String?
+    @Binding var isSidePanelVisible: Bool
     @State private var activeShape: GenogramShape? = nil
-    @State private var selectedImage: String? = nil
     @State private var showNotesPopup: Bool = false
 
     let isEditable: Bool
@@ -25,35 +14,86 @@ struct GenogramBuilder: View {
 
     var body: some View {
         VStack {
-            Text("Genogram Builder") // No client name here
+            Text("Genogram Builder")
                 .font(.largeTitle)
                 .padding()
 
-            // Toolbar for selecting images (only if editable)
             if isEditable {
                 HStack {
-                    Text("Pick an Icon")
-                        .font(.headline)
+                    VStack {
+                        Text("People")
+                            .font(.headline)
 
-                    ForEach(imageOptions, id: \.self) { imageName in
-                        Image(imageName)
-                            .resizable()
-                            .frame(width: 50, height: 50)
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(10)
-                            .onTapGesture {
-                                selectedImage = imageName
+                        ScrollView(.horizontal) {
+                            HStack {
+                                ForEach(imageOptions, id: \.self) { imageName in
+                                    Image(imageName)
+                                        .resizable()
+                                        .frame(width: 50, height: 50)
+                                        .padding()
+                                        .background(Color.gray.opacity(0.2))
+                                        .cornerRadius(10)
+                                        .onTapGesture {
+                                            selectedIcon = imageName
+                                            isSidePanelVisible = true
+                                        }
+                                }
                             }
+                        }
                     }
 
-                    Spacer()
+                    Divider()
+
+                    VStack {
+                        Text("Relationships")
+                            .font(.headline)
+
+                        ScrollView(.horizontal) {
+                            HStack {
+                                ForEach(relationshipOptions, id: \.self) { imageName in
+                                    Image(imageName)
+                                        .resizable()
+                                        .frame(width: 50, height: 50)
+                                        .padding()
+                                        .background(Color.gray.opacity(0.2))
+                                        .cornerRadius(10)
+                                        .onTapGesture {
+                                            selectedIcon = imageName
+                                            isSidePanelVisible = true
+                                        }
+                                }
+                            }
+                        }
+                    }
+
+                    Divider()
+
+                    VStack {
+                        Text("Symptoms")
+                            .font(.headline)
+
+                        ScrollView(.horizontal) {
+                            HStack {
+                                ForEach(symptomOptions, id: \.self) { imageName in
+                                    Image(imageName)
+                                        .resizable()
+                                        .frame(width: 50, height: 50)
+                                        .padding()
+                                        .background(Color.gray.opacity(0.2))
+                                        .cornerRadius(10)
+                                        .onTapGesture {
+                                            selectedIcon = imageName
+                                            isSidePanelVisible = true
+                                        }
+                                }
+                            }
+                        }
+                    }
                 }
                 .padding(.horizontal)
                 .background(Color.gray.opacity(0.3))
             }
 
-            // Genogram canvas
             ZStack {
                 ForEach(genogramData.genogram) { shape in
                     Image(shape.imageName)
@@ -76,16 +116,9 @@ struct GenogramBuilder: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.gray.opacity(0.1))
             .border(Color.gray, width: 2)
-            .onTapGesture { location in
-                if let imageName = selectedImage, isEditable {
-                    addNewShape(withImage: imageName, at: location)
-                    selectedImage = nil
-                }
-            }
 
             Spacer()
 
-            // Show "Notes" and "Delete" buttons if a shape is selected
             if let selectedShape = activeShape {
                 HStack {
                     Button(action: {
@@ -132,11 +165,6 @@ struct GenogramBuilder: View {
         }
     }
 
-    private func addNewShape(withImage imageName: String, at location: CGPoint) {
-        let newShape = GenogramShape(id: UUID(), imageName: imageName, position: location)
-        genogramData.genogram.append(newShape)
-    }
-
     private func moveShape(shape: GenogramShape, newLocation: CGPoint) {
         if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
             genogramData.genogram[index].position = newLocation
@@ -151,22 +179,39 @@ struct GenogramBuilder: View {
     }
 }
 
+// Model to represent each shape with an image and notes
+struct GenogramShape: Identifiable {
+    var id: UUID
+    var imageName: String
+    var position: CGPoint
+    var notes: String = "" // Optional notes for each shape
+}
 
+struct GenogramData {
+    var genogram: [GenogramShape] // The collection of shapes in the genogram
+}
+
+// View for editing notes for a selected shape in the genogram
 struct NotesPopupView: View {
-    @Binding var shape: GenogramShape // Use Binding to get the current shape
-    var isEditable: Bool // A flag to determine if editing is allowed
+    @Binding var shape: GenogramShape // Binding to the selected shape
+    var isEditable: Bool // Whether the notes can be edited
 
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Notes")) {
-                    TextEditor(text: $shape.notes) // TextEditor for editing notes
-                        .frame(height: 200)
+                    if isEditable {
+                        TextEditor(text: $shape.notes) // TextEditor for editable notes
+                            .frame(height: 200)
+                    } else {
+                        Text(shape.notes) // Display notes if not editable
+                            .frame(height: 200)
+                    }
                 }
             }
             .navigationTitle("Edit Notes")
             .navigationBarItems(trailing: Button("Done") {
-                // Dismiss the popup when done
+                // Handle dismiss
             })
         }
     }

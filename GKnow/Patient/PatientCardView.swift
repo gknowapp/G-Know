@@ -5,9 +5,9 @@ struct PatientCardView: View {
     @Binding var middleName: String
     @Binding var lastName: String
     
-//    @Binding var dob: Date
-//    @Binding var role: [String]
-//    @Binding var birthOrder: [String]
+    @Binding var dob: Date
+    @Binding var role: [String]
+    @Binding var birthOrder: [String]
     
     @Binding var isEditing: Bool
     @Binding var showPatientCard: Bool
@@ -24,23 +24,23 @@ struct PatientCardView: View {
                 .font(.headline)
             Text("First: \(firstName)")
             Text("Middle: \(middleName)")
-//            Text("Last: \(lastName)")
-//            Text("DOB: \(iso8601Formatter.string(from: dob))") // Format the date
+            Text("Last: \(lastName)")
+            Text("DOB: \(iso8601Formatter.string(from: dob))") // Format the date
 
-//            // Display role(s)
-//            if !role.isEmpty {
-//                Text("Role: \(role.joined(separator: ", "))") // Join roles into a single string
-//            } else {
-//                Text("Role: None") // Handle empty role
-//            }
-//            
-//            // Display birth order(s)
-//            if !birthOrder.isEmpty {
-//                Text("Birth Order: \(birthOrder.joined(separator: ", "))") // Join birth orders into a single string
-//            } else {
-//                Text("Birth Order: None") // Handle empty birth order
-//            }
-//            
+            // Display role(s)
+            if !role.isEmpty {
+                Text("Role: \(role.joined(separator: ", "))") // Join roles into a single string
+            } else {
+                Text("Role: None") // Handle empty role
+            }
+            
+            // Display birth order(s)
+            if !birthOrder.isEmpty {
+                Text("Birth Order: \(birthOrder.joined(separator: ", "))") // Join birth orders into a single string
+            } else {
+                Text("Birth Order: None") // Handle empty birth order
+            }
+            
             /* Uncomment if you need editing and delete buttons
             HStack {
                 Button(action: {
