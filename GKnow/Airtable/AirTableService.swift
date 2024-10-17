@@ -38,9 +38,9 @@ struct AirTableService {
                     "firstName": firstName,
                     "middleName": middleName,
                     "lastName": lastName,
-                    "dob": iso8601Formatter.string(from: dob),
-                    "role": role,
-                    "birthOrder": birthOrder
+//                    "dob": iso8601Formatter.string(from: dob),
+//                    "role": role,
+//                    "birthOrder": birthOrder
                 ]
             ]
             

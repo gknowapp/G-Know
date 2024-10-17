@@ -13,9 +13,9 @@ struct PatientInfoInput: View {
     @State private var middleName: String
     @State private var lastName: String
     
-    @State private var dob: Date
-    @State private var role: [String] // Assuming role is an array of strings (multi-select)
-    @State private var birthOrder: [String] // Assuming birthOrder is an array of strings (multi-select)
+//    @State private var dob: Date
+//    @State private var role: [String] // Assuming role is an array of strings (multi-select)
+//    @State private var birthOrder: [String] // Assuming birthOrder is an array of strings (multi-select)
     
     @State private var showPatientCard: Bool = false
     @State private var isEditing: Bool = false
@@ -31,9 +31,9 @@ struct PatientInfoInput: View {
         _firstName = State(initialValue: patient.fields.firstName ?? "")
         _middleName = State(initialValue: patient.fields.middleName ?? "")
         _lastName = State(initialValue: patient.fields.lastName ?? "")
-        _dob = State(initialValue: patient.fields.dob ?? Date())
-        _role = State(initialValue: patient.fields.role ?? []) // Initialize multi-select roles
-        _birthOrder = State(initialValue: patient.fields.birthOrder ?? []) // Initialize multi-select birth order
+//        _dob = State(initialValue: patient.fields.dob ?? Date())
+//        _role = State(initialValue: patient.fields.role ?? []) // Initialize multi-select roles
+//        _birthOrder = State(initialValue: patient.fields.birthOrder ?? []) // Initialize multi-select birth order
     }
 
     var body: some View {
@@ -49,14 +49,14 @@ struct PatientInfoInput: View {
                     inputField(label: "First Name", text: $firstName)
                     inputField(label: "Middle Name", text: $middleName)
                     inputField(label: "Last Name", text: $lastName)
-                    DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
-                        .datePickerStyle(DefaultDatePickerStyle())
-                    MultiSelectField(label: "Role", selections: $role, options: ["hero", "peacekeeper", "clown", "lost child", "rebel", "scapegoat"]) // Update this with your options
-                    MultiSelectField(label: "Birth Order", selections: $birthOrder, options: ["oldest", "youngest", "only", "middle", "twin"]) // Update this with your options
+//                    DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
+//                        .datePickerStyle(DefaultDatePickerStyle())
+//                    MultiSelectField(label: "Role", selections: $role, options: ["hero", "peacekeeper", "clown", "lost child", "rebel", "scapegoat"]) // Update this with your options
+//                    MultiSelectField(label: "Birth Order", selections: $birthOrder, options: ["oldest", "youngest", "only", "middle", "twin"]) // Update this with your options
                 }
             } else {
                 // Display patient information
-                PatientCardView(firstName: $firstName, middleName: $middleName, lastName: $lastName, dob: $dob, role: $role, birthOrder: $birthOrder, isEditing: $isEditing, showPatientCard: $showPatientCard)
+                PatientCardView(firstName: $firstName, middleName: $middleName, lastName: $lastName, /*dob: $dob, role: $role, birthOrder: $birthOrder,*/ isEditing: $isEditing, showPatientCard: $showPatientCard)
                     .padding(.top)
             }
 
@@ -107,36 +107,36 @@ struct PatientInfoInput: View {
         }
     }
 }
-
-// Example of a multi-select component
-struct MultiSelectField: View {
-    let label: String
-    @Binding var selections: [String]
-    let options: [String] // Options for selection
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(label + ":")
-            ForEach(options, id: \.self) { option in
-                HStack {
-                    Text(option)
-                    Spacer()
-                    Button(action: {
-                        toggleSelection(option)
-                    }) {
-                        Image(systemName: selections.contains(option) ? "checkmark.circle.fill" : "circle")
-                            .foregroundColor(selections.contains(option) ? .green : .gray)
-                    }
-                }
-            }
-        }
-    }
-
-    private func toggleSelection(_ option: String) {
-        if selections.contains(option) {
-            selections.removeAll { $0 == option }
-        } else {
-            selections.append(option)
-        }
-    }
-}
+//
+//// Example of a multi-select component
+//struct MultiSelectField: View {
+//    let label: String
+//    @Binding var selections: [String]
+//    let options: [String] // Options for selection
+//
+//    var body: some View {
+//        VStack(alignment: .leading) {
+//            Text(label + ":")
+//            ForEach(options, id: \.self) { option in
+//                HStack {
+//                    Text(option)
+//                    Spacer()
+//                    Button(action: {
+//                        toggleSelection(option)
+//                    }) {
+//                        Image(systemName: selections.contains(option) ? "checkmark.circle.fill" : "circle")
+//                            .foregroundColor(selections.contains(option) ? .green : .gray)
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private func toggleSelection(_ option: String) {
+//        if selections.contains(option) {
+//            selections.removeAll { $0 == option }
+//        } else {
+//            selections.append(option)
+//        }
+//    }
+//}

@@ -16,8 +16,8 @@ struct Fields: Codable {
     var firstName: String?
     var middleName: String?
     var lastName: String?
-    var dob: Date?
-    var birthOrder: [String]?
-    var role: [String]?
+//    var dob: Date?
+//    var birthOrder: [String]?
+//    var role: [String]?
 }
 
