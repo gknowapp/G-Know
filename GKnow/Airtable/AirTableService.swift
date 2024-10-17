@@ -47,6 +47,7 @@ struct AirTableService {
                 "middleName": middleName,
                 "lastName": lastName,
                 "dob": simpleDateFormatter.string(from: dob), 
+
                 "role": role,
                 "birthOrder": birthOrder
             ]

@@ -11,6 +11,7 @@
 		142F98872C93DEC7006F5D48 /* UserTypeSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142F98862C93DEC7006F5D48 /* UserTypeSelection.swift */; };
 		142F98892C93DEE8006F5D48 /* ClientCodeEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142F98882C93DEE8006F5D48 /* ClientCodeEntryView.swift */; };
 		142F988B2C93E0FE006F5D48 /* PatientCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142F988A2C93E0FE006F5D48 /* PatientCardView.swift */; };
+		14A0DBFF2CC0C0430092F8AA /* SidePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A0DBFE2CC0C0420092F8AA /* SidePanelView.swift */; };
 		624BE9B02C810E3900612D23 /* GKnowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624BE9AF2C810E3900612D23 /* GKnowApp.swift */; };
 		624BE9B22C810E3900612D23 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 624BE9B12C810E3900612D23 /* ContentView.swift */; };
 		624BE9B42C810E3A00612D23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 624BE9B32C810E3A00612D23 /* Assets.xcassets */; };
@@ -34,6 +35,7 @@
 		142F98862C93DEC7006F5D48 /* UserTypeSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTypeSelection.swift; sourceTree = "<group>"; };
 		142F98882C93DEE8006F5D48 /* ClientCodeEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientCodeEntryView.swift; sourceTree = "<group>"; };
 		142F988A2C93E0FE006F5D48 /* PatientCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientCardView.swift; sourceTree = "<group>"; };
+		14A0DBFE2CC0C0420092F8AA /* SidePanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidePanelView.swift; sourceTree = "<group>"; };
 		624BE9AC2C810E3900612D23 /* GKnow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GKnow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		624BE9AF2C810E3900612D23 /* GKnowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GKnowApp.swift; sourceTree = "<group>"; };
 		624BE9B12C810E3900612D23 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 				6276B55B2CB877290069653C /* Login.swift */,
 				624BE9B32C810E3A00612D23 /* Assets.xcassets */,
 				624BE9B52C810E3A00612D23 /* Preview Content */,
+				14A0DBFE2CC0C0420092F8AA /* SidePanelView.swift */,
 			);
 			path = GKnow;
 			sourceTree = "<group>";
@@ -223,6 +226,7 @@
 				62AE18BD2CAE399D00F64150 /* PatientDataService.swift in Sources */,
 				142F98872C93DEC7006F5D48 /* UserTypeSelection.swift in Sources */,
 				624BE9B02C810E3900612D23 /* GKnowApp.swift in Sources */,
+				14A0DBFF2CC0C0430092F8AA /* SidePanelView.swift in Sources */,
 				62CE7B862C8FD78A00D9467A /* PatientInfoInput.swift in Sources */,
 				142F98852C9383B9006F5D48 /* GenogramBuilder.swift in Sources */,
 				62A1604F2CBB4B0C0058FB41 /* Signup.swift in Sources */,
