@@ -31,61 +31,127 @@ struct PatientInfoInput: View {
         _role = State(initialValue: patient.fields.role ?? [])
         _birthOrder = State(initialValue: patient.fields.birthOrder ?? [])
     }
+    
+    let backgroundImage = Image("Therapist Background")
+        .resizable()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text(isTherapist ? "Client: \(firstName) \(middleName) \(lastName)" : "My Genogram")
-                .font(.headline)
-
-            if isEditing {
-                VStack(spacing: 10) {
-                    inputField(label: "First Name", text: $firstName)
-                    inputField(label: "Middle Name", text: $middleName)
-                    inputField(label: "Last Name", text: $lastName)
-                    DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
-                    MultiSelectField(label: "Role", selections: $role, options: ["hero", "peacekeeper", "clown", "lost child", "rebel", "scapegoat"])
-                    MultiSelectField(label: "Birth Order", selections: $birthOrder, options: ["oldest", "youngest", "only", "middle", "twin"])
-                }
-            } else {
-                PatientCardView(firstName: $firstName, middleName: $middleName, lastName: $lastName, dob: $dob, role: $role, birthOrder: $birthOrder, isEditing: $isEditing, showPatientCard: $showPatientCard)
-                    .padding(.top)
+        ZStack {
+            //Background Image
+            HStack {
+                backgroundImage
+                    .opacity(0.25)
             }
-
-            Button(action: {
-                isEditing.toggle()
-                showPatientCard.toggle()
-            }) {
-                Text(isEditing ? "Save" : isTherapist ? "Edit Client Information" : "Edit My Information")
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }
-            .padding(.top)
-
-            if !isEditing {
-                Button(action: {
-                    showGenogramBuilder = true
-                }) {
-                    Text("Open Genogram Builder")
+            .overlay(Color ("Overlay"))
+            .ignoresSafeArea(.container)
+            
+            VStack(alignment: .center, spacing: 20) {
+                Text(isTherapist ? "Client: \(firstName) \(middleName) \(lastName)" : "My Genogram")
+                    .font(.system(size: 72))
+                    .foregroundColor(Color("Candace's Couch"))
+                    .padding(.top, 40)
+                
+                if isEditing {
+                    VStack(spacing: 10) {
+                        inputField(label: "First Name", text: $firstName)
+                            .padding(.horizontal, 30)
+                            .padding(.top, 10)
+                            .font(.title2)
+                            .foregroundColor(Color("Candace's Couch"))
+                        Divider()
+                        inputField(label: "Middle Name", text: $middleName)
+                            .padding(.horizontal, 30)
+                            .font(.title2)
+                            .foregroundColor(Color("Candace's Couch"))
+                        Divider()
+                        inputField(label: "Last Name", text: $lastName)
+                            .padding(.horizontal, 30)
+                            .font(.title2)
+                            .foregroundColor(Color("Candace's Couch"))
+                        Divider()
+                        DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
+                            .padding(.horizontal, 30)
+                            .font(.title2)
+                            .foregroundColor(Color("Candace's Couch"))
+                        Divider()
+                        MultiSelectField(label: "Role", selections: $role, options: ["Hero", "Peacekeeper", "Clown", "Lost Child", "Rebel", "Scapegoat"])
+                            .padding(.horizontal, 30)
+                            .font(.title2)
+                            .foregroundColor(Color("Candace's Couch"))
+                        Divider()
+                        MultiSelectField(label: "Birth Order", selections: $birthOrder, options: ["Oldest", "Youngest", "Only", "Middle", "Twin"])
+                            .padding(.horizontal, 30)
+                            .font(.title2)
+                            .foregroundColor(Color("Candace's Couch"))
+                        Divider()
+                    }
+                    //.frame(width: nil, height: nil , alignment: .leading)
+                    .background(Color ("Anti-flash White"))
+                    .padding(CGFloat(50))
+                    .cornerRadius(20)
+                    .shadow(radius: 10)
+                    
+                } else {
+                    PatientCardView(firstName: $firstName, middleName: $middleName, lastName: $lastName, dob: $dob, role: $role, birthOrder: $birthOrder, isEditing: $isEditing, showPatientCard: $showPatientCard)
                         .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                        .background(Color ("Dark Green"))
+                        .cornerRadius(20)
+                        //.shadow(radius: 20)
+                    
                 }
-                .padding(.top)
-                .sheet(isPresented: $showGenogramBuilder) {
-                    GenogramBuilder(
-                        genogramData: $genogramData,
-                        selectedIcon: $selectedIcon,
-                        isSidePanelVisible: $isSidePanelVisible,
-                        isEditable: true
-                    )
+                
+                HStack {
+                    Button(action: {
+                        isEditing.toggle()
+                        showPatientCard.toggle()
+                    }) {
+                        Text(isEditing ? "Save" : isTherapist ? "Edit Client Information" : "Edit My Information")
+                            .padding()
+                            .background(Color ("Light Green"))
+                            .foregroundColor(Color ("Candace's Couch"))
+                            .cornerRadius(10)
+                            .font(.title2)
+                    }
+                    .padding(.bottom, 40)
+                    .shadow(radius: 5)
+                    .padding(.horizontal)
+                    
+                    if !isEditing {
+                        Button(action: {
+                            showGenogramBuilder = true
+                        }) {
+                            Text("Open Genogram Builder")
+                                .padding()
+                                .background(Color ("Light Green"))
+                                .foregroundColor(Color ("Candace's Couch"))
+                                .cornerRadius(10)
+                                .font(.title2)
+                        }
+                        
+                        .sheet(isPresented: $showGenogramBuilder) {
+                            GenogramBuilder(
+                                genogramData: $genogramData,
+                                selectedIcon: $selectedIcon,
+                                isSidePanelVisible: $isSidePanelVisible,
+                                isEditable: true
+                            )
+                        }
+                        .padding(.bottom, 40)
+                        .shadow(radius: 5)
+                    }
+                        
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color ("Dark Green"))
+            .padding(.horizontal, 150)
+            .padding(.vertical, 100)
+            .cornerRadius(20)
+            .shadow(radius: 20)
         }
-        .padding()
+        
     }
+        
 
     private func inputField(label: String, text: Binding<String>) -> some View {
         HStack {
@@ -101,23 +167,32 @@ struct MultiSelectField: View {
     let label: String
     @Binding var selections: [String]
     let options: [String] // The available options for selection
+    let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
 
     var body: some View {
         VStack(alignment: .leading) {
             Text(label + ":")
-            ForEach(options, id: \.self) { option in
-                HStack {
-                    Text(option)
-                    Spacer()
-                    Button(action: {
-                        toggleSelection(option)
-                    }) {
-                        Image(systemName: selections.contains(option) ? "checkmark.circle.fill" : "circle")
-                            .foregroundColor(selections.contains(option) ? .green : .gray)
+                .font(.title2)
+            LazyVGrid(columns: columns) {
+                
+                
+                ForEach(options, id: \.self) { option in
+                    HStack {
+                        Text(option)
+                        Spacer()
+                        Button(action: {
+                            toggleSelection(option)
+                        }) {
+                            Image(systemName: selections.contains(option) ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(selections.contains(option) ? .green : .gray)
+                        }
                     }
+                    .padding(.horizontal, 10)
                 }
             }
         }
+        .padding(.bottom, 10)
+        
     }
 
     private func toggleSelection(_ option: String) {

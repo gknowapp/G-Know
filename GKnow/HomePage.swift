@@ -12,50 +12,82 @@ struct HomePage: View {
     @State private var showAlert = true
     @State private var showSignup = false
     @State private var showLogin = false
-
-
-        var body: some View {
+    
+    let backgroundImage = Image("Therapist Background")
+        .resizable()
+    
+    let GKnowLogo = Image("GKnow Logo")
+    
+    
+    var body: some View {
+        ZStack {
+            //Background Image
+            HStack {
+                backgroundImage
+                    .opacity(0.25)
+            }
+            .overlay(Color ("Overlay"))
+            .ignoresSafeArea(.container)
+            
             VStack {
-                // Title
-                Text("GKNow")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding(.top, 50)
-
+                //Logo
+                HStack {
+                    GKnowLogo
+                }
+                .frame(height: 450.0)
+                .padding(.top, 50)
+                
+                
+                
                 // Subtitle
                 Text("Genogram Maker")
-                    .font(.title2)
+                    .font(.system(size:72))
                     .foregroundColor(.gray)
-                    .padding(.bottom, 50)
-
+                    .fontWeight(.bold)
+                    .padding(.bottom, 80)
+                    .padding(.top, -70)
+                
                 // Sign Up Button
                 Button(action: {
                     // Handle sign up action
                     showSignup = true
                 }) {
                     Text("New to GKnow? Sign Up")
-                        .font(.headline)
-                        .foregroundColor(.blue)
+                        .font(.largeTitle)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color ("Candace's Couch"))
                         .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color ("Login Box"))
+                        .cornerRadius(20)
+                        .padding(.horizontal, 400)
                 }
                 .fullScreenCover(isPresented: $showSignup) {
                     Signup(isHome: $isHome)
                 }
-
+                .padding(.bottom, 30)
+                .shadow(radius: 10)
+                
                 // Login Button
                 Button(action: {
                     // Handle login action
                     showLogin = true
                 }) {
-                    Text("Existing User? Log In")
-                        .font(.headline)
-                        .foregroundColor(.blue)
+                    Text("Existing User? Login")
+                        .font(.largeTitle)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color ("Candace's Couch"))
                         .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color ("Login Box"))
+                        .cornerRadius(20)
+                        .padding(.horizontal, 400)
+                        
                 }
                 .fullScreenCover(isPresented: $showLogin) {
                     Login(isHome: $isHome)
                 }
-
+                .shadow(radius: 10)
                 Spacer()
             }
             .alert(isPresented: $showAlert) {
@@ -69,9 +101,10 @@ struct HomePage: View {
             }
         }
     }
-
+}
     struct HomePage_Previews: PreviewProvider {
         static var previews: some View {
             HomePage(isHome: .constant(true))
         }
     }
+

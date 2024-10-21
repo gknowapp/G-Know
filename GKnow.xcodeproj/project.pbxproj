@@ -52,7 +52,7 @@
 		62AE18C22CAE474C00F64150 /* AirTableService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirTableService.swift; sourceTree = "<group>"; };
 		62AE18C42CAE47A200F64150 /* AddNewPatient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewPatient.swift; sourceTree = "<group>"; };
 		62AE18C82CAE4D9700F64150 /* GenogramModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenogramModels.swift; sourceTree = "<group>"; };
-		62CE7B852C8FD78A00D9467A /* PatientInfoInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientInfoInput.swift; sourceTree = "<group>"; };
+		62CE7B852C8FD78A00D9467A /* PatientInfoInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientInfoInput.swift; sourceTree = "<group>"; usesTabs = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -367,7 +367,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"GKnow/Preview Content\"";
-				DEVELOPMENT_TEAM = HMX7L2XRHM;
+				DEVELOPMENT_TEAM = C32HX45PQ4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = GKnow;
@@ -397,7 +397,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"GKnow/Preview Content\"";
-				DEVELOPMENT_TEAM = HMX7L2XRHM;
+				DEVELOPMENT_TEAM = C32HX45PQ4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = GKnow;

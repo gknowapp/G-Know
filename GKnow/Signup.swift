@@ -15,73 +15,99 @@ struct Signup: View {
     @State private var showPatientSignup = false
     @State private var showTempTherapistView = false // State variable for redirecting
 
+    let backgroundImage = Image("Therapist Background")
+        .resizable()
+    
+    let GKnowLogo = Image("GKnow Logo")
+        
     var body: some View {
-        VStack {
-            // Back button
-            Button(action: {
-                dismiss() // Use dismiss() to close the Signup view
-            }) {
-                HStack {
-                    Image(systemName: "chevron.left")
-                    Text("Back")
+        ZStack {
+            //Background Image
+            HStack {
+                backgroundImage
+                    .opacity(0.25)
+            }
+            .overlay(Color ("Overlay"))
+            VStack {
+                // Back button
+                Button(action: {
+                    dismiss() // Use dismiss() to close the Signup view
+                }) {
+                    HStack {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.blue)
+                    .padding()
                 }
-                .font(.headline)
-                .foregroundColor(.blue)
-                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                //Logo
+                HStack {
+                    GKnowLogo
+                }
+                .frame(height: 450.0)
+                
+                // Subtitle
+                Text("Genogram Maker")
+                    .font(.system(size:72))
+                    .foregroundColor(.gray)
+                    .fontWeight(.bold)
+                    .padding(.bottom, 80)
+                    .padding(.top, -70)
+                    
+                
+                // Therapist Sign Up Button
+                Button(action: {
+                    showTherapistSignup.toggle()
+                }) {
+                    Text("Sign Up as a Therapist")
+                        .font(.largeTitle)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color ("Candace's Couch"))
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color ("Login Box"))
+                        .cornerRadius(20)
+                        .padding(.horizontal, 400)
+                }
+                .sheet(isPresented: $showTherapistSignup) {
+                    TherapistSignupView(onComplete: {
+                        showTempTherapistView = true // Navigate to TempTherapistView
+                    })
+                }
+                .padding(.bottom, 30)
+                .shadow(radius: 10)
+                
+                // Full screen cover for TempTherapistView
+                .fullScreenCover(isPresented: $showTempTherapistView) {
+                    TempTherapistView()
+                }
+                
+                // Patient Sign Up Button
+                    Button(action: {
+                        showPatientSignup.toggle()
+                    }) {
+                        Text("Sign Up as a Patient")
+                            .font(.largeTitle)
+                            .fontWeight(.semibold)
+                            .foregroundColor(Color ("Candace's Couch"))
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color ("Login Box"))
+                            .cornerRadius(20)
+                            .padding(.horizontal, 400)
+                    }
+                    .sheet(isPresented: $showPatientSignup) {
+                        PatientSignupView() // Placeholder for patient sign-up
+                    }
+                    .shadow(radius: 10)
+                Spacer()
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            // Title
-            Text("Sign Up")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding(.top, 50)
-
-            // Therapist Sign Up Button
-            Button(action: {
-                showTherapistSignup.toggle()
-            }) {
-                Text("Sign Up as a Therapist")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.green)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-            }
-            .sheet(isPresented: $showTherapistSignup) {
-                TherapistSignupView(onComplete: {
-                    showTempTherapistView = true // Navigate to TempTherapistView
-                })
-            }
-            .padding(.bottom, 20)
-
-            // Full screen cover for TempTherapistView
-            .fullScreenCover(isPresented: $showTempTherapistView) {
-                TempTherapistView()
-            }
-
-            // Patient Sign Up Button
-            Button(action: {
-                showPatientSignup.toggle()
-            }) {
-                Text("Sign Up as a Patient")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-            }
-            .sheet(isPresented: $showPatientSignup) {
-                PatientSignupView() // Placeholder for patient sign-up
-            }
-            
-            Spacer()
+            .navigationBarHidden(true)
         }
-        .navigationBarHidden(true)
+        .ignoresSafeArea(.container)
     }
 }
 
