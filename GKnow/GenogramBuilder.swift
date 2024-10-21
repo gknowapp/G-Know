@@ -6,11 +6,31 @@ struct GenogramBuilder: View {
     @Binding var isSidePanelVisible: Bool
     @State private var activeShape: GenogramShape? = nil
     @State private var showNotesPopup: Bool = false
+    @State private var iconClickCounter: [String: Int] = [:] // Tracks how many times each icon has been clicked
 
     let isEditable: Bool
     var imageOptions = ["MaleIcon", "FemaleIcon", "AbortionIcon", "MiscarriageIcon", "MaleDeathIcon", "FemaleDeathIcon", "UnknownGenderIcon", "PregnancyIcon"]
     var relationshipOptions = ["CutoffIcon", "MarriageIcon", "DivorceIcon", "EngagedIcon", "CommittedRelationshipIcon", "LegalSeparationIcon", "SeparationInFactIcon", "NormalIcon", "FocusedOnIcon", "FocusedOnNegativelyIcon"]
     var symptomOptions = ["MaleADAbuseIcon", "MaleADRecoveryIcon", "MaleIllnessIcon", "MaleIllnessRecoveryIcon"]
+
+    static func initialGenogramData() -> [GenogramShape] {
+            return [
+                // Grandparents
+                GenogramShape(id: UUID(), imageName: "MaleIcon", position: CGPoint(x: 100, y: 100)),
+                GenogramShape(id: UUID(), imageName: "FemaleIcon", position: CGPoint(x: 200, y: 100)),
+
+                // Parents (first pair)
+                GenogramShape(id: UUID(), imageName: "MaleIcon", position: CGPoint(x: 100, y: 200)),
+                GenogramShape(id: UUID(), imageName: "FemaleIcon", position: CGPoint(x: 200, y: 200)),
+
+                // Parents (second pair)
+                GenogramShape(id: UUID(), imageName: "MaleIcon", position: CGPoint(x: 300, y: 200)),
+                GenogramShape(id: UUID(), imageName: "FemaleIcon", position: CGPoint(x: 400, y: 200)),
+
+                // Patient
+                GenogramShape(id: UUID(), imageName: "FemaleIcon", position: CGPoint(x: 250, y: 300))
+            ]
+        }
 
     var body: some View {
         VStack {
@@ -34,8 +54,7 @@ struct GenogramBuilder: View {
                                         .background(Color.gray.opacity(0.2))
                                         .cornerRadius(10)
                                         .onTapGesture {
-                                            selectedIcon = imageName
-                                            isSidePanelVisible = true
+                                            handleIconTap(imageName: imageName)
                                         }
                                 }
                             }
@@ -58,8 +77,7 @@ struct GenogramBuilder: View {
                                         .background(Color.gray.opacity(0.2))
                                         .cornerRadius(10)
                                         .onTapGesture {
-                                            selectedIcon = imageName
-                                            isSidePanelVisible = true
+                                            handleIconTap(imageName: imageName)
                                         }
                                 }
                             }
@@ -82,8 +100,7 @@ struct GenogramBuilder: View {
                                         .background(Color.gray.opacity(0.2))
                                         .cornerRadius(10)
                                         .onTapGesture {
-                                            selectedIcon = imageName
-                                            isSidePanelVisible = true
+                                            handleIconTap(imageName: imageName)
                                         }
                                 }
                             }
@@ -163,6 +180,40 @@ struct GenogramBuilder: View {
                 ), isEditable: isEditable)
             }
         }
+        .sheet(isPresented: $isSidePanelVisible) {
+            if let selectedIcon = selectedIcon {
+                SidePanelView(
+                    iconName: selectedIcon,
+                    description: "\(selectedIcon) description",
+                    onClose: {
+                        isSidePanelVisible = false
+                    }
+                )
+            }
+        }
+    }
+
+    private func handleIconTap(imageName: String) {
+        // Increment the counter for the selected icon
+        iconClickCounter[imageName, default: 0] += 1
+
+        // Check if the icon has been clicked once or twice
+        if iconClickCounter[imageName] == 1 {
+            // Show the side panel
+            selectedIcon = imageName
+            isSidePanelVisible = true
+        } else if iconClickCounter[imageName] == 2 {
+            // Insert the icon into the genogram and reset the counter for this icon
+            addIconToGenogram(imageName: imageName)
+            iconClickCounter[imageName] = 0
+            isSidePanelVisible = false
+        }
+    }
+
+    private func addIconToGenogram(imageName: String) {
+        // Add the selected icon to the genogram with a default position
+        let newShape = GenogramShape(id: UUID(), imageName: imageName, position: CGPoint(x: 100, y: 100))
+        genogramData.genogram.append(newShape)
     }
 
     private func moveShape(shape: GenogramShape, newLocation: CGPoint) {
