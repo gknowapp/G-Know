@@ -7,6 +7,9 @@ struct GenogramBuilder: View {
     @State private var activeShape: GenogramShape? = nil
     @State private var showNotesPopup: Bool = false
     @State private var iconClickCounter: [String: Int] = [:] // Tracks how many times each icon has been clicked
+    @State private var showPeopleOptions = false
+    @State private var showRelationshipOptions = false
+    @State private var showSymptomOptions = false
 
     let isEditable: Bool
     var imageOptions = ["MaleIcon", "FemaleIcon", "AbortionIcon", "MiscarriageIcon", "MaleDeathIcon", "FemaleDeathIcon", "UnknownGenderIcon", "PregnancyIcon"]
@@ -32,6 +35,8 @@ struct GenogramBuilder: View {
             ]
         }
 
+    let gridItemLayout = [GridItem(.adaptive(minimum: 50))]
+    
     var body: some View {
         VStack {
             Text("Genogram Builder")
@@ -39,77 +44,71 @@ struct GenogramBuilder: View {
                 .padding()
 
             if isEditable {
-                HStack {
-                    VStack {
-                        Text("People")
-                            .font(.headline)
-
-                        ScrollView(.horizontal) {
-                            HStack {
-                                ForEach(imageOptions, id: \.self) { imageName in
-                                    Image(imageName)
-                                        .resizable()
-                                        .frame(width: 50, height: 50)
-                                        .padding()
-                                        .background(Color.gray.opacity(0.2))
-                                        .cornerRadius(10)
-                                        .onTapGesture {
-                                            handleIconTap(imageName: imageName)
-                                        }
+                            VStack {
+                                DisclosureGroup("People", isExpanded: $showPeopleOptions) {
+                                    LazyVGrid(columns: gridItemLayout) {
+//                                        HStack {
+                                            ForEach(imageOptions, id: \.self) { imageName in
+                                                Image(imageName)
+                                                    .resizable()
+                                                    .frame(width: 50, height: 50)
+                                                    .padding()
+                                                    .background(Color.gray.opacity(0.2))
+                                                    .cornerRadius(10)
+                                                    .onTapGesture {
+                                                        handleIconTap(imageName: imageName)
+                                                    }
+                                            }
+                                        //                                        }
+                                    }
                                 }
-                            }
-                        }
-                    }
+                                .padding()
 
                     Divider()
 
-                    VStack {
-                        Text("Relationships")
-                            .font(.headline)
-
-                        ScrollView(.horizontal) {
-                            HStack {
-                                ForEach(relationshipOptions, id: \.self) { imageName in
-                                    Image(imageName)
-                                        .resizable()
-                                        .frame(width: 50, height: 50)
-                                        .padding()
-                                        .background(Color.gray.opacity(0.2))
-                                        .cornerRadius(10)
-                                        .onTapGesture {
-                                            handleIconTap(imageName: imageName)
-                                        }
-                                }
-                            }
-                        }
-                    }
+                                DisclosureGroup("Relationships", isExpanded: $showRelationshipOptions) {
+                                    LazyVGrid(columns: gridItemLayout) {
+//                                                            HStack {
+                                                                ForEach(relationshipOptions, id: \.self) { imageName in
+                                                                    Image(imageName)
+                                                                        .resizable()
+                                                                        .frame(width: 50, height: 50)
+                                                                        .padding()
+                                                                        .background(Color.gray.opacity(0.2))
+                                                                        .cornerRadius(10)
+                                                                        .onTapGesture {
+                                                                            handleIconTap(imageName: imageName)
+                                                                        }
+                                                                }
+                                        //                                                            }
+                                                        }
+                                                    }
+                                                    .padding()
 
                     Divider()
 
-                    VStack {
-                        Text("Symptoms")
-                            .font(.headline)
-
-                        ScrollView(.horizontal) {
-                            HStack {
-                                ForEach(symptomOptions, id: \.self) { imageName in
-                                    Image(imageName)
-                                        .resizable()
-                                        .frame(width: 50, height: 50)
-                                        .padding()
-                                        .background(Color.gray.opacity(0.2))
-                                        .cornerRadius(10)
-                                        .onTapGesture {
-                                            handleIconTap(imageName: imageName)
-                                        }
-                                }
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .background(Color.gray.opacity(0.3))
-            }
+                                DisclosureGroup("Symptoms", isExpanded: $showSymptomOptions) {
+                                    LazyVGrid(columns: gridItemLayout) {
+//                                                           HStack {
+                                                               ForEach(symptomOptions, id: \.self) { imageName in
+                                                                   Image(imageName)
+                                                                       .resizable()
+                                                                       .frame(width: 50, height: 50)
+                                                                       .padding()
+                                                                       .background(Color.gray.opacity(0.2))
+                                                                       .cornerRadius(10)
+                                                                       .onTapGesture {
+                                                                           handleIconTap(imageName: imageName)
+                                                                       }
+                                                                   //                                                               }
+                                                           }
+                                                       }
+                                                   }
+                                                   .padding()
+                                               }
+                                               .background(Color.gray.opacity(0.3))
+                                               .padding(.horizontal)
+                                           }
 
             ZStack {
                 ForEach(genogramData.genogram) { shape in

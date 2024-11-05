@@ -53,12 +53,12 @@ struct PatientInfoInput: View {
                 
                 if isEditing {
                     VStack(spacing: 10) {
-                        inputField(label: "First Name", text: $firstName)
+                 /*       inputField(label: "First Name", text: $firstName)
                             .padding(.horizontal, 30)
                             .padding(.top, 10)
                             .font(.title2)
                             .foregroundColor(Color("Candace's Couch"))
-                        Divider()
+                        Divider() */
                         inputField(label: "Middle Name", text: $middleName)
                             .padding(.horizontal, 30)
                             .font(.title2)
@@ -83,7 +83,7 @@ struct PatientInfoInput: View {
                             .padding(.horizontal, 30)
                             .font(.title2)
                             .foregroundColor(Color("Candace's Couch"))
-                        Divider()
+                        /*Divider()*/
                     }
                     //.frame(width: nil, height: nil , alignment: .leading)
                     .background(Color ("Anti-flash White"))
