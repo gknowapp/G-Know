@@ -94,7 +94,7 @@ struct HomePage: View {
                 Alert(
                     title: Text("Disclaimer"),
                     message: Text("The information provided by the GKnow app is for educational and informational purposes only. It is not a substitute for professional advice, diagnosis, or treatment. The app does not account for the full complexity of individual cases, and any insights offered should be considered as general patterns, rather than specific indicators of personal circumstances."),
-                    dismissButton: .default(Text("I understand.")) {
+                    dismissButton: .default(Text("I understand")) {
                         showAlert = false // Dismiss the alert when the button is pressed
                     }
                 )

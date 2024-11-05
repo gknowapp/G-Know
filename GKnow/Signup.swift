@@ -40,6 +40,7 @@ struct Signup: View {
                     .font(.headline)
                     .foregroundColor(.blue)
                     .padding()
+                    .padding(.top, 10)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
