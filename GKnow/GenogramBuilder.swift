@@ -44,7 +44,7 @@ struct GenogramBuilder: View {
                 .padding()
 
             if isEditable {
-                            VStack {
+                            HStack {
                                 DisclosureGroup("People", isExpanded: $showPeopleOptions) {
                                     LazyVGrid(columns: gridItemLayout) {
 //                                        HStack {
