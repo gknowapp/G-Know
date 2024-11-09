@@ -1,4 +1,5 @@
 import SwiftUI
+import PencilKit
 
 struct GenogramBuilder: View {
     @Binding var genogramData: GenogramData
@@ -6,37 +7,19 @@ struct GenogramBuilder: View {
     @Binding var isSidePanelVisible: Bool
     @State private var activeShape: GenogramShape? = nil
     @State private var showNotesPopup: Bool = false
-    @State private var iconClickCounter: [String: Int] = [:] // Tracks how many times each icon has been clicked
+    @State private var iconClickCounter: [String: Int] = [:]
     @State private var showPeopleOptions = false
     @State private var showRelationshipOptions = false
     @State private var showSymptomOptions = false
+    @State private var showDrawingCanvas: Bool = false // State for showing the drawing canvas
+    @State private var canvasView = PKCanvasView() // PencilKit canvas view
+    @State private var savedDrawing = PKDrawing() // Stores the drawing to display it after exiting
 
     let isEditable: Bool
     var imageOptions = ["MaleIcon", "FemaleIcon", "AbortionIcon", "MiscarriageIcon", "MaleDeathIcon", "FemaleDeathIcon", "UnknownGenderIcon", "PregnancyIcon"]
     var relationshipOptions = ["CutoffIcon", "MarriageIcon", "DivorceIcon", "EngagedIcon", "CommittedRelationshipIcon", "LegalSeparationIcon", "SeparationInFactIcon", "NormalIcon", "FocusedOnIcon", "FocusedOnNegativelyIcon"]
     var symptomOptions = ["MaleADAbuseIcon", "MaleADRecoveryIcon", "MaleIllnessIcon", "MaleIllnessRecoveryIcon"]
 
-    static func initialGenogramData() -> [GenogramShape] {
-            return [
-                // Grandparents
-                GenogramShape(id: UUID(), imageName: "MaleIcon", position: CGPoint(x: 100, y: 100)),
-                GenogramShape(id: UUID(), imageName: "FemaleIcon", position: CGPoint(x: 200, y: 100)),
-
-                // Parents (first pair)
-                GenogramShape(id: UUID(), imageName: "MaleIcon", position: CGPoint(x: 100, y: 200)),
-                GenogramShape(id: UUID(), imageName: "FemaleIcon", position: CGPoint(x: 200, y: 200)),
-
-                // Parents (second pair)
-                GenogramShape(id: UUID(), imageName: "MaleIcon", position: CGPoint(x: 300, y: 200)),
-                GenogramShape(id: UUID(), imageName: "FemaleIcon", position: CGPoint(x: 400, y: 200)),
-
-                // Patient
-                GenogramShape(id: UUID(), imageName: "FemaleIcon", position: CGPoint(x: 250, y: 300))
-            ]
-        }
-
-    let gridItemLayout = [GridItem(.adaptive(minimum: 50))]
-    
     var body: some View {
         VStack {
             Text("Genogram Builder")
@@ -44,73 +27,73 @@ struct GenogramBuilder: View {
                 .padding()
 
             if isEditable {
-                            HStack {
-                                DisclosureGroup("People", isExpanded: $showPeopleOptions) {
-                                    LazyVGrid(columns: gridItemLayout) {
-//                                        HStack {
-                                            ForEach(imageOptions, id: \.self) { imageName in
-                                                Image(imageName)
-                                                    .resizable()
-                                                    .frame(width: 50, height: 50)
-                                                    .padding()
-                                                    .background(Color.gray.opacity(0.2))
-                                                    .cornerRadius(10)
-                                                    .onTapGesture {
-                                                        handleIconTap(imageName: imageName)
-                                                    }
-                                            }
-                                        //                                        }
+                HStack {
+                    DisclosureGroup("People", isExpanded: $showPeopleOptions) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
+                            ForEach(imageOptions, id: \.self) { imageName in
+                                Image(imageName)
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .onTapGesture {
+                                        handleIconTap(imageName: imageName)
                                     }
-                                }
-                                .padding()
+                            }
+                        }
+                    }
+                    .padding()
 
                     Divider()
 
-                                DisclosureGroup("Relationships", isExpanded: $showRelationshipOptions) {
-                                    LazyVGrid(columns: gridItemLayout) {
-//                                                            HStack {
-                                                                ForEach(relationshipOptions, id: \.self) { imageName in
-                                                                    Image(imageName)
-                                                                        .resizable()
-                                                                        .frame(width: 50, height: 50)
-                                                                        .padding()
-                                                                        .background(Color.gray.opacity(0.2))
-                                                                        .cornerRadius(10)
-                                                                        .onTapGesture {
-                                                                            handleIconTap(imageName: imageName)
-                                                                        }
-                                                                }
-                                        //                                                            }
-                                                        }
-                                                    }
-                                                    .padding()
+                    DisclosureGroup("Relationships", isExpanded: $showRelationshipOptions) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
+                            ForEach(relationshipOptions, id: \.self) { imageName in
+                                Image(imageName)
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .onTapGesture {
+                                        handleIconTap(imageName: imageName)
+                                    }
+                            }
+                        }
+                    }
+                    .padding()
 
                     Divider()
 
-                                DisclosureGroup("Symptoms", isExpanded: $showSymptomOptions) {
-                                    LazyVGrid(columns: gridItemLayout) {
-//                                                           HStack {
-                                                               ForEach(symptomOptions, id: \.self) { imageName in
-                                                                   Image(imageName)
-                                                                       .resizable()
-                                                                       .frame(width: 50, height: 50)
-                                                                       .padding()
-                                                                       .background(Color.gray.opacity(0.2))
-                                                                       .cornerRadius(10)
-                                                                       .onTapGesture {
-                                                                           handleIconTap(imageName: imageName)
-                                                                       }
-                                                                   //                                                               }
-                                                           }
-                                                       }
-                                                   }
-                                                   .padding()
-                                               }
-                                               .background(Color.gray.opacity(0.3))
-                                               .padding(.horizontal)
-                                           }
+                    DisclosureGroup("Symptoms", isExpanded: $showSymptomOptions) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
+                            ForEach(symptomOptions, id: \.self) { imageName in
+                                Image(imageName)
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .onTapGesture {
+                                        handleIconTap(imageName: imageName)
+                                    }
+                            }
+                        }
+                    }
+                    .padding()
+                }
+                .background(Color.gray.opacity(0.3))
+                .padding(.horizontal)
+            }
 
             ZStack {
+                // Display the saved drawing as a background image
+                CanvasView(canvasView: $canvasView, drawing: $savedDrawing, isDrawing: $showDrawingCanvas)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.clear)
+                    .border(Color.gray, width: 2)
+
                 ForEach(genogramData.genogram) { shape in
                     Image(shape.imageName)
                         .resizable()
@@ -160,6 +143,22 @@ struct GenogramBuilder: View {
                     }
                 }
             }
+
+            // Button to toggle the drawing mode
+            if isEditable {
+                Button(action: {
+                    if showDrawingCanvas {
+                        savedDrawing = canvasView.drawing // Save the current drawing
+                    }
+                    showDrawingCanvas.toggle()
+                }) {
+                    Text(showDrawingCanvas ? "Exit Drawing" : "Draw")
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+            }
         }
         .padding()
         .sheet(isPresented: $showNotesPopup) {
@@ -193,16 +192,11 @@ struct GenogramBuilder: View {
     }
 
     private func handleIconTap(imageName: String) {
-        // Increment the counter for the selected icon
         iconClickCounter[imageName, default: 0] += 1
-
-        // Check if the icon has been clicked once or twice
         if iconClickCounter[imageName] == 1 {
-            // Show the side panel
             selectedIcon = imageName
             isSidePanelVisible = true
         } else if iconClickCounter[imageName] == 2 {
-            // Insert the icon into the genogram and reset the counter for this icon
             addIconToGenogram(imageName: imageName)
             iconClickCounter[imageName] = 0
             isSidePanelVisible = false
@@ -210,7 +204,6 @@ struct GenogramBuilder: View {
     }
 
     private func addIconToGenogram(imageName: String) {
-        // Add the selected icon to the genogram with a default position
         let newShape = GenogramShape(id: UUID(), imageName: imageName, position: CGPoint(x: 100, y: 100))
         genogramData.genogram.append(newShape)
     }
@@ -229,32 +222,53 @@ struct GenogramBuilder: View {
     }
 }
 
+// A separate view to handle the PencilKit canvas
+struct CanvasView: UIViewRepresentable {
+    @Binding var canvasView: PKCanvasView
+    @Binding var drawing: PKDrawing
+    @Binding var isDrawing: Bool
+
+    func makeUIView(context: Context) -> PKCanvasView {
+        canvasView.drawingPolicy = .anyInput
+        canvasView.backgroundColor = UIColor.clear
+        canvasView.drawing = drawing // Load the saved drawing
+        return canvasView
+    }
+
+    func updateUIView(_ uiView: PKCanvasView, context: Context) {
+        if !isDrawing {
+            // Update the saved drawing if exiting drawing mode
+            drawing = uiView.drawing
+        }
+    }
+}
+
 // Model to represent each shape with an image and notes
 struct GenogramShape: Identifiable {
     var id: UUID
     var imageName: String
     var position: CGPoint
-    var notes: String = "" // Optional notes for each shape
+    var notes: String = ""
 }
 
 struct GenogramData {
-    var genogram: [GenogramShape] // The collection of shapes in the genogram
+    var genogram: [GenogramShape]
 }
 
 // View for editing notes for a selected shape in the genogram
 struct NotesPopupView: View {
-    @Binding var shape: GenogramShape // Binding to the selected shape
-    var isEditable: Bool // Whether the notes can be edited
+    @Binding var shape: GenogramShape
+    var isEditable: Bool
 
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Notes")) {
                     if isEditable {
-                        TextEditor(text: $shape.notes) // TextEditor for editable notes
+                        TextEditor(text: $shape.notes)
                             .frame(height: 200)
                     } else {
-                        Text(shape.notes) // Display notes if not editable
+                        Text(shape.notes)
                             .frame(height: 200)
                     }
                 }
@@ -266,3 +280,4 @@ struct NotesPopupView: View {
         }
     }
 }
+
