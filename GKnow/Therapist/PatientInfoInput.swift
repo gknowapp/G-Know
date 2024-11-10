@@ -138,9 +138,11 @@ struct PatientInfoInput: View {
                         }
                         .padding(.bottom, 40)
                         .shadow(radius: 5)
+                        
                     }
                         
                 }
+                
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color ("Dark Green"))
@@ -149,8 +151,8 @@ struct PatientInfoInput: View {
             .cornerRadius(20)
             .shadow(radius: 20)
         }
-        
     }
+    
         
 
     private func inputField(label: String, text: Binding<String>) -> some View {

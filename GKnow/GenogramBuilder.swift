@@ -38,159 +38,209 @@ struct GenogramBuilder: View {
     let gridItemLayout = [GridItem(.adaptive(minimum: 50))]
     
     var body: some View {
-        VStack {
-            Text("Genogram Builder")
-                .font(.largeTitle)
-                .padding()
-
-            if isEditable {
-                            HStack {
-                                DisclosureGroup("People", isExpanded: $showPeopleOptions) {
-                                    LazyVGrid(columns: gridItemLayout) {
-//                                        HStack {
-                                            ForEach(imageOptions, id: \.self) { imageName in
-                                                Image(imageName)
-                                                    .resizable()
-                                                    .frame(width: 50, height: 50)
-                                                    .padding()
-                                                    .background(Color.gray.opacity(0.2))
-                                                    .cornerRadius(10)
-                                                    .onTapGesture {
-                                                        handleIconTap(imageName: imageName)
-                                                    }
+        ZStack {
+            VStack {
+                /*Text("Genogram Builder")
+                 .font(.largeTitle)
+                 .padding()*/
+                if isEditable {
+                    HStack(alignment: .top){
+                        Spacer()
+                        Spacer()
+                        HStack {
+                            DisclosureGroup("People", isExpanded: $showPeopleOptions) {
+                                LazyVGrid(columns: gridItemLayout) {
+                                    //                                        HStack {
+                                    ForEach(imageOptions, id: \.self) { imageName in
+                                        Image(imageName)
+                                            .resizable()
+                                            .frame(width: 50, height: 50)
+                                            .padding()
+                                            .cornerRadius(10)
+                                            .onTapGesture {
+                                                handleIconTap(imageName: imageName)
                                             }
-                                        //                                        }
                                     }
+                                    //                                        }
                                 }
-                                .padding()
-
-                    Divider()
-
-                                DisclosureGroup("Relationships", isExpanded: $showRelationshipOptions) {
-                                    LazyVGrid(columns: gridItemLayout) {
-//                                                            HStack {
-                                                                ForEach(relationshipOptions, id: \.self) { imageName in
-                                                                    Image(imageName)
-                                                                        .resizable()
-                                                                        .frame(width: 50, height: 50)
-                                                                        .padding()
-                                                                        .background(Color.gray.opacity(0.2))
-                                                                        .cornerRadius(10)
-                                                                        .onTapGesture {
-                                                                            handleIconTap(imageName: imageName)
-                                                                        }
-                                                                }
-                                        //                                                            }
-                                                        }
-                                                    }
-                                                    .padding()
-
-                    Divider()
-
-                                DisclosureGroup("Symptoms", isExpanded: $showSymptomOptions) {
-                                    LazyVGrid(columns: gridItemLayout) {
-//                                                           HStack {
-                                                               ForEach(symptomOptions, id: \.self) { imageName in
-                                                                   Image(imageName)
-                                                                       .resizable()
-                                                                       .frame(width: 50, height: 50)
-                                                                       .padding()
-                                                                       .background(Color.gray.opacity(0.2))
-                                                                       .cornerRadius(10)
-                                                                       .onTapGesture {
-                                                                           handleIconTap(imageName: imageName)
-                                                                       }
-                                                                   //                                                               }
-                                                           }
-                                                       }
-                                                   }
-                                                   .padding()
-                                               }
-                                               .background(Color.gray.opacity(0.3))
-                                               .padding(.horizontal)
-                                           }
-
-            ZStack {
-                ForEach(genogramData.genogram) { shape in
-                    Image(shape.imageName)
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                        .position(x: shape.position.x, y: shape.position.y)
-                        .gesture(
-                            DragGesture()
-                                .onChanged { value in
-                                    if isEditable {
-                                        moveShape(shape: shape, newLocation: value.location)
-                                    }
-                                }
-                        )
-                        .onTapGesture {
-                            activeShape = shape
-                        }
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.gray.opacity(0.1))
-            .border(Color.gray, width: 2)
-
-            Spacer()
-
-            if let selectedShape = activeShape {
-                HStack {
-                    Button(action: {
-                        showNotesPopup = true
-                    }) {
-                        Text("Notes")
+                            }
                             .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                            .foregroundStyle(Color("Candace's Couch"))
+                            .frame(width: 320, height: 75)
+                            
+                            Divider()
+                            
+                            DisclosureGroup("Relationships", isExpanded: $showRelationshipOptions) {
+                                LazyVGrid(columns: gridItemLayout) {
+                                    //                                                            HStack {
+                                    ForEach(relationshipOptions, id: \.self) { imageName in
+                                        Image(imageName)
+                                            .resizable()
+                                            .frame(width: 50, height: 50)
+                                            .padding()
+                                            .cornerRadius(10)
+                                            .onTapGesture {
+                                                handleIconTap(imageName: imageName)
+                                            }
+                                    }
+                                    //                                                            }
+                                }
+                            }
+                            .padding()
+                            .foregroundStyle(Color("Candace's Couch"))
+                            .frame(width: 430, height: 75)
+                            
+                            Divider()
+                            
+                            DisclosureGroup("Symptoms", isExpanded: $showSymptomOptions) {
+                                LazyVGrid(columns: gridItemLayout) {
+                                    //                                                           HStack {
+                                    ForEach(symptomOptions, id: \.self) { imageName in
+                                        Image(imageName)
+                                            .resizable()
+                                            .frame(width: 50, height: 50)
+                                            .padding()
+                                            .cornerRadius(10)
+                                            .onTapGesture {
+                                                handleIconTap(imageName: imageName)
+                                            }
+                                        //                                                               }
+                                    }
+                                }
+                                
+                            }
+                            .padding()
+                            .foregroundStyle(Color("Candace's Couch"))
+                            .frame(width: 270, height: 75)
+                        }
+                        .background(Color("Light Green"))
+                        .frame(height: 75)
+                        //.padding(.horizontal)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .padding(.top, 40)
+                        .shadow(radius: 10)
+                        
+                        
+                        
+                        Spacer()
+                        
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color("Anti-flash White"))
+                            .frame(width: 75, height: 200)
+                            .padding(.trailing, 50)
+                            .padding(.top, 40)
+                            .shadow(radius: 5, x:4, y:2)
+                        
+                        
                     }
-
-                    if isEditable {
+                    
+                }
+                
+                
+                ZStack {
+                    ForEach(genogramData.genogram) { shape in
+                        Image(shape.imageName)
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                            .position(x: shape.position.x, y: shape.position.y)
+                            .gesture(
+                                DragGesture()
+                                    .onChanged { value in
+                                        if isEditable {
+                                            moveShape(shape: shape, newLocation: value.location)
+                                        }
+                                    }
+                            )
+                            .onTapGesture {
+                                activeShape = shape
+                            }
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color("White"))
+                //.border(Color.gray, width: 2)
+                
+                Spacer()
+                
+                if let selectedShape = activeShape {
+                    HStack {
                         Button(action: {
-                            deleteActiveShape()
+                            showNotesPopup = true
                         }) {
-                            Text("Delete")
+                            Text("Notes")
                                 .padding()
-                                .background(Color.red)
+                                .background(Color.blue)
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         }
+                        
+                        if isEditable {
+                            Button(action: {
+                                deleteActiveShape()
+                            }) {
+                                Text("Delete")
+                                    .padding()
+                                    .background(Color.red)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
+                            }
+                        }
                     }
+                }
+                
+                //Spacer()
+                
+                HStack {
+                    Rectangle()
+                        .frame(width: 1400, height: 74)
+                        .foregroundColor(Color("Anti-flash White"))
+                    //.ignoresSafeArea()
+                        .foregroundStyle(
+                            .shadow(.inner(color: .black, radius: 10, x: 1, y: 4)))
+                        .border(Color.black.opacity(0.3), width: 2)
                 }
             }
         }
-        .padding()
-        .sheet(isPresented: $showNotesPopup) {
-            if let shape = activeShape {
-                NotesPopupView(shape: Binding(
-                    get: {
-                        if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
-                            return genogramData.genogram[index]
+            
+            
+            
+            .padding(.top)
+            .sheet(isPresented: $showNotesPopup) {
+                if let shape = activeShape {
+                    NotesPopupView(shape: Binding(
+                        get: {
+                            if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
+                                return genogramData.genogram[index]
+                            }
+                            return shape
+                        },
+                        set: { updatedShape in
+                            if let index = genogramData.genogram.firstIndex(where: { $0.id == updatedShape.id }) {
+                                genogramData.genogram[index] = updatedShape
+                            }
                         }
-                        return shape
-                    },
-                    set: { updatedShape in
-                        if let index = genogramData.genogram.firstIndex(where: { $0.id == updatedShape.id }) {
-                            genogramData.genogram[index] = updatedShape
+                    ), isEditable: isEditable)
+                }
+            }
+            .sheet(isPresented: $isSidePanelVisible) {
+                if let selectedIcon = selectedIcon {
+                    SidePanelView(
+                        iconName: selectedIcon,
+                        description: "\(selectedIcon) description",
+                        onClose: {
+                            isSidePanelVisible = false
                         }
-                    }
-                ), isEditable: isEditable)
+                        
+                    )
+                }
+                
             }
+            .frame(minWidth: 1366, minHeight: 1024)
+            .background(Color("White"))
+            //.presentationSizing(.fitted)
         }
-        .sheet(isPresented: $isSidePanelVisible) {
-            if let selectedIcon = selectedIcon {
-                SidePanelView(
-                    iconName: selectedIcon,
-                    description: "\(selectedIcon) description",
-                    onClose: {
-                        isSidePanelVisible = false
-                    }
-                )
-            }
-        }
-    }
+    
+        
 
     private func handleIconTap(imageName: String) {
         // Increment the counter for the selected icon
@@ -227,7 +277,9 @@ struct GenogramBuilder: View {
             self.activeShape = nil
         }
     }
+        
 }
+
 
 // Model to represent each shape with an image and notes
 struct GenogramShape: Identifiable {
