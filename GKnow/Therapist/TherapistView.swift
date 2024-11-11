@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct TherapistView: View {
+    //@Binding var isTherapistView: Bool
     @StateObject private var patientDataService = PatientDataService()
     @State private var showNewPatientView = false
     

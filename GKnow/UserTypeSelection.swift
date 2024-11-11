@@ -5,6 +5,7 @@ import SwiftUI
 struct UserTypeSelection: View {
     @State private var navigateToTherapist: Bool = false
     @State private var navigateToClientCode: Bool = false
+    //@Binding var isTherapistView: Bool
     
     var body: some View {
         NavigationStack {

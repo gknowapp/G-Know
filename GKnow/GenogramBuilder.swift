@@ -16,9 +16,19 @@ struct GenogramBuilder: View {
     @State private var savedDrawing = PKDrawing() // Stores the drawing to display it after exiting
     
     let isEditable: Bool
-    var imageOptions = ["MaleIcon", "FemaleIcon", "AbortionIcon", "MiscarriageIcon", "MaleDeathIcon", "FemaleDeathIcon", "UnknownGenderIcon", "PregnancyIcon"]
-    var relationshipOptions = ["CutoffIcon", "MarriageIcon", "DivorceIcon", "EngagedIcon", "CommittedRelationshipIcon", "LegalSeparationIcon", "SeparationInFactIcon", "NormalIcon", "FocusedOnIcon", "FocusedOnNegativelyIcon"]
-    var symptomOptions = ["MaleADAbuseIcon", "MaleADRecoveryIcon", "MaleIllnessIcon", "MaleIllnessRecoveryIcon"]
+    var imageOptions = ["AbortionIcon", "MiscarriageIcon", "MaleDeathIcon", "FemaleDeathIcon"]
+    var imageOptionsLabel = ["MaleIcon", "FemaleIcon", "UnknownGenderIcon", "PregnancyIcon"]
+    var relationshipOptions = ["MarriageIcon", "EngagedIcon", "CommittedRelationshipIcon", "LegalSeparationIcon", "SeparationInFactIcon"]
+    var relationshipOptionsLabel = ["CutoffIcon", "DivorceIcon", "FocusedOnIcon", "NormalIcon", "FocusedOnNegativelyIcon"]
+    var symptomOptions = ["MaleADRecoveryIcon", "MaleIllnessRecoveryIcon", "MaleIllnessRecoveryIcon"]
+    var symptomOptionsLabel = ["MaleADAbuseIcon", "MaleIllnessIcon", "MaleIllnessRecoveryIcon"]
+    
+    @Environment(\.dismiss) var dismiss
+    //@Binding var isTherapistView: Bool
+    @State private var showTherapistView = false
+    @State private var navigateToTherapist = false
+    //@State private var isExpanded = false
+
     
     var body: some View {
         ZStack {
@@ -31,89 +41,229 @@ struct GenogramBuilder: View {
                         Spacer()
                         Spacer()
                         HStack {
-                            DisclosureGroup("People", isExpanded: $showPeopleOptions) {
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
-                                    //                                        HStack {
-                                    ForEach(imageOptions, id: \.self) { imageName in
-                                        Image(imageName)
-                                            .resizable()
-                                            .frame(width: 50, height: 50)
-                                            .padding()
-                                            .cornerRadius(10)
-                                            .onTapGesture {
-                                                handleIconTap(imageName: imageName)
-                                            }
+                            
+                            DisclosureGroup(
+                                content: {
+                                    HStack {
+                                        //                                        HStack {
+                                        ForEach(imageOptions, id: \.self) { imageName in
+                                            Image(imageName)
+                                                .resizable()
+                                                .frame(width: 50, height: 50)
+                                                .padding(.horizontal, 5)
+                                                .padding(.vertical, 10)
+                                                .cornerRadius(10)
+                                                .onTapGesture {
+                                                    handleIconTap(imageName: imageName)
+                                                }
+                                        }
+                                        //                                        }
                                     }
-                                    //                                        }
+                                    .padding(.trailing, 35)
+                                },
+                                label: {
+                                    HStack {
+                                        ForEach(imageOptionsLabel, id: \.self) { imageName in
+                                            
+                                            Image(imageName)
+                                                .resizable()
+                                                .frame(width: 50, height: 50)
+                                                .padding(.horizontal, 5)
+                                            //.padding(.leading, 50)
+                                                .cornerRadius(10)
+                                                .onTapGesture {
+                                                    handleIconTap(imageName: imageName)
+                                                }
+                                        }
+                                    }
                                 }
-                            }
-                            .padding()
+                            )
+                            /*DisclosureGroup("People", isExpanded: $showPeopleOptions) {
+                             LazyVGrid(columns: column3) {
+                             //                                        HStack {
+                             ForEach(imageOptions, id: \.self) { imageName in
+                             Image(imageName)
+                             .resizable()
+                             .frame(width: 50, height: 50)
+                             .padding()
+                             .cornerRadius(10)
+                             .onTapGesture {
+                             handleIconTap(imageName: imageName)
+                             }
+                             }
+                             //                                        }
+                             }
+                             }*/
+                            .padding(.leading, 15)
+                            .padding(.trailing, 5)
+                            .accentColor(Color("Candace's Couch"))
                             .foregroundStyle(Color("Candace's Couch"))
-                            .frame(width: 320, height: 75)
+                            .frame(width: 320)
                             
                             Divider()
-                            
-                            DisclosureGroup("Relationships", isExpanded: $showRelationshipOptions) {
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
-                                    ForEach(relationshipOptions, id: \.self) { imageName in
-                                        Image(imageName)
-                                            .resizable()
-                                            .frame(width: 50, height: 50)
-                                            .padding()
-                                            .cornerRadius(10)
-                                            .onTapGesture {
-                                                handleIconTap(imageName: imageName)
-                                            }
+                            DisclosureGroup(
+                                content: {
+                                    HStack {
+                                        ForEach(relationshipOptions, id: \.self) { imageName in
+                                            Image(imageName)
+                                                .resizable()
+                                                .frame(width: 50, height: 50)
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 10)
+                                                .cornerRadius(10)
+                                                .onTapGesture {
+                                                    handleIconTap(imageName: imageName)
+                                                }
+                                        }
+                                    }
+                                    .padding(.trailing, 27)
+                                },
+                                label: {
+                                    HStack {
+                                        ForEach(relationshipOptionsLabel, id: \.self) { imageName in
+                                            Image(imageName)
+                                                .resizable()
+                                                .frame(width: 50, height: 50)
+                                                .padding(.horizontal, 10)
+                                                .cornerRadius(10)
+                                                .onTapGesture {
+                                                    
+                                                    handleIconTap(imageName: imageName)
+                                                }
+                                            
+                                        }
                                     }
                                 }
-                            }
-                            .padding()
+                            )
+                            
+                            /*DisclosureGroup("Relationships", isExpanded: $showRelationshipOptions) {
+                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
+                             ForEach(relationshipOptions, id: \.self) { imageName in
+                             Image(imageName)
+                             .resizable()
+                             .frame(width: 50, height: 50)
+                             .padding()
+                             .cornerRadius(10)
+                             .onTapGesture {
+                             handleIconTap(imageName: imageName)
+                             }
+                             }
+                             }
+                             }*/
+                            .padding(.leading, 15)
+                            .padding(.trailing, 5)
+                            .accentColor(Color("Candace's Couch"))
                             .foregroundStyle(Color("Candace's Couch"))
-                            .frame(width: 430, height: 75)
+                            .frame(width: 430)
                             
                             Divider()
-                            
-                            DisclosureGroup("Symptoms", isExpanded: $showSymptomOptions) {
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
-                                    ForEach(symptomOptions, id: \.self) { imageName in
-                                        Image(imageName)
-                                            .resizable()
-                                            .frame(width: 50, height: 50)
-                                            .padding()
-                                            .cornerRadius(10)
-                                            .onTapGesture {
-                                                handleIconTap(imageName: imageName)
-                                            }
+                            DisclosureGroup(
+                                content: {
+                                    HStack {
+                                        ForEach(symptomOptions, id: \.self) { imageName in
+                                            Image(imageName)
+                                                .resizable()
+                                                .frame(width: 50, height: 50)
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 10)
+                                                .cornerRadius(10)
+                                                .onTapGesture {
+                                                    handleIconTap(imageName: imageName)
+                                                }
+                                        }
+                                    }
+                                    .padding(.trailing, 20)
+                                },
+                                label: {
+                                    HStack {
+                                        ForEach(symptomOptionsLabel, id: \.self) { imageName in
+                                            Image(imageName)
+                                                .resizable()
+                                                .frame(width: 50, height: 50)
+                                                .padding(.horizontal, 10)
+                                                .cornerRadius(10)
+                                                .onTapGesture {
+                                                    handleIconTap(imageName: imageName)
+                                                }
+                                            
+                                        }
                                     }
                                 }
-                            }
-                            .padding()
+                            )
+                            /*DisclosureGroup("Symptoms", isExpanded: $showSymptomOptions) {
+                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
+                             ForEach(symptomOptions, id: \.self) { imageName in
+                             Image(imageName)
+                             .resizable()
+                             .frame(width: 50, height: 50)
+                             .padding()
+                             .cornerRadius(10)
+                             .onTapGesture {
+                             handleIconTap(imageName: imageName)
+                             }
+                             }
+                             }
+                             }*/
+                            .padding(.leading, 10)
+                            .padding(.trailing, 15)
+                            .accentColor(Color("Candace's Couch"))
                             .foregroundStyle(Color("Candace's Couch"))
-                            .frame(width: 270, height: 75)
+                            .frame(width: 270)
+                            
+                            
                         }
                         .background(Color("Light Green"))
-                        .frame(height: 75)
+                        .frame(minHeight: 75, maxHeight: 150)
                         //.padding(.horizontal)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .padding(.top, 40)
-                        .shadow(radius: 10)
+                        .shadow(radius: 10, x:2, y:4)
+                        
+                        
                         
                         
                         Spacer()
-                        
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color("Anti-flash White"))
-                            .frame(width: 75, height: 200)
-                            .padding(.trailing, 50)
-                            .padding(.top, 40)
-                            .shadow(radius: 5, x:4, y:2)
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color("Anti-flash White"))
+                                    .frame(width: 75, height: 200)
+                                    .padding(.trailing, 50)
+                                    .padding(.top, 40)
+                                    .shadow(radius: 5, x:4, y:2)
+                                VStack {
+                                    // Redo Button
+                                    Button(action: {
+                                        
+                                    }) {
+                                        Image(systemName: "arrowshape.turn.up.right.fill")
+                                            .resizable()
+                                            .frame(width: 30, height: 30)
+                                            .foregroundColor(Color("Candace's Couch"))
+                                            .padding()
+                                            .padding(.top, 35)
+                                            .padding(.trailing, 45)
+                                    }
+                                   
+                                    // Undo Button
+                                    Button(action: {
+                                        
+                                    }) {
+                                        Image(systemName: "arrowshape.turn.up.left.fill")
+                                            .resizable()
+                                            .frame(width: 30, height: 30)
+                                            .foregroundColor(Color("Candace's Couch"))
+                                            .padding()
+                                            .padding(.top, 15)
+                                            .padding(.trailing, 50)
+                                    }
+                                }
+                            }
                     }
                     ZStack {
                         // Display the saved drawing as a background image
                         CanvasView(canvasView: $canvasView, drawing: $savedDrawing, isDrawing: $showDrawingCanvas)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .background(Color.clear)
-                        //.border(Color.gray, width: 2)
                         
                         ForEach(genogramData.genogram) { shape in
                             Image(shape.imageName)
@@ -159,19 +309,46 @@ struct GenogramBuilder: View {
                                     .shadow(.inner(color: .black, radius: 10, x: 1, y: 4)))
                                 .border(Color.black.opacity(0.3), width: 2)
                         }
-                        // Button to toggle the drawing mode
-                        if isEditable {
-                            Button(action: {
-                                if showDrawingCanvas {
-                                    savedDrawing = canvasView.drawing // Save the current drawing
+                        HStack {
+                            //NavigationStack{
+                                // Button to take you back to patient page
+                                HStack{
+                                    Button(action: { showTherapistView = true
+                                        dismiss()
+                                        //dismiss() // Dismiss the view
+                                        //isTherapistView = true // Update isHome to trigger navigation back home
+                                        navigateToTherapist = true
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "house.fill")
+                                                .resizable()
+                                                .frame(width:35, height:30)
+                                                .foregroundColor(Color("Candace's Couch"))
+                                                .padding(.leading, 40)
+                                        }
+                                    }}
+                                //.frame(maxWidth: .infinity, alignment: .leading)
+                                //.navigationDestination(isPresented: $showTherapistView) {TherapistView()}}
+                                /*NavigationLink(destination: TherapistView(), isActive: $navigateToTherapist) {
+                                    EmptyView() // Hidden link
+                                }*/
+                            //}
+                            Spacer()
+                            // Button to toggle the drawing mode
+                            if isEditable {
+                                Button(action: {
+                                    if showDrawingCanvas {
+                                        savedDrawing = canvasView.drawing // Save the current drawing
+                                    }
+                                    showDrawingCanvas.toggle()
+                                }) {
+                                    
+                                    Image(systemName: showDrawingCanvas ? "xmark.circle" : "pencil")
+                                        .resizable()
+                                        .frame(width:30, height:30)
+                                        .foregroundColor(Color("Candace's Couch"))
+                                        .padding(.trailing, 40)
                                 }
-                                showDrawingCanvas.toggle()
-                            }) {
-                                Text(showDrawingCanvas ? "Exit Drawing" : "Draw")
-                                    .padding()
-                                    .background(Color.green)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
                             }
                         }
                     }
@@ -345,3 +522,44 @@ struct NotesPopupView: View {
     }
 }
 
+struct DemoDisclosureGroups: View {
+    let items: [Bookmark] = [.example1, .example2, .example3]
+    @State private var flags: [Bool] = [false, false, false]
+
+    var body: some View {
+        List {
+            ForEach(Array(items.enumerated()), id: \.1.id) { i, group in
+                DisclosureGroup(isExpanded: $flags[i]) {
+                    ForEach(group.items ?? []) { item in
+                        Label(item.name, systemImage: item.icon)
+                    }
+                } label: {
+                    Label(group.name, systemImage: group.icon)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation {
+                                self.flags[i].toggle()
+                            }
+                        }
+                }
+            }
+        }
+    }
+}
+struct Bookmark: Identifiable {
+    let id = UUID()
+    let name: String
+    let icon: String
+    var items: [Bookmark]?
+
+    // some example websites
+    static let apple = Bookmark(name: "Apple", icon: "1.circle")
+    static let bbc = Bookmark(name: "BBC", icon: "square.and.pencil")
+    static let swift = Bookmark(name: "Swift", icon: "bolt.fill")
+    static let twitter = Bookmark(name: "Twitter", icon: "mic")
+
+    // some example groups
+    static let example1 = Bookmark(name: "Favorites", icon: "star", items: [Bookmark.apple, Bookmark.bbc, Bookmark.swift, Bookmark.twitter])
+    static let example2 = Bookmark(name: "Recent", icon: "timer", items: [Bookmark.apple, Bookmark.bbc, Bookmark.swift, Bookmark.twitter])
+    static let example3 = Bookmark(name: "Recommended", icon: "hand.thumbsup", items: [Bookmark.apple, Bookmark.bbc, Bookmark.swift, Bookmark.twitter])
+}

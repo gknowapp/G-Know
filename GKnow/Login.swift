@@ -24,6 +24,8 @@ struct Login: View {
         .resizable()
     
     let GKnowLogo = Image("GKnow Logo")
+    
+    //@Binding var isTherapistView: Bool
 
     var body: some View {
         NavigationStack {

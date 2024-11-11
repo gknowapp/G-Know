@@ -18,6 +18,8 @@ struct HomePage: View {
     
     let GKnowLogo = Image("GKnow Logo")
     
+    //@Binding var isTherapistView: Bool
+    
     
     var body: some View {
         ZStack {
@@ -86,6 +88,7 @@ struct HomePage: View {
                 }
                 .fullScreenCover(isPresented: $showLogin) {
                     Login(isHome: $isHome)
+                    
                 }
                 .shadow(radius: 10)
                 Spacer()
