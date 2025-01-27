@@ -24,8 +24,8 @@ let simpleDateFormatter: DateFormatter = {
 
 
 struct AirTableService {
-    let apiKey = "pat21tabkcDu3jCzi.1a3edc80390b51ae038a1aa3963a2eef472fcd208591d615c8d4e69b6b3c8e4d"
-    let baseId = "appUqouJ9CVWLO228"
+    let apiKey = "pat21tabkcDu3jCzi.1a3edc80390b51ae038a1aa3963a2eef472fcd208591d615c8d4e69b6b3c8e4d" //Holy security vulnerability
+    let baseId = "appUqouJ9CVWLO228" //Another one
     let tableName = "Patient"
     
     
@@ -47,7 +47,6 @@ struct AirTableService {
                 "middleName": middleName,
                 "lastName": lastName,
                 "dob": simpleDateFormatter.string(from: dob), 
-
                 "role": role,
                 "birthOrder": birthOrder
             ]

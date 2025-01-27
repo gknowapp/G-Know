@@ -8,7 +8,7 @@ import SwiftUI
 
 struct TherapistView: View {
     //@Binding var isTherapistView: Bool
-    @StateObject private var patientDataService = PatientDataService()
+    @StateObject private var patientDataService = PatientDataService() // Look into this
     @State private var showNewPatientView = false
     
     let backgroundImage = Image("Therapist Background")
@@ -40,6 +40,7 @@ struct TherapistView: View {
                             
                             Spacer()
                             Spacer()
+                            //This is the + button, this shows the AddNewPatient i thi
                             Button(action: {
                                 showNewPatientView = true
                             }) {
@@ -58,7 +59,10 @@ struct TherapistView: View {
                         //.foregroundColor(.accentColor)
                         //Text("GKnow!")
                         
-                            
+                        Text("Select a Patient to View Genogram")
+                            .font(.headline)
+                            .foregroundColor(Color("Candace's Couch"))
+                            .padding(.top, 50)
                             List(patientDataService.patients) { patient in
                                 // Create the full name here
                                 let firstName = patient.fields.firstName ?? ""
@@ -78,7 +82,7 @@ struct TherapistView: View {
                             }
                             
                             
-                            .cornerRadius(20)
+                            .cornerRadius(20) // Going to be deprecated
                             .background(Color ("Dark Green"))
                             .scrollContentBackground(.hidden)
                             
@@ -93,11 +97,9 @@ struct TherapistView: View {
                         .padding([.horizontal, .bottom], 50)
                         .shadow(radius: 20)
                         
+                        
                     }
-                    Text("Select a Patient to View Genogram")
-                        .font(.headline)
-                        .foregroundColor(Color("Candace's Couch"))
-                        .padding(.top, 50)
+                    
                         
                         
                 }

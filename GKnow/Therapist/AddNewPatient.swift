@@ -25,53 +25,57 @@ struct AddNewPatient: View {
     let birthOrderOptions = ["Oldest", "Youngest", "Only", "Middle", "Twin"]
 
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Add New Patient")
-                    .font(.headline)
-                
-                // First Name Field
-                TextField("First Name", text: $firstName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                
-                // Middle Name Field
-                TextField("Middle Name", text: $middleName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                
-                // Last Name Field
-                TextField("Last Name", text: $lastName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                
-                // Date of Birth Picker
-                DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
-                    .datePickerStyle(WheelDatePickerStyle())
-                
-                // Role Multi-select Picker
-                Text("Select Role(s):")
-                MultiSelectPicker(options: roleOptions, selections: $selectedRole)
-                
-                // Birth Order Multi-select Picker
-                Text("Select Birth Order:")
-                MultiSelectPicker(options: birthOrderOptions, selections: $selectedBirthOrder)
-                
-                // Save Button
-                Button(action: savePatient) {
-                    Text("Save")
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+        
+            NavigationStack { // I think I may need to add a scroll view to this, as right now I can't see the bottom of the page
+                ScrollView{
+                VStack(alignment: .leading, spacing: 20) {
+                    /*Text("Add New Patient")  I dont know if we need two things saying add new patient
+                     .font(.headline) */
+                    
+                    // First Name Field
+                    TextField("First Name", text: $firstName)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    // Middle Name Field
+                    TextField("Middle Name", text: $middleName)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    // Last Name Field
+                    TextField("Last Name", text: $lastName)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    // Date of Birth Picker
+                    DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
+                        .datePickerStyle(WheelDatePickerStyle())
+                    
+                    // Role Multi-select Picker
+                    Text("Select Role(s):")
+                    MultiSelectPicker(options: roleOptions, selections: $selectedRole)
+                    
+                    // Birth Order Multi-select Picker
+                    Text("Select Birth Order:")
+                    MultiSelectPicker(options: birthOrderOptions, selections: $selectedBirthOrder)
+                    
+                    // Save Button
+                    Button(action: savePatient) {
+                        Text("Save")
+                            .padding()
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .padding(.top)
+                    
+                    //Spacer()
                 }
-                .padding(.top)
-                
-                //Spacer()
-            }
-            .padding()
-            .navigationTitle("Add New Patient Details")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
+                .padding()
+                .navigationTitle("Add New Patient Details")
+                .padding()
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Cancel") {
+                            dismiss()
+                        }
                     }
                 }
             }
