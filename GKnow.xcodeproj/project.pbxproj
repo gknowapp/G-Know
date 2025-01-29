@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -55,6 +55,10 @@
 		62CE7B852C8FD78A00D9467A /* PatientInfoInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientInfoInput.swift; sourceTree = "<group>"; usesTabs = 0; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		30B2B6CC2D485FC30049E1E8 /* Secrets */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Secrets; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		624BE9A92C810E3900612D23 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -85,6 +89,7 @@
 		624BE9AE2C810E3900612D23 /* GKnow */ = {
 			isa = PBXGroup;
 			children = (
+				30B2B6CC2D485FC30049E1E8 /* Secrets */,
 				62AE18C12CAE472E00F64150 /* Airtable */,
 				62AE18BF2CAE46A500F64150 /* TBD */,
 				62AE18B32CAE312800F64150 /* Patient */,
@@ -164,6 +169,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				30B2B6CC2D485FC30049E1E8 /* Secrets */,
 			);
 			name = GKnow;
 			productName = GKnow;
