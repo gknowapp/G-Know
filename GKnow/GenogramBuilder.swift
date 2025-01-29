@@ -432,15 +432,17 @@ struct GenogramBuilder: View {
     
     
     private func handleIconTap(imageName: String) {
-        iconClickCounter[imageName, default: 0] += 1
+        /*iconClickCounter[imageName, default: 0] += 1
         if iconClickCounter[imageName] == 1 {
             selectedIcon = imageName
-            isSidePanelVisible = true
+            isSidePanelVisible = true // TODO THIS IS JUST FOR DEMO PURPOSES... LOOK INTO THIS LATER
         } else if iconClickCounter[imageName] == 2 {
             addIconToGenogram(imageName: imageName)
             iconClickCounter[imageName] = 0
             isSidePanelVisible = false
-        }
+        } */
+        
+        addIconToGenogram(imageName: imageName)
     }
     
     private func addIconToGenogram(imageName: String) {
@@ -479,7 +481,9 @@ struct CanvasView: UIViewRepresentable {
     func updateUIView(_ uiView: PKCanvasView, context: Context) {
         if !isDrawing {
             // Update the saved drawing if exiting drawing mode
-            drawing = uiView.drawing
+            DispatchQueue.main.async {drawing = uiView.drawing}
+            
+            // ^Testing something
         }
     }
 }
