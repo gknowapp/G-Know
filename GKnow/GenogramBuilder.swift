@@ -15,6 +15,27 @@ struct GenogramBuilder: View {
     @State private var canvasView = PKCanvasView() // PencilKit canvas view
     @State private var savedDrawing = PKDrawing() // Stores the drawing to display it after exiting
     
+    
+    /** Cursor first attempt at creating the function*/
+    @State private var isConnectingMode: Bool = false
+    @State private var drawingMode: DrawingMode = .none
+    @State private var selectedConnection: Connection? = nil // For child connections
+    @State private var currentLine: [CGPoint] = []
+    @State private var isDrawingLine: Bool = false
+    @State private var connections: [Connection] = []
+    @State private var startSymbol: GenogramShape? = nil
+    @State private var pkDrawing = PKDrawing() // For temporary drawing
+    
+    enum DrawingMode {
+           case none
+           case connecting
+           case freeform
+       }
+    enum ConnectionType {
+        case marriage
+        case child
+    }
+    
     let isEditable: Bool
     var imageOptions = ["AbortionIcon", "MiscarriageIcon", "MaleDeathIcon", "FemaleDeathIcon"]
     var imageOptionsLabel = ["MaleIcon", "FemaleIcon", "UnknownGenderIcon", "PregnancyIcon"]
@@ -36,228 +57,189 @@ struct GenogramBuilder: View {
                 /*Text("Genogram Builder")
                  .font(.largeTitle)
                  .padding()*/
+                // ... existing code ...
+                
                 if isEditable {
-                    HStack(alignment: .top){
+                    HStack(alignment: .top) {
                         Spacer()
-                        Spacer()
-                        HStack {
-                            
+                        
+                        // Main toolbar container
+                        HStack(spacing: UIHelper.standardPadding) {
+                            // People/Icons Group
                             DisclosureGroup(
                                 content: {
-                                    HStack {
-                                        //                                        HStack {
-                                        ForEach(imageOptions, id: \.self) { imageName in
-                                            Image(imageName)
-                                                .resizable()
-                                                .frame(width: 50, height: 50)
-                                                .padding(.horizontal, 5)
-                                                .padding(.vertical, 10)
-                                                .cornerRadius(10)
-                                                .onTapGesture {
-                                                    handleIconTap(imageName: imageName)
-                                                }
+                                    
+                                        HStack(spacing: UIHelper.standardPadding) {
+                                            ForEach(imageOptions, id: \.self) { imageName in
+                                                Image(imageName)
+                                                    .resizable()
+                                                    .frame(width: UIHelper.standardIconSize,
+                                                           height: UIHelper.standardIconSize)
+                                                    .cornerRadius(UIHelper.standardCornerRadius)
+                                                    .onTapGesture {
+                                                        handleIconTap(imageName: imageName)
+                                                    }
+                                            }
                                         }
-                                        //                                        }
-                                    }
-                                    .padding(.trailing, 35)
+                                        .padding(.vertical, UIHelper.standardPadding)
+                                   
                                 },
                                 label: {
-                                    HStack {
-                                        ForEach(imageOptionsLabel, id: \.self) { imageName in
-                                            
-                                            Image(imageName)
-                                                .resizable()
-                                                .frame(width: 50, height: 50)
-                                                .padding(.horizontal, 5)
-                                            //.padding(.leading, 50)
-                                                .cornerRadius(10)
-                                                .onTapGesture {
-                                                    handleIconTap(imageName: imageName)
-                                                }
+                                    
+                                        HStack(spacing: UIHelper.standardPadding) {
+                                            ForEach(imageOptionsLabel, id: \.self) { imageName in
+                                                Image(imageName)
+                                                    .resizable()
+                                                    .frame(width: UIHelper.standardIconSize,
+                                                           height: UIHelper.standardIconSize)
+                                                    .cornerRadius(UIHelper.standardCornerRadius)
+                                                    .onTapGesture {
+                                                        handleIconTap(imageName: imageName)
+                                                    }
+                                            }
                                         }
                                     }
-                                }
+                                
                             )
-                            /*DisclosureGroup("People", isExpanded: $showPeopleOptions) {
-                             LazyVGrid(columns: column3) {
-                             //                                        HStack {
-                             ForEach(imageOptions, id: \.self) { imageName in
-                             Image(imageName)
-                             .resizable()
-                             .frame(width: 50, height: 50)
-                             .padding()
-                             .cornerRadius(10)
-                             .onTapGesture {
-                             handleIconTap(imageName: imageName)
-                             }
-                             }
-                             //                                        }
-                             }
-                             }*/
-                            .padding(.leading, 15)
-                            .padding(.trailing, 5)
+                            .frame(width: UIHelper.relativeWidth(0.23))
+                            .padding(.horizontal, UIHelper.standardPadding)
                             .accentColor(Color("Candace's Couch"))
                             .foregroundStyle(Color("Candace's Couch"))
-                            .frame(width: 320)
                             
                             Divider()
+                            
+                            // Relationships Group
                             DisclosureGroup(
                                 content: {
-                                    HStack {
+                                    
+                                    HStack(spacing: UIHelper.standardPadding) {
                                         ForEach(relationshipOptions, id: \.self) { imageName in
                                             Image(imageName)
                                                 .resizable()
-                                                .frame(width: 50, height: 50)
-                                                .padding(.horizontal, 10)
-                                                .padding(.vertical, 10)
-                                                .cornerRadius(10)
+                                                .frame(width: UIHelper.standardIconSize,
+                                                       height: UIHelper.standardIconSize)
+                                                .cornerRadius(UIHelper.standardCornerRadius)
                                                 .onTapGesture {
                                                     handleIconTap(imageName: imageName)
                                                 }
                                         }
                                     }
-                                    .padding(.trailing, 27)
+                                    .padding(.vertical, UIHelper.standardPadding)
+                                    
                                 },
                                 label: {
-                                    HStack {
-                                        ForEach(relationshipOptionsLabel, id: \.self) { imageName in
-                                            Image(imageName)
-                                                .resizable()
-                                                .frame(width: 50, height: 50)
-                                                .padding(.horizontal, 10)
-                                                .cornerRadius(10)
-                                                .onTapGesture {
-                                                    
-                                                    handleIconTap(imageName: imageName)
-                                                }
-                                            
+                                    
+                                        HStack(spacing: UIHelper.standardPadding) {
+                                            ForEach(relationshipOptionsLabel, id: \.self) { imageName in
+                                                Image(imageName)
+                                                    .resizable()
+                                                    .frame(width: UIHelper.standardIconSize,
+                                                           height: UIHelper.standardIconSize)
+                                                    .cornerRadius(UIHelper.standardCornerRadius)
+                                                    .onTapGesture {
+                                                        handleIconTap(imageName: imageName)
+                                                    }
+                                            }
                                         }
-                                    }
+                                    
                                 }
                             )
-                            
-                            /*DisclosureGroup("Relationships", isExpanded: $showRelationshipOptions) {
-                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
-                             ForEach(relationshipOptions, id: \.self) { imageName in
-                             Image(imageName)
-                             .resizable()
-                             .frame(width: 50, height: 50)
-                             .padding()
-                             .cornerRadius(10)
-                             .onTapGesture {
-                             handleIconTap(imageName: imageName)
-                             }
-                             }
-                             }
-                             }*/
-                            .padding(.leading, 15)
-                            .padding(.trailing, 5)
+                            .frame(width: UIHelper.relativeWidth(0.23))
+                            .padding(.horizontal, UIHelper.standardPadding)
                             .accentColor(Color("Candace's Couch"))
                             .foregroundStyle(Color("Candace's Couch"))
-                            .frame(width: 430)
                             
                             Divider()
+                            
+                            // Symptoms Group
                             DisclosureGroup(
                                 content: {
-                                    HStack {
-                                        ForEach(symptomOptions, id: \.self) { imageName in
-                                            Image(imageName)
-                                                .resizable()
-                                                .frame(width: 50, height: 50)
-                                                .padding(.horizontal, 10)
-                                                .padding(.vertical, 10)
-                                                .cornerRadius(10)
-                                                .onTapGesture {
-                                                    handleIconTap(imageName: imageName)
-                                                }
+                                    
+                                        HStack(spacing: UIHelper.standardPadding) {
+                                            ForEach(symptomOptions, id: \.self) { imageName in
+                                                Image(imageName)
+                                                    .resizable()
+                                                    .frame(width: UIHelper.standardIconSize,
+                                                           height: UIHelper.standardIconSize)
+                                                    .cornerRadius(UIHelper.standardCornerRadius)
+                                                    .onTapGesture {
+                                                        handleIconTap(imageName: imageName)
+                                                    }
+                                            }
                                         }
-                                    }
-                                    .padding(.trailing, 20)
+                                        .padding(.vertical, UIHelper.standardPadding)
+                                    
                                 },
                                 label: {
-                                    HStack {
-                                        ForEach(symptomOptionsLabel, id: \.self) { imageName in
-                                            Image(imageName)
-                                                .resizable()
-                                                .frame(width: 50, height: 50)
-                                                .padding(.horizontal, 10)
-                                                .cornerRadius(10)
-                                                .onTapGesture {
-                                                    handleIconTap(imageName: imageName)
-                                                }
-                                            
+                                    
+                                        HStack(spacing: UIHelper.standardPadding) {
+                                            ForEach(symptomOptionsLabel, id: \.self) { imageName in
+                                                Image(imageName)
+                                                    .resizable()
+                                                    .frame(width: UIHelper.standardIconSize,
+                                                           height: UIHelper.standardIconSize)
+                                                    .cornerRadius(UIHelper.standardCornerRadius)
+                                                    .onTapGesture {
+                                                        handleIconTap(imageName: imageName)
+                                                    }
+                                            }
                                         }
                                     }
-                                }
+                                
                             )
-                            /*DisclosureGroup("Symptoms", isExpanded: $showSymptomOptions) {
-                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
-                             ForEach(symptomOptions, id: \.self) { imageName in
-                             Image(imageName)
-                             .resizable()
-                             .frame(width: 50, height: 50)
-                             .padding()
-                             .cornerRadius(10)
-                             .onTapGesture {
-                             handleIconTap(imageName: imageName)
-                             }
-                             }
-                             }
-                             }*/
-                            .padding(.leading, 10)
-                            .padding(.trailing, 15)
+                            .frame(width: UIHelper.relativeWidth(0.23))
+                            .padding(.horizontal, UIHelper.standardPadding)
                             .accentColor(Color("Candace's Couch"))
                             .foregroundStyle(Color("Candace's Couch"))
-                            .frame(width: 270)
-                            
-                            
                         }
                         .background(Color("Light Green"))
-                        .frame(minHeight: 75, maxHeight: 150)
-                        //.padding(.horizontal)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .padding(.top, 40)
-                        .shadow(radius: 10, x:2, y:4)
+                        .frame(height: UIHelper.relativeHeight(0.17))
+                        .clipShape(RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius))
+                        .padding(.top, UIHelper.relativeHeight(0.04))
+                        //.withStandardShadow()
+                        
+                        
+                        
                         
                         
                         
                         
                         Spacer()
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color("Anti-flash White"))
-                                    .frame(width: 75, height: 200)
-                                    .padding(.trailing, 50)
-                                    .padding(.top, 40)
-                                    .shadow(radius: 5, x:4, y:2)
-                                VStack {
-                                    // Redo Button
-                                    Button(action: {
-                                        
-                                    }) {
-                                        Image(systemName: "arrowshape.turn.up.right.fill")
-                                            .resizable()
-                                            .frame(width: 30, height: 30)
-                                            .foregroundColor(Color("Candace's Couch"))
-                                            .padding()
-                                            .padding(.top, 35)
-                                            .padding(.trailing, 45)
-                                    }
-                                   
-                                    // Undo Button
-                                    Button(action: {
-                                        
-                                    }) {
-                                        Image(systemName: "arrowshape.turn.up.left.fill")
-                                            .resizable()
-                                            .frame(width: 30, height: 30)
-                                            .foregroundColor(Color("Candace's Couch"))
-                                            .padding()
-                                            .padding(.top, 15)
-                                            .padding(.trailing, 50)
-                                    }
+                        /*ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color("Anti-flash White"))
+                                .frame(width: 75, height: 200)
+                                .padding(.trailing, 50)
+                                .padding(.top, 40)
+                                .shadow(radius: 5, x:4, y:2)
+                            VStack {
+                                // Redo Button
+                                Button(action: {
+                                    
+                                }) {
+                                    Image(systemName: "arrowshape.turn.up.right.fill")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                        .foregroundColor(Color("Candace's Couch"))
+                                        .padding()
+                                        .padding(.top, 35)
+                                        .padding(.trailing, 45)
+                                }
+                                
+                                // Undo Button
+                                Button(action: {
+                                    
+                                }) {
+                                    Image(systemName: "arrowshape.turn.up.left.fill")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                        .foregroundColor(Color("Candace's Couch"))
+                                        .padding()
+                                        .padding(.top, 15)
+                                        .padding(.trailing, 50)
                                 }
                             }
+                        }*/
                     }
                     ZStack {
                         // Display the saved drawing as a background image
@@ -266,23 +248,62 @@ struct GenogramBuilder: View {
                             .background(Color.clear)
                         
                         ForEach(genogramData.genogram) { shape in
-                            Image(shape.imageName)
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .position(x: shape.position.x, y: shape.position.y)
-                                .gesture(
-                                    DragGesture()
-                                        .onChanged { value in
-                                            if isEditable {
-                                                moveShape(shape: shape, newLocation: value.location)
+                                            Image(shape.imageName)
+                                                .resizable()
+                                                .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
+                                                .position(x: shape.position.x, y: shape.position.y)
+                                                .gesture(
+                                                    DragGesture()
+                                                        .onChanged { value in
+                                                            if isEditable {
+                                                                moveShape(shape: shape, newLocation: value.location)
+                                                                updateConnections(for: shape)
+                                                            }
+                                                        }
+                                                )
+                                                .onTapGesture {
+                                                    handleSymbolTap(shape)
+                                                }
+                                        }
+                        
+                        // Draw existing connections
+                        ForEach(connections) { connection in
+                                            switch connection.type {
+                                            case .marriage:
+                                                MarriageConnectionLine(
+                                                    start: getBottomCenter(for: connection.startSymbolId),
+                                                    end: getBottomCenter(for: connection.endSymbolId)
+                                                )
+                                                .stroke(Color("Candace's Couch"), lineWidth: 2)
+                                                .contentShape(Rectangle()) // Make the whole area tappable
+                                                .onTapGesture {
+                                                    if isConnectingMode, let symbol = startSymbol {
+                                                        // Create child connection
+                                                        createChildConnection(from: connection, to: symbol)
+                                                        startSymbol = nil
+                                                    }
+                                                }
+                                            case .child:
+                                                if let parentConnection = connections.first(where: { $0.id == connection.parentConnectionId }) {
+                                                    ChildConnectionLine(
+                                                        parentStart: getBottomCenter(for: parentConnection.startSymbolId),
+                                                        parentEnd: getBottomCenter(for: parentConnection.endSymbolId),
+                                                        childPosition: getTopCenter(for: connection.endSymbolId)
+                                                    )
+                                                    .stroke(Color("Candace's Couch"), lineWidth: 2)
+                                                }
                                             }
                                         }
-                                )
-                                .onTapGesture {
-                                    activeShape = shape
-                                }
-                        }
-                        
+                                                
+                                                // PencilKit canvas
+                                                ConnectingCanvasView(
+                                                    canvasView: $canvasView,
+                                                    drawing: $pkDrawing,
+                                                    drawingMode: $drawingMode,
+                                                    onDrawingFinished: handleDrawingFinished,
+                                                    findNearbySymbol: findNearbySymbol
+                                                )
+                                                .opacity(drawingMode != .none ? 1 : 0)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color("White"))
@@ -311,27 +332,41 @@ struct GenogramBuilder: View {
                         }
                         HStack {
                             //NavigationStack{
-                                // Button to take you back to patient page
-                                HStack{
-                                    Button(action: { showTherapistView = true
-                                        dismiss()
-                                        //dismiss() // Dismiss the view
-                                        //isTherapistView = true // Update isHome to trigger navigation back home
-                                        navigateToTherapist = true
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "house.fill")
-                                                .resizable()
-                                                .frame(width:35, height:30)
-                                                .foregroundColor(Color("Candace's Couch"))
-                                                .padding(.leading, 40)
-                                        }
-                                    }}
-                                //.frame(maxWidth: .infinity, alignment: .leading)
-                                //.navigationDestination(isPresented: $showTherapistView) {TherapistView()}}
-                                /*NavigationLink(destination: TherapistView(), isActive: $navigateToTherapist) {
-                                    EmptyView() // Hidden link
-                                }*/
+                            // Button to take you back to patient page
+                            HStack{
+                                Button(action: { showTherapistView = true
+                                    dismiss()
+                                    //dismiss() // Dismiss the view
+                                    //isTherapistView = true // Update isHome to trigger navigation back home
+                                    navigateToTherapist = true
+                                }) {
+                                    HStack {
+                                        Image(systemName: "house.fill")
+                                            .resizable()
+                                            .frame(width:35, height:30)
+                                            .foregroundColor(Color("Candace's Couch"))
+                                            .padding(.leading, 40)
+                                    }
+                                }}
+                            
+                            HStack {
+                                Button(action: {
+                                                isConnectingMode.toggle()
+                                                startSymbol = nil  // Reset selection when toggling mode
+                                            }) {
+                                                Image(systemName: isConnectingMode ? "link.circle.fill" : "link.circle")
+                                                    .resizable()
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundColor(Color("Candace's Couch"))
+                                            }
+                                
+                                
+                            }
+                            //.frame(maxWidth: .infinity, alignment: .leading)
+                            //.navigationDestination(isPresented: $showTherapistView) {TherapistView()}}
+                            /*NavigationLink(destination: TherapistView(), isActive: $navigateToTherapist) {
+                             EmptyView() // Hidden link
+                             }*/
                             //}
                             Spacer()
                             // Button to toggle the drawing mode
@@ -423,12 +458,127 @@ struct GenogramBuilder: View {
                 }
                 
             }
-            .frame(minWidth: 1366, minHeight: 1024)
+            .frame(minWidth: UIHelper.screenSize.width, minHeight: UIHelper.screenSize.height)
             .background(Color("White"))
+            
+            
             //.presentationSizing(.fitted)
+            
+            
+            .onAppear {
+                // Lock to landscape when view appears
+                lockOrientation(.landscape)
+            }
+            .onDisappear {
+                // Remove lock when view disappears
+                lockOrientation(.all)
+            }
         }
+       /* .toolbar {
+                   ToolbarItem(placement: .primaryAction) {
+                       
+                   }
+               } */
     }
     
+    private func getBottomCenter(for symbolId: UUID) -> CGPoint {
+            if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
+                return CGPoint(
+                    x: shape.position.x,
+                    y: shape.position.y + (UIHelper.standardIconSize / 2)
+                )
+            }
+            return .zero
+        }
+        
+        private func getTopCenter(for symbolId: UUID) -> CGPoint {
+            if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
+                return CGPoint(
+                    x: shape.position.x,
+                    y: shape.position.y - (UIHelper.standardIconSize / 2)
+                )
+            }
+            return .zero
+        }
+        
+    private func handleSymbolTap(_ shape: GenogramShape) {
+            if !isConnectingMode {
+                activeShape = shape
+                return
+            }
+            
+            if let firstSymbol = startSymbol {
+                if firstSymbol.id != shape.id {
+                    // Create marriage connection between two symbols
+                    createMarriageConnection(from: firstSymbol, to: shape)
+                }
+                startSymbol = nil
+            } else {
+                startSymbol = shape
+            }
+        }
+    
+    private func createMarriageConnection(from first: GenogramShape, to second: GenogramShape) {
+            connections.append(Connection(
+                id: UUID(),
+                startSymbolId: first.id,
+                endSymbolId: second.id,
+                type: .marriage
+            ))
+        }
+    
+    private func handleMarriageConnection(_ shape: GenogramShape) {
+            if startSymbol == nil {
+                startSymbol = shape
+            } else if startSymbol!.id != shape.id {
+                connections.append(Connection(
+                    id: UUID(),
+                    startSymbolId: startSymbol!.id,
+                    endSymbolId: shape.id,
+                    type: .marriage
+                ))
+                startSymbol = nil
+            }
+        }
+    
+    private func createChildConnection(from parentConnection: Connection, to childSymbol: GenogramShape) {
+            connections.append(Connection(
+                id: UUID(),
+                startSymbolId: parentConnection.startSymbolId,
+                endSymbolId: childSymbol.id,
+                type: .child,
+                parentConnectionId: parentConnection.id
+            ))
+        }
+        
+        private func handleChildConnection(_ shape: GenogramShape) {
+            if let parentConnection = selectedConnection {
+                connections.append(Connection(
+                    id: UUID(),
+                    startSymbolId: parentConnection.startSymbolId,
+                    endSymbolId: shape.id,
+                    type: .child,
+                    parentConnectionId: parentConnection.id
+                ))
+                selectedConnection = nil
+            }
+        }
+    
+    
+                // Helper function to manage orientation
+    private func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: orientation))
+                }
+                    
+                    // Force immediate rotation if needed
+        if orientation == .landscape {
+            UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+        }
+    }
+
+        
+       
     
     
     private func handleIconTap(imageName: String) {
@@ -460,6 +610,172 @@ struct GenogramBuilder: View {
         if let activeShape = activeShape, let index = genogramData.genogram.firstIndex(where: { $0.id == activeShape.id }) {
             genogramData.genogram.remove(at: index)
             self.activeShape = nil
+        }
+    }
+    
+    private func handleDrawingFinished(startPoint: CGPoint, endPoint: CGPoint) {
+            guard drawingMode == .connecting,
+                  let startSymbol = findNearbySymbol(at: startPoint),
+                  let endSymbol = findNearbySymbol(at: endPoint),
+                  startSymbol.id != endSymbol.id else {
+                pkDrawing = PKDrawing() // Clear temporary drawing
+                return
+            }
+            
+            // Create new connection
+        let connection = Connection(
+            id: UUID(),
+            startSymbolId: startSymbol.id,
+            endSymbolId: endSymbol.id,
+            type: .marriage  // Add the required type parameter
+        )
+            connections.append(connection)
+            pkDrawing = PKDrawing() // Clear temporary drawing
+        }
+        
+        private func findNearbySymbol(at point: CGPoint) -> GenogramShape? {
+            let threshold: CGFloat = UIHelper.standardIconSize
+            return genogramData.genogram.first { shape in
+                let distance = sqrt(
+                    pow(shape.position.x - point.x, 2) +
+                    pow(shape.position.y - point.y, 2)
+                )
+                return distance < threshold
+            }
+        }
+    
+   /* private func handleSymbolTapInConnectingMode(_ shape: GenogramShape) {
+            if startSymbol == nil {
+                // First symbol selection
+                startSymbol = shape
+            } else if startSymbol!.id != shape.id {
+                // Second symbol selection - create connection
+                let connection = Connection(
+                    id: UUID(),
+                    start: startSymbol!.position,
+                    end: shape.position,
+                    startSymbolId: startSymbol!.id,
+                    endSymbolId: shape.id
+                )
+                connections.append(connection)
+                startSymbol = nil  // Reset for next connection
+            }
+        } */
+        
+    private func updateConnections(for shape: GenogramShape) {
+            connections = connections.map { connection in
+                var updatedConnection = connection
+                if connection.startSymbolId == shape.id {
+                    updatedConnection.start = shape.position
+                }
+                if connection.endSymbolId == shape.id {
+                    updatedConnection.end = shape.position
+                }
+                return updatedConnection
+            }
+        }
+    
+    
+    struct Connection: Identifiable {
+        let id: UUID
+        var start: CGPoint?
+        var end: CGPoint?
+        let startSymbolId: UUID
+        let endSymbolId: UUID
+        let type: ConnectionType
+        var parentConnectionId: UUID? // For child connections
+    }
+    
+    struct MarriageConnectionLine: Shape {
+        let start: CGPoint
+        let end: CGPoint
+        
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            let spacing: CGFloat = 20 // Vertical spacing for marriage connection
+            
+            // Start point
+            path.move(to: start)
+            // Down from start
+            path.addLine(to: CGPoint(x: start.x, y: start.y + spacing))
+            // Horizontal connection
+            path.addLine(to: CGPoint(x: end.x, y: start.y + spacing))
+            // Up to end
+            path.addLine(to: end)
+            
+            return path
+        }
+    }
+    
+    struct ChildConnectionLine: Shape {
+        let parentStart: CGPoint
+        let parentEnd: CGPoint
+        let childPosition: CGPoint
+        
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            let parentMiddleX = (parentStart.x + parentEnd.x) / 2
+            let parentY = parentStart.y + 20 // Use same spacing as marriage connection
+            
+            // Start from parent connection
+            path.move(to: CGPoint(x: parentMiddleX, y: parentY))
+            // Draw down to child level
+            path.addLine(to: CGPoint(x: parentMiddleX, y: childPosition.y))
+            // Draw to child
+            path.addLine(to: childPosition)
+            
+            return path
+        }
+    }
+
+    struct ConnectingCanvasView: UIViewRepresentable {
+        @Binding var canvasView: PKCanvasView
+        @Binding var drawing: PKDrawing
+        @Binding var drawingMode: DrawingMode
+        var onDrawingFinished: (CGPoint, CGPoint) -> Void
+        var findNearbySymbol: (CGPoint) -> GenogramShape?
+        
+        func makeUIView(context: Context) -> PKCanvasView {
+            canvasView.delegate = context.coordinator
+            canvasView.drawing = drawing
+            canvasView.tool = PKInkingTool(.pen, color: .systemBlue, width: 2)
+            return canvasView
+        }
+        
+        func updateUIView(_ uiView: PKCanvasView, context: Context) {
+            uiView.drawing = drawing
+        }
+        
+        func makeCoordinator() -> Coordinator {
+            Coordinator(self)
+        }
+        
+        class Coordinator: NSObject, PKCanvasViewDelegate {
+            let parent: ConnectingCanvasView
+            var startPoint: CGPoint?
+            
+            init(_ parent: ConnectingCanvasView) {
+                self.parent = parent
+            }
+            
+            func canvasViewDidBeginUsingTool(_ canvasView: PKCanvasView) {
+                if let stroke = canvasView.drawing.strokes.last {
+                            let points = stroke.path.map { $0 }
+                            startPoint = CGPoint(x: points[0].location.x, y: points[0].location.y)
+                        }
+            }
+            
+            func canvasViewDidEndUsingTool(_ canvasView: PKCanvasView) {
+                if let stroke = canvasView.drawing.strokes.last,
+                           let startPoint = startPoint {
+                            let points = stroke.path.map { $0 }
+                            let endPoint = CGPoint(x: points.last?.location.x ?? 0,
+                                                 y: points.last?.location.y ?? 0)
+                            
+                            parent.onDrawingFinished(startPoint, endPoint)
+                        }
+                        startPoint = nil
+            }
         }
     }
     
@@ -525,6 +841,9 @@ struct NotesPopupView: View {
         }
     }
 }
+
+// Add these new structures
+
 
 struct DemoDisclosureGroups: View {
     let items: [Bookmark] = [.example1, .example2, .example3]
