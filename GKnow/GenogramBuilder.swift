@@ -26,6 +26,11 @@ struct GenogramBuilder: View {
     @State private var startSymbol: GenogramShape? = nil
     @State private var pkDrawing = PKDrawing() // For temporary drawing
     
+    @State private var scale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastScale: CGFloat = 1.0
+    @State private var lastOffset: CGSize = .zero
+    
     enum DrawingMode {
            case none
            case connecting
@@ -204,6 +209,7 @@ struct GenogramBuilder: View {
                         
                         
                         
+                        
                         Spacer()
                         /*ZStack {
                             RoundedRectangle(cornerRadius: 10)
@@ -273,6 +279,44 @@ struct GenogramBuilder: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color("White"))
+                    .scaleEffect(scale)
+                    .offset(offset)
+                    .gesture(
+                        SimultaneousGesture(
+                            MagnificationGesture()
+                                .onChanged { value in
+                                    let delta = value / lastScale
+                                    lastScale = value
+                                    scale *= delta
+                                    // Limit minimum and maximum zoom
+                                    scale = min(max(scale, 0.5), 3.0)
+                                }
+                                .onEnded { _ in
+                                    lastScale = 1.0
+                                },
+                            DragGesture()
+                                .onChanged { value in
+                                    let delta = CGSize(
+                                        width: value.translation.width - lastOffset.width,
+                                        height: value.translation.height - lastOffset.height
+                                    )
+                                    offset = CGSize(
+                                        width: offset.width + delta.width,
+                                        height: offset.height + delta.height
+                                    )
+                                    lastOffset = value.translation
+                                }
+                                .onEnded { _ in
+                                    lastOffset = .zero
+                                }
+                        )
+                    )
+                    .onTapGesture(count: 2) {
+                        withAnimation(.spring()) {
+                            scale = 1.0
+                            offset = .zero
+                        }
+                    }
                     
                     Spacer()
                     
@@ -289,7 +333,7 @@ struct GenogramBuilder: View {
                     ZStack {
                         HStack {
                             Rectangle()
-                                .frame(width: 1400, height: 74)
+                                .frame(width: UIHelper.screenSize.width, height: UIHelper.screenSize.height * 0.15)
                                 .foregroundColor(Color("Anti-flash White"))
                             //.ignoresSafeArea()
                                 .foregroundStyle(
@@ -631,13 +675,24 @@ struct GenogramBuilder: View {
     
     // Helper function to manage orientation
     private func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first
+        else { return }
+        
+        window.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations()
+        
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: orientation))
+            windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: orientation)) { error in
+                print("Failed to update orientation: \(error.localizedDescription)")
+            }
         }
         
-        // Force immediate rotation if needed
-        if orientation == .landscape {
+        // For iPad, we need to set the preferred orientation
+        if UIDevice.current.userInterfaceIdiom == .pad {
             UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+            
+            // Ensure the change has effect
+            UIViewController.attemptRotationToDeviceOrientation()
         }
     }
 
