@@ -57,350 +57,353 @@ struct GenogramBuilder: View {
 
     
     var body: some View {
-        ZStack {
-            // Bottom layer - Canvas and content
-            VStack {
-                if isEditable {
-                    Spacer(minLength: UIHelper.relativeHeight(0.17) + UIHelper.relativeHeight(0.04)) // Top toolbar spacing
-                    
-                    ZStack {
-                        // Display the saved drawing as a background image
-                        CanvasView(canvasView: $canvasView, drawing: $savedDrawing, isDrawing: $showDrawingCanvas)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.clear)
+        NavigationStack {
+            ZStack {
+                // Bottom layer - Canvas and content
+                VStack {
+                    if isEditable {
+                        Spacer(minLength: UIHelper.relativeHeight(0.17) + UIHelper.relativeHeight(0.04)) // Top toolbar spacing
                         
-                        ConnectionsView(
-                            connections: connections,
-                            genogramData: genogramData,
-                            onConnectionTap: handleMarriageConnectionTap
-                        )
-                        
-                        ForEach(genogramData.genogram) { shape in
-                            Image(shape.imageName)
-                                .resizable()
-                                .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
-                                .position(x: shape.position.x, y: shape.position.y)
-                                .gesture(
-                                    DragGesture()
-                                        .onChanged { value in
-                                            if isEditable {
-                                                moveShape(shape: shape, newLocation: value.location)
-                                            }
-                                        }
-                                )
-                                .onTapGesture {
-                                    handleSymbolTap(shape)
-                                }
-                        }
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color("White"))
-                    .scaleEffect(scale)
-                    .offset(offset)
-                    .gesture(
-                        SimultaneousGesture(
-                            MagnificationGesture()
-                                .onChanged { value in
-                                    let delta = value / lastScale
-                                    lastScale = value
-                                    scale *= delta
-                                    scale = min(max(scale, 0.5), 3.0)
-                                }
-                                .onEnded { _ in
-                                    lastScale = 1.0
-                                },
-                            DragGesture()
-                                .onChanged { value in
-                                    let delta = CGSize(
-                                        width: value.translation.width - lastOffset.width,
-                                        height: value.translation.height - lastOffset.height
-                                    )
-                                    offset = CGSize(
-                                        width: offset.width + delta.width,
-                                        height: offset.height + delta.height
-                                    )
-                                    lastOffset = value.translation
-                                }
-                                .onEnded { _ in
-                                    lastOffset = .zero
-                                }
-                        )
-                    )
-                    .onTapGesture(count: 2) {
-                        withAnimation(.spring()) {
-                            scale = 1.0
-                            offset = .zero
-                        }
-                    }
-                    
-                    Spacer(minLength: UIHelper.screenSize.height * 0.15) // Bottom toolbar spacing
-                }
-            }
-            
-            // Middle layer - Top toolbar
-            VStack {
-                if isEditable {
-                    // Toolbar content
-                    HStack(alignment: .top) {
-                        Spacer()
-                        
-                        // Main toolbar container
-                        HStack(spacing: UIHelper.standardPadding) {
-                            // People/Icons Group
-                            DisclosureGroup(
-                                content: {
-                                    
-                                        HStack(spacing: UIHelper.standardPadding) {
-                                            ForEach(imageOptions, id: \.self) { imageName in
-                                                Image(imageName)
-                                                    .resizable()
-                                                    .frame(width: UIHelper.standardIconSize,
-                                                           height: UIHelper.standardIconSize)
-                                                    .cornerRadius(UIHelper.standardCornerRadius)
-                                                    .onTapGesture {
-                                                        handleIconTap(imageName: imageName)
-                                                    }
-                                            }
-                                        }
-                                        .padding(.vertical, UIHelper.standardPadding)
-                                   
-                                },
-                                label: {
-                                    
-                                        HStack(spacing: UIHelper.standardPadding) {
-                                            ForEach(imageOptionsLabel, id: \.self) { imageName in
-                                                Image(imageName)
-                                                    .resizable()
-                                                    .frame(width: UIHelper.standardIconSize,
-                                                           height: UIHelper.standardIconSize)
-                                                    .cornerRadius(UIHelper.standardCornerRadius)
-                                                    .onTapGesture {
-                                                        handleIconTap(imageName: imageName)
-                                                    }
-                                            }
-                                        }
-                                    }
-                                
+                        ZStack {
+                            // Display the saved drawing as a background image
+                            CanvasView(canvasView: $canvasView, drawing: $savedDrawing, isDrawing: $showDrawingCanvas)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .background(Color.clear)
+                            
+                            ConnectionsView(
+                                connections: connections,
+                                genogramData: genogramData,
+                                onConnectionTap: handleMarriageConnectionTap
                             )
-                            .frame(width: UIHelper.relativeWidth(0.23))
-                            .padding(.horizontal, UIHelper.standardPadding)
-                            .accentColor(Color("Candace's Couch"))
-                            .foregroundStyle(Color("Candace's Couch"))
                             
-                            Divider()
-                            
-                            // Relationships Group
-                            DisclosureGroup(
-                                content: {
-                                    
-                                    HStack(spacing: UIHelper.standardPadding) {
-                                        ForEach(relationshipOptions, id: \.self) { imageName in
-                                            Image(imageName)
-                                                .resizable()
-                                                .frame(width: UIHelper.standardIconSize,
-                                                       height: UIHelper.standardIconSize)
-                                                .cornerRadius(UIHelper.standardCornerRadius)
-                                                .onTapGesture {
-                                                    handleIconTap(imageName: imageName)
-                                                }
-                                        }
-                                    }
-                                    .padding(.vertical, UIHelper.standardPadding)
-                                    
-                                },
-                                label: {
-                                    
-                                        HStack(spacing: UIHelper.standardPadding) {
-                                            ForEach(relationshipOptionsLabel, id: \.self) { imageName in
-                                                Image(imageName)
-                                                    .resizable()
-                                                    .frame(width: UIHelper.standardIconSize,
-                                                           height: UIHelper.standardIconSize)
-                                                    .cornerRadius(UIHelper.standardCornerRadius)
-                                                    .onTapGesture {
-                                                        handleIconTap(imageName: imageName)
-                                                    }
-                                            }
-                                        }
-                                    
-                                }
-                            )
-                            .frame(width: UIHelper.relativeWidth(0.23))
-                            .padding(.horizontal, UIHelper.standardPadding)
-                            .accentColor(Color("Candace's Couch"))
-                            .foregroundStyle(Color("Candace's Couch"))
-                            
-                            Divider()
-                            
-                            // Symptoms Group
-                            DisclosureGroup(
-                                content: {
-                                    
-                                        HStack(spacing: UIHelper.standardPadding) {
-                                            ForEach(symptomOptions, id: \.self) { imageName in
-                                                Image(imageName)
-                                                    .resizable()
-                                                    .frame(width: UIHelper.standardIconSize,
-                                                           height: UIHelper.standardIconSize)
-                                                    .cornerRadius(UIHelper.standardCornerRadius)
-                                                    .onTapGesture {
-                                                        handleIconTap(imageName: imageName)
-                                                    }
-                                            }
-                                        }
-                                        .padding(.vertical, UIHelper.standardPadding)
-                                    
-                                },
-                                label: {
-                                    
-                                        HStack(spacing: UIHelper.standardPadding) {
-                                            ForEach(symptomOptionsLabel, id: \.self) { imageName in
-                                                Image(imageName)
-                                                    .resizable()
-                                                    .frame(width: UIHelper.standardIconSize,
-                                                           height: UIHelper.standardIconSize)
-                                                    .cornerRadius(UIHelper.standardCornerRadius)
-                                                    .onTapGesture {
-                                                        handleIconTap(imageName: imageName)
-                                                    }
-                                            }
-                                        }
-                                    }
-                                
-                            )
-                            .frame(width: UIHelper.relativeWidth(0.23))
-                            .padding(.horizontal, UIHelper.standardPadding)
-                            .accentColor(Color("Candace's Couch"))
-                            .foregroundStyle(Color("Candace's Couch"))
-                        }
-                        .background(Color("Light Green"))
-                        .frame(height: UIHelper.relativeHeight(0.17))
-                        .clipShape(RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius))
-                        .padding(.top, UIHelper.relativeHeight(0.04))
-                        
-                        Spacer()
-                    }
-                    
-                    Spacer()
-                }
-            }
-            
-            if let selectedShape = activeShape {
-                HStack {
-                    Button(action: {
-                        showNotesPopup = true
-                    }) {
-                        Text("Notes")
-                    }
-                    
-                }
-            }
-            // Top layer - Bottom toolbar
-            VStack {
-                Spacer()
-                ZStack {
-                    HStack {
-                        Rectangle()
-                            .frame(width: UIHelper.screenSize.width, height: UIHelper.screenSize.height * 0.15)
-                            .foregroundColor(Color("Anti-flash White"))
-                            .foregroundStyle(
-                                .shadow(.inner(color: .black, radius: 10, x: 1, y: 4)))
-                            .border(Color.black.opacity(0.3), width: 2)
-                    }
-                    HStack {
-                        //NavigationStack{
-                        // Button to take you back to patient page
-                        HStack{
-                            Button(action: { showTherapistView = true
-                                dismiss()
-                                navigateToTherapist = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "house.fill")
-                                        .resizable()
-                                        .frame(width:35, height:30)
-                                        .foregroundColor(Color("Candace's Couch"))
-                                        .padding(.leading, 40)
-                                }
-                            }}
-                        
-                        HStack {
-                            Button(action: {
-                                    isConnectingMode.toggle()
-                                    startSymbol = nil  // Reset selection when toggling mode
-                                }) {
-                                    Image(systemName: isConnectingMode ? "link.circle.fill" : "link.circle")
-                                        .resizable()
-                                        .frame(width: 30, height: 30)
-                                        .foregroundColor(Color("Candace's Couch"))
-                                }
-                            
-                            
-                        }
-                        Spacer()
-                        // Button to toggle the drawing mode
-                        if isEditable {
-                            Button(action: {
-                                if showDrawingCanvas {
-                                    savedDrawing = canvasView.drawing // Save the current drawing
-                                }
-                                showDrawingCanvas.toggle()
-                            }) {
-                                
-                                Image(systemName: showDrawingCanvas ? "xmark.circle" : "pencil")
+                            ForEach(genogramData.genogram) { shape in
+                                Image(shape.imageName)
                                     .resizable()
-                                    .frame(width:30, height:30)
-                                    .foregroundColor(Color("Candace's Couch"))
-                                    .padding(.trailing, 40)
+                                    .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
+                                    .position(x: shape.position.x, y: shape.position.y)
+                                    .gesture(
+                                        DragGesture()
+                                            .onChanged { value in
+                                                if isEditable {
+                                                    moveShape(shape: shape, newLocation: value.location)
+                                                }
+                                            }
+                                    )
+                                    .onTapGesture {
+                                        handleSymbolTap(shape)
+                                    }
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color("White"))
+                        .scaleEffect(scale)
+                        .offset(offset)
+                        .gesture(
+                            SimultaneousGesture(
+                                MagnificationGesture()
+                                    .onChanged { value in
+                                        let delta = value / lastScale
+                                        lastScale = value
+                                        scale *= delta
+                                        scale = min(max(scale, 0.5), 3.0)
+                                    }
+                                    .onEnded { _ in
+                                        lastScale = 1.0
+                                    },
+                                DragGesture()
+                                    .onChanged { value in
+                                        let delta = CGSize(
+                                            width: value.translation.width - lastOffset.width,
+                                            height: value.translation.height - lastOffset.height
+                                        )
+                                        offset = CGSize(
+                                            width: offset.width + delta.width,
+                                            height: offset.height + delta.height
+                                        )
+                                        lastOffset = value.translation
+                                    }
+                                    .onEnded { _ in
+                                        lastOffset = .zero
+                                    }
+                            )
+                        )
+                        .onTapGesture(count: 2) {
+                            withAnimation(.spring()) {
+                                scale = 1.0
+                                offset = .zero
+                            }
+                        }
+                        
+                        Spacer(minLength: UIHelper.screenSize.height * 0.15) // Bottom toolbar spacing
+                    }
+                }
+                
+                // Middle layer - Top toolbar
+                VStack {
+                    if isEditable {
+                        // Toolbar content
+                        HStack(alignment: .top) {
+                            Spacer()
+                            
+                            // Main toolbar container
+                            HStack(spacing: UIHelper.standardPadding) {
+                                // People/Icons Group
+                                DisclosureGroup(
+                                    content: {
+                                        
+                                            HStack(spacing: UIHelper.standardPadding) {
+                                                ForEach(imageOptions, id: \.self) { imageName in
+                                                    Image(imageName)
+                                                        .resizable()
+                                                        .frame(width: UIHelper.standardIconSize,
+                                                               height: UIHelper.standardIconSize)
+                                                        .cornerRadius(UIHelper.standardCornerRadius)
+                                                        .onTapGesture {
+                                                            handleIconTap(imageName: imageName)
+                                                        }
+                                                }
+                                            }
+                                            .padding(.vertical, UIHelper.standardPadding)
+                                        
+                                    },
+                                    label: {
+                                        
+                                            HStack(spacing: UIHelper.standardPadding) {
+                                                ForEach(imageOptionsLabel, id: \.self) { imageName in
+                                                    Image(imageName)
+                                                        .resizable()
+                                                        .frame(width: UIHelper.standardIconSize,
+                                                               height: UIHelper.standardIconSize)
+                                                        .cornerRadius(UIHelper.standardCornerRadius)
+                                                        .onTapGesture {
+                                                            handleIconTap(imageName: imageName)
+                                                        }
+                                                }
+                                            }
+                                        }
+                                    
+                                )
+                                .frame(width: UIHelper.relativeWidth(0.23))
+                                .padding(.horizontal, UIHelper.standardPadding)
+                                .accentColor(Color("Candace's Couch"))
+                                .foregroundStyle(Color("Candace's Couch"))
+                                
+                                Divider()
+                                
+                                // Relationships Group
+                                DisclosureGroup(
+                                    content: {
+                                        
+                                        HStack(spacing: UIHelper.standardPadding) {
+                                            ForEach(relationshipOptions, id: \.self) { imageName in
+                                                Image(imageName)
+                                                    .resizable()
+                                                    .frame(width: UIHelper.standardIconSize,
+                                                           height: UIHelper.standardIconSize)
+                                                    .cornerRadius(UIHelper.standardCornerRadius)
+                                                    .onTapGesture {
+                                                        handleIconTap(imageName: imageName)
+                                                    }
+                                            }
+                                        }
+                                        .padding(.vertical, UIHelper.standardPadding)
+                                        
+                                    },
+                                    label: {
+                                        
+                                            HStack(spacing: UIHelper.standardPadding) {
+                                                ForEach(relationshipOptionsLabel, id: \.self) { imageName in
+                                                    Image(imageName)
+                                                        .resizable()
+                                                        .frame(width: UIHelper.standardIconSize,
+                                                               height: UIHelper.standardIconSize)
+                                                        .cornerRadius(UIHelper.standardCornerRadius)
+                                                        .onTapGesture {
+                                                            handleIconTap(imageName: imageName)
+                                                        }
+                                                }
+                                            }
+                                        
+                                    }
+                                )
+                                .frame(width: UIHelper.relativeWidth(0.23))
+                                .padding(.horizontal, UIHelper.standardPadding)
+                                .accentColor(Color("Candace's Couch"))
+                                .foregroundStyle(Color("Candace's Couch"))
+                                
+                                Divider()
+                                
+                                // Symptoms Group
+                                DisclosureGroup(
+                                    content: {
+                                        
+                                            HStack(spacing: UIHelper.standardPadding) {
+                                                ForEach(symptomOptions, id: \.self) { imageName in
+                                                    Image(imageName)
+                                                        .resizable()
+                                                        .frame(width: UIHelper.standardIconSize,
+                                                               height: UIHelper.standardIconSize)
+                                                        .cornerRadius(UIHelper.standardCornerRadius)
+                                                        .onTapGesture {
+                                                            handleIconTap(imageName: imageName)
+                                                        }
+                                                }
+                                            }
+                                            .padding(.vertical, UIHelper.standardPadding)
+                                        
+                                    },
+                                    label: {
+                                        
+                                            HStack(spacing: UIHelper.standardPadding) {
+                                                ForEach(symptomOptionsLabel, id: \.self) { imageName in
+                                                    Image(imageName)
+                                                        .resizable()
+                                                        .frame(width: UIHelper.standardIconSize,
+                                                               height: UIHelper.standardIconSize)
+                                                        .cornerRadius(UIHelper.standardCornerRadius)
+                                                        .onTapGesture {
+                                                            handleIconTap(imageName: imageName)
+                                                        }
+                                                }
+                                            }
+                                        }
+                                    
+                                )
+                                .frame(width: UIHelper.relativeWidth(0.23))
+                                .padding(.horizontal, UIHelper.standardPadding)
+                                .accentColor(Color("Candace's Couch"))
+                                .foregroundStyle(Color("Candace's Couch"))
+                            }
+                            .background(Color("Light Green"))
+                            .frame(height: UIHelper.relativeHeight(0.17))
+                            .clipShape(RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius))
+                            .padding(.top, UIHelper.relativeHeight(0.04))
+                            
+                            Spacer()
+                        }
+                        
+                        Spacer()
+                    }
+                }
+                
+                if let selectedShape = activeShape {
+                    HStack {
+                        Button(action: {
+                            showNotesPopup = true
+                        }) {
+                            Text("Notes")
+                        }
+                        
+                    }
+                }
+                // Top layer - Bottom toolbar
+                VStack {
+                    Spacer()
+                    ZStack {
+                        HStack {
+                            Rectangle()
+                                .frame(width: UIHelper.screenSize.width, height: UIHelper.screenSize.height * 0.15)
+                                .foregroundColor(Color("Anti-flash White"))
+                                .foregroundStyle(
+                                    .shadow(.inner(color: .black, radius: 10, x: 1, y: 4)))
+                                .border(Color.black.opacity(0.3), width: 2)
+                        }
+                        HStack {
+                            //NavigationStack{
+                            // Button to take you back to patient page
+                            HStack{
+                                Button(action: { showTherapistView = true
+                                    dismiss()
+                                    navigateToTherapist = true
+                                }) {
+                                    HStack {
+                                        Image(systemName: "house.fill")
+                                            .resizable()
+                                            .frame(width:35, height:30)
+                                            .foregroundColor(Color("Candace's Couch"))
+                                            .padding(.leading, 40)
+                                    }
+                                }}
+                            
+                            HStack {
+                                Button(action: {
+                                        isConnectingMode.toggle()
+                                        startSymbol = nil  // Reset selection when toggling mode
+                                    }) {
+                                        Image(systemName: isConnectingMode ? "link.circle.fill" : "link.circle")
+                                            .resizable()
+                                            .frame(width: 30, height: 30)
+                                            .foregroundColor(Color("Candace's Couch"))
+                                    }
+                                
+                                
+                            }
+                            Spacer()
+                            // Button to toggle the drawing mode
+                            if isEditable {
+                                Button(action: {
+                                    if showDrawingCanvas {
+                                        savedDrawing = canvasView.drawing // Save the current drawing
+                                    }
+                                    showDrawingCanvas.toggle()
+                                }) {
+                                    
+                                    Image(systemName: showDrawingCanvas ? "xmark.circle" : "pencil")
+                                        .resizable()
+                                        .frame(width:30, height:30)
+                                        .foregroundColor(Color("Candace's Couch"))
+                                        .padding(.trailing, 40)
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        
-        .padding(.top)
-        .sheet(isPresented: $showNotesPopup) {
-            if let shape = activeShape {
-                NotesPopupView(shape: Binding(
-                    get: {
-                        if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
-                            return genogramData.genogram[index]
-                        }
-                        return shape
-                    },
-                    set: { updatedShape in
-                        if let index = genogramData.genogram.firstIndex(where: { $0.id == updatedShape.id }) {
-                            genogramData.genogram[index] = updatedShape
-                        }
-                    }
-                ), isEditable: isEditable)
-            }
-        }
-        .sheet(isPresented: $isSidePanelVisible) {
-            if let selectedIcon = selectedIcon {
-                SidePanelView(
-                    iconName: selectedIcon,
-                    description: "\(selectedIcon) description",
-                    onClose: {
-                        isSidePanelVisible = false
-                    }
-                    
-                )
-            }
             
+            .padding(.top)
+            .sheet(isPresented: $showNotesPopup) {
+                if let shape = activeShape {
+                    NotesPopupView(shape: Binding(
+                        get: {
+                            if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
+                                return genogramData.genogram[index]
+                            }
+                            return shape
+                        },
+                        set: { updatedShape in
+                            if let index = genogramData.genogram.firstIndex(where: { $0.id == updatedShape.id }) {
+                                genogramData.genogram[index] = updatedShape
+                            }
+                        }
+                    ), isEditable: isEditable)
+                }
+            }
+            .sheet(isPresented: $isSidePanelVisible) {
+                if let selectedIcon = selectedIcon {
+                    SidePanelView(
+                        iconName: selectedIcon,
+                        description: "\(selectedIcon) description",
+                        onClose: {
+                            isSidePanelVisible = false
+                        }
+                        
+                    )
+                }
+                
+            }
+            .frame(minWidth: UIHelper.screenSize.width, minHeight: UIHelper.screenSize.height)
+            .background(Color("White"))
+            
+            .onAppear {
+                // Lock to landscape when view appears
+                lockOrientation(.landscape)
+            }
+            .onDisappear {
+                // Remove lock when view disappears
+                lockOrientation(.all)
+            }
         }
-        .frame(minWidth: UIHelper.screenSize.width, minHeight: UIHelper.screenSize.height)
-        .background(Color("White"))
-        
-        .onAppear {
-            // Lock to landscape when view appears
-            lockOrientation(.landscape)
-        }
-        .onDisappear {
-            // Remove lock when view disappears
-            lockOrientation(.all)
-        }
+        .navigationBarBackButtonHidden(true) // This hides the default back button
     }
     
     struct ConnectionsView: View {

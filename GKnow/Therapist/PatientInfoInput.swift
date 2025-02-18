@@ -14,7 +14,6 @@ struct PatientInfoInput: View {
     
     @State private var showPatientCard: Bool = false
     @State private var isEditing: Bool = false
-    @State private var showGenogramBuilder: Bool = false
     @State private var genogramData = GenogramData(genogram: [])
 
     @State private var selectedIcon: String? = nil
@@ -36,120 +35,115 @@ struct PatientInfoInput: View {
         .resizable()
 
     var body: some View {
-        ZStack {
-            //Background Image
-            HStack {
-                backgroundImage
-                    .opacity(0.25)
-            }
-            .overlay(Color ("Overlay"))
-            .ignoresSafeArea(.container)
-            
-            VStack(alignment: .center, spacing: 20) {
-                Text(isTherapist ? "Client: \(firstName) \(middleName) \(lastName)" : "My Genogram")
-                    .font(.system(size: 72))
-                    .foregroundColor(Color("Candace's Couch"))
-                    .padding(.top, 40)
-                
-                if isEditing {
-                    VStack(spacing: 10) {
-                        inputField(label: "First Name", text: $firstName)
-                            .padding(.horizontal, 30)
-                            .padding(.top, 10)
-                            .font(.title2)
-                            .foregroundColor(Color("Candace's Couch"))
-                        Divider() 
-                        inputField(label: "Middle Name", text: $middleName)
-                            .padding(.horizontal, 30)
-                            .font(.title2)
-                            .foregroundColor(Color("Candace's Couch"))
-                        Divider()
-                        inputField(label: "Last Name", text: $lastName)
-                            .padding(.horizontal, 30)
-                            .font(.title2)
-                            .foregroundColor(Color("Candace's Couch"))
-                        Divider()
-                        DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
-                            .padding(.horizontal, 30)
-                            .font(.title2)
-                            .foregroundColor(Color("Candace's Couch"))
-                        Divider()
-                        MultiSelectField(label: "Role", selections: $role, options: ["Hero", "Peacekeeper", "Clown", "Lost Child", "Rebel", "Scapegoat"])
-                            .padding(.horizontal, 30)
-                            .font(.title2)
-                            .foregroundColor(Color("Candace's Couch"))
-                        Divider()
-                        MultiSelectField(label: "Birth Order", selections: $birthOrder, options: ["Oldest", "Youngest", "Only", "Middle", "Twin"])
-                            .padding(.horizontal, 30)
-                            .font(.title2)
-                            .foregroundColor(Color("Candace's Couch"))
-                        /*Divider()*/
-                    }
-                    //.frame(width: nil, height: nil , alignment: .leading)
-                    .background(Color ("Anti-flash White"))
-                    .padding(CGFloat(50))
-                    .cornerRadius(20)
-                    .shadow(radius: 10)
-                    
-                } else {
-                    PatientCardView(firstName: $firstName, middleName: $middleName, lastName: $lastName, dob: $dob, role: $role, birthOrder: $birthOrder, isEditing: $isEditing, showPatientCard: $showPatientCard)
-                        .padding()
-                        .background(Color ("Dark Green"))
-                        .cornerRadius(20)
-                        //.shadow(radius: 20)
-                    
-                }
-                
+        NavigationStack {
+            ZStack {
+                //Background Image
                 HStack {
-                    Button(action: {
-                        isEditing.toggle()
-                        showPatientCard.toggle()
-                    }) {
-                        Text(isEditing ? "Save" : isTherapist ? "Edit Client Information" : "Edit My Information")
-                            .padding()
-                            .background(Color ("Light Green"))
-                            .foregroundColor(Color ("Candace's Couch"))
-                            .cornerRadius(10)
-                            .font(.title2)
-                    }
-                    .padding(.bottom, 40)
-                    .shadow(radius: 5)
-                    .padding(.horizontal)
+                    backgroundImage
+                        .opacity(0.25)
+                }
+                .overlay(Color ("Overlay"))
+                .ignoresSafeArea(.container)
+                
+                VStack(alignment: .center, spacing: 20) {
+                    Text(isTherapist ? "Client: \(firstName) \(middleName) \(lastName)" : "My Genogram")
+                        .font(.system(size: 72))
+                        .foregroundColor(Color("Candace's Couch"))
+                        .padding(.top, 40)
                     
-                    if !isEditing {
+                    if isEditing {
+                        VStack(spacing: 10) {
+                            inputField(label: "First Name", text: $firstName)
+                                .padding(.horizontal, 30)
+                                .padding(.top, 10)
+                                .font(.title2)
+                                .foregroundColor(Color("Candace's Couch"))
+                            Divider()
+                            inputField(label: "Middle Name", text: $middleName)
+                                .padding(.horizontal, 30)
+                                .font(.title2)
+                                .foregroundColor(Color("Candace's Couch"))
+                            Divider()
+                            inputField(label: "Last Name", text: $lastName)
+                                .padding(.horizontal, 30)
+                                .font(.title2)
+                                .foregroundColor(Color("Candace's Couch"))
+                            Divider()
+                            DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
+                                .padding(.horizontal, 30)
+                                .font(.title2)
+                                .foregroundColor(Color("Candace's Couch"))
+                            Divider()
+                            MultiSelectField(label: "Role", selections: $role, options: ["Hero", "Peacekeeper", "Clown", "Lost Child", "Rebel", "Scapegoat"])
+                                .padding(.horizontal, 30)
+                                .font(.title2)
+                                .foregroundColor(Color("Candace's Couch"))
+                            Divider()
+                            MultiSelectField(label: "Birth Order", selections: $birthOrder, options: ["Oldest", "Youngest", "Only", "Middle", "Twin"])
+                                .padding(.horizontal, 30)
+                                .font(.title2)
+                                .foregroundColor(Color("Candace's Couch"))
+                            /*Divider()*/
+                        }
+                        //.frame(width: nil, height: nil , alignment: .leading)
+                        .background(Color ("Anti-flash White"))
+                        .padding(CGFloat(50))
+                        .cornerRadius(20)
+                        .shadow(radius: 10)
+                        
+                    } else {
+                        PatientCardView(firstName: $firstName, middleName: $middleName, lastName: $lastName, dob: $dob, role: $role, birthOrder: $birthOrder, isEditing: $isEditing, showPatientCard: $showPatientCard)
+                            .padding()
+                            .background(Color ("Dark Green"))
+                            .cornerRadius(20)
+                            //.shadow(radius: 20)
+                        
+                    }
+                    
+                    HStack {
                         Button(action: {
-                            showGenogramBuilder = true
+                            isEditing.toggle()
+                            showPatientCard.toggle()
                         }) {
-                            Text("Open Genogram Builder")
+                            Text(isEditing ? "Save" : isTherapist ? "Edit Client Information" : "Edit My Information")
                                 .padding()
                                 .background(Color ("Light Green"))
                                 .foregroundColor(Color ("Candace's Couch"))
                                 .cornerRadius(10)
                                 .font(.title2)
                         }
+                        .padding(.bottom, 40)
+                        .shadow(radius: 5)
+                        .padding(.horizontal)
                         
-                        .sheet(isPresented: $showGenogramBuilder) {
-                            GenogramBuilder(
+                        if !isEditing {
+                            NavigationLink(destination: GenogramBuilder(
                                 genogramData: $genogramData,
                                 selectedIcon: $selectedIcon,
                                 isSidePanelVisible: $isSidePanelVisible,
                                 isEditable: true
-                            )
+                            )) {
+                                Text("Open Genogram Builder")
+                                    .padding()
+                                    .background(Color("Light Green"))
+                                    .foregroundColor(Color("Candace's Couch"))
+                                    .cornerRadius(10)
+                                    .font(.title2)
+                            }
+                            .padding(.bottom, 40)
+                            .shadow(radius: 5)
                         }
-                        .padding(.bottom, 40)
-                        .shadow(radius: 5)
-                        
+                            
                     }
-                        
+                    
                 }
-                
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color ("Dark Green"))
+                .padding(.horizontal, 150)
+                .padding(.vertical, 100)
+                .cornerRadius(20)
+                .shadow(radius: 20)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color ("Dark Green"))
-            .padding(.horizontal, 150)
-            .padding(.vertical, 100)
-            .cornerRadius(20)
-            .shadow(radius: 20)
         }
     }
     
