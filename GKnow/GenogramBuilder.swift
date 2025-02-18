@@ -7,7 +7,7 @@ struct GenogramBuilder: View {
     @Binding var isSidePanelVisible: Bool
     @State private var activeShape: GenogramShape? = nil
     @State private var showNotesPopup: Bool = false
-    @State private var iconClickCounter: [String: Int] = [:]
+    @State private var iconClickCounter: [String: Int] = [:] // dont think i need this
     @State private var showPeopleOptions = false
     @State private var showRelationshipOptions = false
     @State private var showSymptomOptions = false
@@ -42,12 +42,12 @@ struct GenogramBuilder: View {
    
     
     let isEditable: Bool
-    var imageOptions = ["AbortionIcon", "MiscarriageIcon", "MaleDeathIcon", "FemaleDeathIcon"]
-    var imageOptionsLabel = ["MaleIcon", "FemaleIcon", "UnknownGenderIcon", "PregnancyIcon"]
-    var relationshipOptions = ["MarriageIcon", "EngagedIcon", "CommittedRelationshipIcon", "LegalSeparationIcon", "SeparationInFactIcon"]
-    var relationshipOptionsLabel = ["CutoffIcon", "DivorceIcon", "FocusedOnIcon", "NormalIcon", "FocusedOnNegativelyIcon"]
-    var symptomOptions = ["MaleADRecoveryIcon", "MaleIllnessRecoveryIcon", "MaleIllnessRecoveryIcon"]
-    var symptomOptionsLabel = ["MaleADAbuseIcon", "MaleIllnessIcon", "MaleIllnessRecoveryIcon"]
+    var imageOptions = ["Abortion", "Miscarriage", "Male Death", "Female Death"]
+    var imageOptionsLabel = ["Male", "Female", "Unknown Gender", "Pregnancy"]
+    var relationshipOptions = ["Marriage", "Engaged", "Committed Relationship", "Legal Separation", "Separation In Fact"]
+    var relationshipOptionsLabel = ["Cutoff", "Divorce", "Focused On", "Normal", "Focused On Negatively"]
+    var symptomOptions = ["Male AD Recovery", "Male Illness Recovery", "Male Illness Recovery"]
+    var symptomOptionsLabel = ["Male AD Abuse", "Male Illness", "Male Illness Recovery"]
     
     @Environment(\.dismiss) var dismiss
     //@Binding var isTherapistView: Bool
@@ -785,14 +785,14 @@ struct GenogramBuilder: View {
         
         // First generation (4 pairs)
         let gen1Symbols = [
-            ("MaleIcon", CGPoint(x: startX, y: startY)),
-            ("FemaleIcon", CGPoint(x: startX + baseSpacing, y: startY)),
-            ("MaleIcon", CGPoint(x: startX + baseSpacing * 2.5, y: startY)),
-            ("FemaleIcon", CGPoint(x: startX + baseSpacing * 3.5, y: startY)),
-            ("MaleIcon", CGPoint(x: startX + baseSpacing * 5, y: startY)),
-            ("FemaleIcon", CGPoint(x: startX + baseSpacing * 6, y: startY)),
-            ("MaleIcon", CGPoint(x: startX + baseSpacing * 7.5, y: startY)),
-            ("FemaleIcon", CGPoint(x: startX + baseSpacing * 8.5, y: startY))
+            ("Male", CGPoint(x: startX, y: startY)),
+            ("Female", CGPoint(x: startX + baseSpacing, y: startY)),
+            ("Male", CGPoint(x: startX + baseSpacing * 2.5, y: startY)),
+            ("Female", CGPoint(x: startX + baseSpacing * 3.5, y: startY)),
+            ("Male", CGPoint(x: startX + baseSpacing * 5, y: startY)),
+            ("Female", CGPoint(x: startX + baseSpacing * 6, y: startY)),
+            ("Male", CGPoint(x: startX + baseSpacing * 7.5, y: startY)),
+            ("Female", CGPoint(x: startX + baseSpacing * 8.5, y: startY))
         ]
         
         // Calculate midpoints for first generation marriages
@@ -808,10 +808,10 @@ struct GenogramBuilder: View {
         let gen2RightPartnerX = gen1Pair4Mid  // Female under fourth marriage
         
         let gen2Symbols = [
-            ("MaleIcon", CGPoint(x: gen2LeftX, y: startY + baseSpacing)),
-            ("FemaleIcon", CGPoint(x: gen2LeftPartnerX, y: startY + baseSpacing)),
-            ("MaleIcon", CGPoint(x: gen2RightX, y: startY + baseSpacing)),
-            ("FemaleIcon", CGPoint(x: gen2RightPartnerX, y: startY + baseSpacing))
+            ("Male", CGPoint(x: gen2LeftX, y: startY + baseSpacing)),
+            ("Female", CGPoint(x: gen2LeftPartnerX, y: startY + baseSpacing)),
+            ("Male", CGPoint(x: gen2RightX, y: startY + baseSpacing)),
+            ("Female", CGPoint(x: gen2RightPartnerX, y: startY + baseSpacing))
         ]
         
         // Calculate midpoints for second generation marriages
@@ -820,8 +820,8 @@ struct GenogramBuilder: View {
         
         // Third generation (final pair)
         let gen3Symbols = [
-            ("MaleIcon", CGPoint(x: gen2Pair1Mid, y: startY + baseSpacing * 2)),
-            ("FemaleIcon", CGPoint(x: gen2Pair2Mid, y: startY + baseSpacing * 2))
+            ("Male", CGPoint(x: gen2Pair1Mid, y: startY + baseSpacing * 2)),
+            ("Female", CGPoint(x: gen2Pair2Mid, y: startY + baseSpacing * 2))
         ]
         
         // Create all symbols
