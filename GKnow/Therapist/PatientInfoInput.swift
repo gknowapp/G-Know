@@ -3,6 +3,8 @@ import SwiftUI
 struct PatientInfoInput: View {
     let isTherapist: Bool
     let patient: PatientInformation
+    
+    
 
     @State private var firstName: String
     @State private var middleName: String
@@ -14,7 +16,7 @@ struct PatientInfoInput: View {
     
     @State private var showPatientCard: Bool = false
     @State private var isEditing: Bool = false
-    @State private var genogramData = GenogramData(genogram: [])
+    @State private var genogramData = GenogramData(genogram: [], connections: [])
 
     @State private var selectedIcon: String? = nil
     @State private var isSidePanelVisible: Bool = false
