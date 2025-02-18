@@ -58,13 +58,89 @@ struct GenogramBuilder: View {
     
     var body: some View {
         ZStack {
+            // Bottom layer - Canvas and content
             VStack {
-                /*Text("Genogram Builder")
-                 .font(.largeTitle)
-                 .padding()*/
-                // ... existing code ...
-                
                 if isEditable {
+                    Spacer(minLength: UIHelper.relativeHeight(0.17) + UIHelper.relativeHeight(0.04)) // Top toolbar spacing
+                    
+                    ZStack {
+                        // Display the saved drawing as a background image
+                        CanvasView(canvasView: $canvasView, drawing: $savedDrawing, isDrawing: $showDrawingCanvas)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.clear)
+                        
+                        ConnectionsView(
+                            connections: connections,
+                            genogramData: genogramData,
+                            onConnectionTap: handleMarriageConnectionTap
+                        )
+                        
+                        ForEach(genogramData.genogram) { shape in
+                            Image(shape.imageName)
+                                .resizable()
+                                .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
+                                .position(x: shape.position.x, y: shape.position.y)
+                                .gesture(
+                                    DragGesture()
+                                        .onChanged { value in
+                                            if isEditable {
+                                                moveShape(shape: shape, newLocation: value.location)
+                                            }
+                                        }
+                                )
+                                .onTapGesture {
+                                    handleSymbolTap(shape)
+                                }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color("White"))
+                    .scaleEffect(scale)
+                    .offset(offset)
+                    .gesture(
+                        SimultaneousGesture(
+                            MagnificationGesture()
+                                .onChanged { value in
+                                    let delta = value / lastScale
+                                    lastScale = value
+                                    scale *= delta
+                                    scale = min(max(scale, 0.5), 3.0)
+                                }
+                                .onEnded { _ in
+                                    lastScale = 1.0
+                                },
+                            DragGesture()
+                                .onChanged { value in
+                                    let delta = CGSize(
+                                        width: value.translation.width - lastOffset.width,
+                                        height: value.translation.height - lastOffset.height
+                                    )
+                                    offset = CGSize(
+                                        width: offset.width + delta.width,
+                                        height: offset.height + delta.height
+                                    )
+                                    lastOffset = value.translation
+                                }
+                                .onEnded { _ in
+                                    lastOffset = .zero
+                                }
+                        )
+                    )
+                    .onTapGesture(count: 2) {
+                        withAnimation(.spring()) {
+                            scale = 1.0
+                            offset = .zero
+                        }
+                    }
+                    
+                    Spacer(minLength: UIHelper.screenSize.height * 0.15) // Bottom toolbar spacing
+                }
+            }
+            
+            // Middle layer - Top toolbar
+            VStack {
+                if isEditable {
+                    // Toolbar content
                     HStack(alignment: .top) {
                         Spacer()
                         
@@ -201,294 +277,130 @@ struct GenogramBuilder: View {
                         .frame(height: UIHelper.relativeHeight(0.17))
                         .clipShape(RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius))
                         .padding(.top, UIHelper.relativeHeight(0.04))
-                        //.withStandardShadow()
-                        
-                        
-                        
-                        
-                        
-                        
-                        
                         
                         Spacer()
-                        /*ZStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color("Anti-flash White"))
-                                .frame(width: 75, height: 200)
-                                .padding(.trailing, 50)
-                                .padding(.top, 40)
-                                .shadow(radius: 5, x:4, y:2)
-                            VStack {
-                                // Redo Button
-                                Button(action: {
-                                    
-                                }) {
-                                    Image(systemName: "arrowshape.turn.up.right.fill")
-                                        .resizable()
-                                        .frame(width: 30, height: 30)
-                                        .foregroundColor(Color("Candace's Couch"))
-                                        .padding()
-                                        .padding(.top, 35)
-                                        .padding(.trailing, 45)
-                                }
-                                
-                                // Undo Button
-                                Button(action: {
-                                    
-                                }) {
-                                    Image(systemName: "arrowshape.turn.up.left.fill")
-                                        .resizable()
-                                        .frame(width: 30, height: 30)
-                                        .foregroundColor(Color("Candace's Couch"))
-                                        .padding()
-                                        .padding(.top, 15)
-                                        .padding(.trailing, 50)
-                                }
-                            }
-                        }*/
-                    }
-                    ZStack {
-                        // Display the saved drawing as a background image
-                        CanvasView(canvasView: $canvasView, drawing: $savedDrawing, isDrawing: $showDrawingCanvas)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.clear)
-                        
-                        ConnectionsView(
-                            connections: connections,
-                            genogramData: genogramData,
-                            onConnectionTap: handleMarriageConnectionTap
-                        )
-                        
-                        ForEach(genogramData.genogram) { shape in
-                            Image(shape.imageName)
-                                .resizable()
-                                .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
-                                .position(x: shape.position.x, y: shape.position.y)
-                                .gesture(
-                                    DragGesture()
-                                        .onChanged { value in
-                                            if isEditable {
-                                                moveShape(shape: shape, newLocation: value.location)
-                                            }
-                                        }
-                                )
-                                .onTapGesture {
-                                    handleSymbolTap(shape)
-                                }
-                        }
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color("White"))
-                    .scaleEffect(scale)
-                    .offset(offset)
-                    .gesture(
-                        SimultaneousGesture(
-                            MagnificationGesture()
-                                .onChanged { value in
-                                    let delta = value / lastScale
-                                    lastScale = value
-                                    scale *= delta
-                                    // Limit minimum and maximum zoom
-                                    scale = min(max(scale, 0.5), 3.0)
-                                }
-                                .onEnded { _ in
-                                    lastScale = 1.0
-                                },
-                            DragGesture()
-                                .onChanged { value in
-                                    let delta = CGSize(
-                                        width: value.translation.width - lastOffset.width,
-                                        height: value.translation.height - lastOffset.height
-                                    )
-                                    offset = CGSize(
-                                        width: offset.width + delta.width,
-                                        height: offset.height + delta.height
-                                    )
-                                    lastOffset = value.translation
-                                }
-                                .onEnded { _ in
-                                    lastOffset = .zero
-                                }
-                        )
-                    )
-                    .onTapGesture(count: 2) {
-                        withAnimation(.spring()) {
-                            scale = 1.0
-                            offset = .zero
-                        }
                     }
                     
                     Spacer()
+                }
+            }
+            
+            if let selectedShape = activeShape {
+                HStack {
+                    Button(action: {
+                        showNotesPopup = true
+                    }) {
+                        Text("Notes")
+                    }
                     
-                    if let selectedShape = activeShape {
+                }
+            }
+            // Top layer - Bottom toolbar
+            VStack {
+                Spacer()
+                ZStack {
+                    HStack {
+                        Rectangle()
+                            .frame(width: UIHelper.screenSize.width, height: UIHelper.screenSize.height * 0.15)
+                            .foregroundColor(Color("Anti-flash White"))
+                            .foregroundStyle(
+                                .shadow(.inner(color: .black, radius: 10, x: 1, y: 4)))
+                            .border(Color.black.opacity(0.3), width: 2)
+                    }
+                    HStack {
+                        //NavigationStack{
+                        // Button to take you back to patient page
+                        HStack{
+                            Button(action: { showTherapistView = true
+                                dismiss()
+                                navigateToTherapist = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "house.fill")
+                                        .resizable()
+                                        .frame(width:35, height:30)
+                                        .foregroundColor(Color("Candace's Couch"))
+                                        .padding(.leading, 40)
+                                }
+                            }}
+                        
                         HStack {
                             Button(action: {
-                                showNotesPopup = true
-                            }) {
-                                Text("Notes")
-                            }
-                            
-                        }
-                    }
-                    ZStack {
-                        HStack {
-                            Rectangle()
-                                .frame(width: UIHelper.screenSize.width, height: UIHelper.screenSize.height * 0.15)
-                                .foregroundColor(Color("Anti-flash White"))
-                            //.ignoresSafeArea()
-                                .foregroundStyle(
-                                    .shadow(.inner(color: .black, radius: 10, x: 1, y: 4)))
-                                .border(Color.black.opacity(0.3), width: 2)
-                        }
-                        HStack {
-                            //NavigationStack{
-                            // Button to take you back to patient page
-                            HStack{
-                                Button(action: { showTherapistView = true
-                                    dismiss()
-                                    //dismiss() // Dismiss the view
-                                    //isTherapistView = true // Update isHome to trigger navigation back home
-                                    navigateToTherapist = true
+                                    isConnectingMode.toggle()
+                                    startSymbol = nil  // Reset selection when toggling mode
                                 }) {
-                                    HStack {
-                                        Image(systemName: "house.fill")
-                                            .resizable()
-                                            .frame(width:35, height:30)
-                                            .foregroundColor(Color("Candace's Couch"))
-                                            .padding(.leading, 40)
-                                    }
-                                }}
-                            
-                            HStack {
-                                Button(action: {
-                                                isConnectingMode.toggle()
-                                                startSymbol = nil  // Reset selection when toggling mode
-                                            }) {
-                                                Image(systemName: isConnectingMode ? "link.circle.fill" : "link.circle")
-                                                    .resizable()
-                                                    .frame(width: 30, height: 30)
-                                                    .foregroundColor(Color("Candace's Couch"))
-                                            }
-                                
-                                
-                            }
-                            //.frame(maxWidth: .infinity, alignment: .leading)
-                            //.navigationDestination(isPresented: $showTherapistView) {TherapistView()}}
-                            /*NavigationLink(destination: TherapistView(), isActive: $navigateToTherapist) {
-                             EmptyView() // Hidden link
-                             }*/
-                            //}
-                            Spacer()
-                            // Button to toggle the drawing mode
-                            if isEditable {
-                                Button(action: {
-                                    if showDrawingCanvas {
-                                        savedDrawing = canvasView.drawing // Save the current drawing
-                                    }
-                                    showDrawingCanvas.toggle()
-                                }) {
-                                    
-                                    Image(systemName: showDrawingCanvas ? "xmark.circle" : "pencil")
+                                    Image(systemName: isConnectingMode ? "link.circle.fill" : "link.circle")
                                         .resizable()
-                                        .frame(width:30, height:30)
+                                        .frame(width: 30, height: 30)
                                         .foregroundColor(Color("Candace's Couch"))
-                                        .padding(.trailing, 40)
                                 }
+                            
+                            
+                        }
+                        Spacer()
+                        // Button to toggle the drawing mode
+                        if isEditable {
+                            Button(action: {
+                                if showDrawingCanvas {
+                                    savedDrawing = canvasView.drawing // Save the current drawing
+                                }
+                                showDrawingCanvas.toggle()
+                            }) {
+                                
+                                Image(systemName: showDrawingCanvas ? "xmark.circle" : "pencil")
+                                    .resizable()
+                                    .frame(width:30, height:30)
+                                    .foregroundColor(Color("Candace's Couch"))
+                                    .padding(.trailing, 40)
                             }
                         }
                     }
                 }
-                
-                
-                /*ZStack {
-                 
-                 
-                 Spacer()
-                 
-                 if let selectedShape = activeShape {
-                 HStack {
-                 Button(action: {
-                 showNotesPopup = true
-                 }) {
-                 Text("Notes")
-                 .padding()
-                 .background(Color.blue)
-                 .foregroundColor(.white)
-                 .cornerRadius(10)
-                 }
-                 
-                 if isEditable {
-                 Button(action: {
-                 deleteActiveShape()
-                 }) {
-                 Text("Delete")
-                 .padding()
-                 .background(Color.red)
-                 .foregroundColor(.white)
-                 .cornerRadius(10)
-                 }
-                 }
-                 }
-                 }
-                 }*/
-                
-                
-            }
-            
-            
-            
-            .padding(.top)
-            .sheet(isPresented: $showNotesPopup) {
-                if let shape = activeShape {
-                    NotesPopupView(shape: Binding(
-                        get: {
-                            if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
-                                return genogramData.genogram[index]
-                            }
-                            return shape
-                        },
-                        set: { updatedShape in
-                            if let index = genogramData.genogram.firstIndex(where: { $0.id == updatedShape.id }) {
-                                genogramData.genogram[index] = updatedShape
-                            }
-                        }
-                    ), isEditable: isEditable)
-                }
-            }
-            .sheet(isPresented: $isSidePanelVisible) {
-                if let selectedIcon = selectedIcon {
-                    SidePanelView(
-                        iconName: selectedIcon,
-                        description: "\(selectedIcon) description",
-                        onClose: {
-                            isSidePanelVisible = false
-                        }
-                        
-                    )
-                }
-                
-            }
-            .frame(minWidth: UIHelper.screenSize.width, minHeight: UIHelper.screenSize.height)
-            .background(Color("White"))
-            
-            
-            //.presentationSizing(.fitted)
-            
-            
-            .onAppear {
-                // Lock to landscape when view appears
-                lockOrientation(.landscape)
-            }
-            .onDisappear {
-                // Remove lock when view disappears
-                lockOrientation(.all)
             }
         }
-       /* .toolbar {
-                   ToolbarItem(placement: .primaryAction) {
-                       
-                   }
-               } */
+        
+        .padding(.top)
+        .sheet(isPresented: $showNotesPopup) {
+            if let shape = activeShape {
+                NotesPopupView(shape: Binding(
+                    get: {
+                        if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
+                            return genogramData.genogram[index]
+                        }
+                        return shape
+                    },
+                    set: { updatedShape in
+                        if let index = genogramData.genogram.firstIndex(where: { $0.id == updatedShape.id }) {
+                            genogramData.genogram[index] = updatedShape
+                        }
+                    }
+                ), isEditable: isEditable)
+            }
+        }
+        .sheet(isPresented: $isSidePanelVisible) {
+            if let selectedIcon = selectedIcon {
+                SidePanelView(
+                    iconName: selectedIcon,
+                    description: "\(selectedIcon) description",
+                    onClose: {
+                        isSidePanelVisible = false
+                    }
+                    
+                )
+            }
+            
+        }
+        .frame(minWidth: UIHelper.screenSize.width, minHeight: UIHelper.screenSize.height)
+        .background(Color("White"))
+        
+        .onAppear {
+            // Lock to landscape when view appears
+            lockOrientation(.landscape)
+        }
+        .onDisappear {
+            // Remove lock when view disappears
+            lockOrientation(.all)
+        }
     }
     
     struct ConnectionsView: View {
