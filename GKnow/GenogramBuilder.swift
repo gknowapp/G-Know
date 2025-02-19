@@ -34,6 +34,8 @@ struct GenogramBuilder: View {
     
     @State private var hasGeneratedTemplate: Bool = false
     
+    @State private var selectedConnectionType: Connection.ConnectionType = .marriage
+    
     enum DrawingMode {
            case none
            case connecting
@@ -45,7 +47,7 @@ struct GenogramBuilder: View {
     var imageOptions = ["Abortion", "Miscarriage", "Male Death", "Female Death"]
     var imageOptionsLabel = ["Male", "Female", "Unknown Gender", "Pregnancy"]
     var relationshipOptions = ["Marriage", "Engaged", "Committed Relationship", "Legal Separation", "Separation In Fact"]
-    var relationshipOptionsLabel = ["Cutoff", "Divorce", "Focused On", "Normal", "Focused On Negatively"]
+    var relationshipOptionsLabel = ["Cutoff", "Divorce", "Focused On", "Normal", "Abuse"]
     var symptomOptions = ["Male AD Recovery", "Male Illness Recovery", "Male Illness Recovery"]
     var symptomOptionsLabel = ["Male AD Abuse", "Male Illness", "Male Illness Recovery"]
     
@@ -202,7 +204,6 @@ struct GenogramBuilder: View {
                                 // Relationships Group
                                 DisclosureGroup(
                                     content: {
-                                        
                                         HStack(spacing: UIHelper.standardPadding) {
                                             ForEach(relationshipOptions, id: \.self) { imageName in
                                                 Image(imageName)
@@ -210,6 +211,12 @@ struct GenogramBuilder: View {
                                                     .frame(width: UIHelper.standardIconSize,
                                                            height: UIHelper.standardIconSize)
                                                     .cornerRadius(UIHelper.standardCornerRadius)
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius)
+                                                            .stroke(isConnectingMode && selectedIcon == imageName ?
+                                                                   Color("Dark Green") : Color.clear,
+                                                                   lineWidth: 2)
+                                                    )
                                                     .onTapGesture {
                                                         handleIconTap(imageName: imageName)
                                                     }
@@ -420,6 +427,16 @@ struct GenogramBuilder: View {
         .navigationBarBackButtonHidden(true) // This hides the default back button
     }
     
+    private func getCenter(for symbolId: UUID) -> CGPoint {
+        if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
+            return CGPoint(
+                x: shape.position.x,
+                y: shape.position.y
+            )
+        }
+        return .zero
+    }
+    
     struct ConnectionsView: View {
         let genogramData: GenogramData
         let onConnectionTap: (Connection) -> Void
@@ -441,7 +458,25 @@ struct GenogramBuilder: View {
                                       connections: genogramData.connections,
                                       genogramData: genogramData)
                 }
+                
+                // Abuse Connections
+                ForEach(genogramData.connections.filter { $0.type == .abuse }) { connection in
+                    if let start = getCenter(for: connection.startSymbolId),
+                       let end = getCenter(for: connection.endSymbolId) {
+                        AbuseConnectionLine(start: start, end: end)
+                            .stroke(Color.black, lineWidth: 2)
+                            //.background(AbuseConnectionLine(start: start, end: end).fill(Color.black))
+                    }
+                }
             }
+        }
+        
+        // Helper function to get center point of a symbol
+        private func getCenter(for symbolId: UUID) -> CGPoint? {
+            if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
+                return shape.position
+            }
+            return nil
         }
     }
     
@@ -565,16 +600,16 @@ struct GenogramBuilder: View {
         
         if let firstSymbol = startSymbol {
             if firstSymbol.id != shape.id {
-                // Create marriage connection between two symbols
-                let marriageConnection = Connection(
+                // Create connection between two symbols
+                let connection = Connection(
                     id: UUID(),
-                    start: getBottomCenter(for: firstSymbol.id),
-                    end: getBottomCenter(for: shape.id),
+                    start: getCenter(for: firstSymbol.id),
+                    end: getCenter(for: shape.id),
                     startSymbolId: firstSymbol.id,
                     endSymbolId: shape.id,
-                    type: .marriage
+                    type: selectedConnectionType
                 )
-                genogramData.connections.append(marriageConnection)
+                genogramData.connections.append(connection)
             }
             startSymbol = nil
             selectedShapeId = nil
@@ -614,7 +649,16 @@ struct GenogramBuilder: View {
     }
     
     private func handleIconTap(imageName: String) {
-        addIconToGenogram(imageName: imageName)
+        // Check if the image is a relationship type
+        if relationshipOptions.contains(imageName) || relationshipOptionsLabel.contains(imageName) {
+            // Enable connecting mode with the appropriate connection type
+            isConnectingMode = true
+            selectedConnectionType = getConnectionType(for: imageName)
+            selectedIcon = imageName // This will help with visual feedback
+        } else {
+            // Handle regular icon placement as before
+            addIconToGenogram(imageName: imageName)
+        }
     }
     
     private func addIconToGenogram(imageName: String) {
@@ -991,6 +1035,20 @@ struct GenogramBuilder: View {
             UIViewController.attemptRotationToDeviceOrientation()
         }
     }
+    
+    // Add helper function to determine connection type
+    private func getConnectionType(for relationshipImage: String) -> Connection.ConnectionType {
+        switch relationshipImage {
+        case "Marriage", "Engaged", "Committed Relationship", "Legal Separation", "Separation In Fact":
+            return .marriage
+        case "Cutoff", "Divorce", "Focused On", "Normal", "Focused On Negatively":
+            return .marriage // or create new types for these if needed
+        case "Abuse": // Add your abuse-related relationship images here
+            return .abuse
+        default:
+            return .marriage
+        }
+    }
 }
            
 // A separate view to handle the PencilKit canvas
@@ -1113,10 +1171,89 @@ struct Connection: Identifiable {
     enum ConnectionType {
         case marriage
         case child
+        case abuse
     }
     
     var parentMiddlePoint: CGPoint? {
         guard let start = start, let end = end else { return nil }
         return CGPoint(x: (start.x + end.x) / 2, y: start.y)
+    }
+}
+
+// Add new shape for abuse connection
+struct AbuseConnectionLine: Shape {
+    let start: CGPoint
+    let end: CGPoint
+    var segments: Int = 12// Number of zigzag segments
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        // Calculate direction vector
+        let dx = end.x - start.x
+        let dy = end.y - start.y
+        let distance = sqrt(dx * dx + dy * dy)
+        
+        
+        // Calculate unit vector
+        let ux = dx / distance
+        let uy = dy / distance
+        
+        // Calculate perpendicular unit vector for zigzag
+        let px = -uy
+        let py = ux
+        
+        // Start the path
+        path.move(to: start)
+        
+        let arrowLength: CGFloat = 60 // Increased to ensure visibility
+        let arrowBaseX = end.x - ux * arrowLength
+        let arrowBaseY = end.y - uy * arrowLength
+        
+        // Draw zigzag all the way to arrow base
+        for i in 0...segments {
+            let t = CGFloat(i) / CGFloat(segments)
+            
+            // Calculate points from start to arrow base
+            let x1 = start.x + (arrowBaseX - start.x) * t
+            let y1 = start.y + (arrowBaseY - start.y) * t
+            
+            if i % 2 == 0 {
+                path.addLine(to: CGPoint(
+                    x: x1 + px * 8,
+                    y: y1 + py * 8
+                ))
+            } else {
+                path.addLine(to: CGPoint(
+                    x: x1 - px * 8,
+                    y: y1 - py * 8
+                ))
+            }
+        }
+        
+        // Draw arrow head as a filled triangle
+        let arrowWidth: CGFloat = 15
+        
+        // Move to arrow base center
+        path.move(to: CGPoint(x: arrowBaseX, y: arrowBaseY))
+        
+        // Draw arrow head outline
+        path.addLine(to: CGPoint(
+            x: arrowBaseX + px * arrowWidth,
+            y: arrowBaseY + py * arrowWidth
+        ))
+        path.addLine(to: CGPoint(
+            x: end.x - ux * 30, // Stop short of the actual end point
+            y: end.y - uy * 30
+        ))
+        path.addLine(to: CGPoint(
+            x: arrowBaseX - px * arrowWidth,
+            y: arrowBaseY - py * arrowWidth
+        ))
+        
+        // Close the arrow head
+        path.closeSubpath()
+        
+        return path
     }
 }
