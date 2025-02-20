@@ -42,14 +42,3 @@ G-Know is a native Swift app designed for therapists to create, securely store, 
 - HIPAA-compliant data handling
 - Protected patient information
 
-## Installation
-
-1. Clone the repository
-2. Install Xcode (minimum version 14.0)
-3. Set up your Airtable credentials in the `Secrets` folder
-4. Build and run the project
-
-## Configuration
-
-Create a `Secrets` folder in the project root with your Airtable credentials:
-
