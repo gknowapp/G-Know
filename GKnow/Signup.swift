@@ -123,6 +123,8 @@ struct TherapistSignupView: View {
     @State private var birthDate = Date()
     @State private var address = ""
     @State private var email = ""
+    @State private var password = ""
+    @State private var confirmPassword = ""
     @State private var selectedImage: PhotosPickerItem? = nil
     @State private var profileImage: Image? = nil
     var onComplete: () -> Void // Callback for completion

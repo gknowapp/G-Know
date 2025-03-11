@@ -6,6 +6,7 @@
 //
 // Login.swift
 import SwiftUI
+import FirebaseAuth
 
 struct Login: View {
     @Environment(\.dismiss) var dismiss
@@ -17,8 +18,7 @@ struct Login: View {
     @State private var navigateToTherapist = false
     
     // Hardcoded for now
-    let validUsername = "Candacecouch"
-    let validPassword = "password"
+    
     
     let backgroundImage = Image("Therapist Background")
         .resizable()
@@ -94,20 +94,7 @@ struct Login: View {
                         .shadow(radius: 10)
                     
                     // Login Button
-                    Button(action: {
-                        if email.isEmpty || password.isEmpty {
-                            alertMessage = "Please fill in both fields."
-                            showAlert = true
-                        } else if email == validUsername && password == validPassword {
-                            // If credentials are correct, navigate to the TherapistView
-                            print("Logging in with \(email) and \(password)")
-                            navigateToTherapist = true
-                        } else {
-                            // Show error if credentials are wrong
-                            alertMessage = "Invalid username or password. Please try again."
-                            showAlert = true
-                        }
-                    }) {
+                    Button(action: {login()}) {
                         Text("Login")
                             .font(.largeTitle)
                             .foregroundColor(Color ("Candace's Couch"))
@@ -135,6 +122,26 @@ struct Login: View {
         } // Hide the navigation bar
             
         }
+    
+    func login() {
+        
+        if (email.isEmpty || password.isEmpty) {
+            self.alertMessage = "Please fill in all fields."
+            self.showAlert = true
+            return
+        }
+        
+        Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
+            
+            if error != nil {
+                self.alertMessage = (error?.localizedDescription)!
+                self.showAlert = true
+            } else {
+                navigateToTherapist = true
+            }
+            
+        }
+    }
     }
 
 struct Login_Previews: PreviewProvider {

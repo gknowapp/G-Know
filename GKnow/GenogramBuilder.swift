@@ -16,7 +16,6 @@ struct GenogramBuilder: View {
     @State private var savedDrawing = PKDrawing() // Stores the drawing to display it after exiting
     
     
-    /** Cursor first attempt at creating the function*/
     @State private var isConnectingMode: Bool = false
     @State private var drawingMode: DrawingMode = .none
     @State private var selectedConnection: Connection? = nil // For child connections
