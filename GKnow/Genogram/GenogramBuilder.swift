@@ -993,8 +993,10 @@ struct GenogramBuilder: View {
     // Add helper function to determine connection type
     private func getConnectionType(for relationshipImage: String) -> Connection.ConnectionType {
         switch relationshipImage {
-        case "Marriage", "Engaged", "Committed Relationship", "Legal Separation", "Separation In Fact":
+        case "Marriage":
             return .marriage
+        case "Engaged":
+            return .harmony
         case "Cutoff", "Divorce", "Focused On", "Normal", "Focused On Negatively":
             return .marriage // or create new types for these if needed
         case "Abuse": // Add your abuse-related relationship images here

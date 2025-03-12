@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 //
 // MARK: Connection Struct
@@ -31,6 +32,7 @@ struct Connection: Identifiable {
         case focus
         case dating
         case affair
+        case engaged
     }
     
     var parentMiddlePoint: CGPoint? {
@@ -172,5 +174,147 @@ struct AbuseConnectionLine: Shape {
         path.closeSubpath()
         
         return path
+    }
+}
+
+//
+//MARK: Harmony Connection Line - A straight line from one shape to another
+//
+struct HarmonyConnectionLine : Shape {
+    
+    let start: CGPoint
+    let end: CGPoint
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: start)
+        path.addLine(to: end)
+        return path
+    }
+    
+    
+}
+
+//
+// MARK: FriendshipConnection - Two parallel lines from one shape to another
+//
+
+struct FriendshipConnectionLine: Shape {
+    let start: CGPoint
+    let end: CGPoint
+    let lineSpacing: CGFloat = 2
+    
+    func path(in rect: CGRect) -> Path {
+        // Calculate offsets for the two parallel lines
+        let (startLine1, endLine1, startLine2, endLine2) = calculateOffsetPoints()
+        
+        // Create a combined path
+        var path = Path()
+        path.addPath(HarmonyConnectionLine(start: startLine1, end: endLine1).path(in: rect))
+        path.addPath(HarmonyConnectionLine(start: startLine2, end: endLine2).path(in: rect))
+        
+        return path
+    }
+    
+    private func calculateOffsetPoints() -> (CGPoint, CGPoint, CGPoint, CGPoint) {
+        // Calculate the vector from start to end
+        let dx = end.x - start.x
+        let dy = end.y - start.y
+        
+        // Calculate the normalized perpendicular vector
+        let length = sqrt(dx * dx + dy * dy)
+        guard length > 0 else {
+            return (start, end, start, end) // Return same points if length is zero
+        }
+        
+        let perpX = -dy / length
+        let perpY = dx / length
+        
+        // Calculate offset points for the two parallel lines
+        let halfSpacing = lineSpacing / 2
+        
+        let startLine1 = CGPoint(
+            x: start.x + perpX * halfSpacing,
+            y: start.y + perpY * halfSpacing
+        )
+        let endLine1 = CGPoint(
+            x: end.x + perpX * halfSpacing,
+            y: end.y + perpY * halfSpacing
+        )
+        
+        let startLine2 = CGPoint(
+            x: start.x - perpX * halfSpacing,
+            y: start.y - perpY * halfSpacing
+        )
+        let endLine2 = CGPoint(
+            x: end.x - perpX * halfSpacing,
+            y: end.y - perpY * halfSpacing
+        )
+        
+        return (startLine1, endLine1, startLine2, endLine2)
+    }
+}
+//
+//MARK: FusionConnectionLine - 3 parallel lines from one point to another
+//
+struct FusionConnectionLine: Shape {
+    let start: CGPoint
+    let end: CGPoint
+    let lineSpacing: CGFloat = 2
+    
+    func path(in rect: CGRect) -> Path {
+        // Calculate offsets for the three parallel lines
+        let (startLine1, endLine1, startLine2, endLine2, startLine3, endLine3) = calculateOffsetPoints()
+        
+        // Create a combined path
+        var path = Path()
+        path.addPath(HarmonyConnectionLine(start: startLine1, end: endLine1).path(in: rect))
+        path.addPath(HarmonyConnectionLine(start: startLine2, end: endLine2).path(in: rect))
+        path.addPath(HarmonyConnectionLine(start: startLine3, end: endLine3).path(in: rect))
+        
+        return path
+    }
+    
+    private func calculateOffsetPoints() -> (CGPoint, CGPoint, CGPoint, CGPoint, CGPoint, CGPoint) {
+        // Calculate the vector from start to end
+        let dx = end.x - start.x
+        let dy = end.y - start.y
+        
+        // Calculate the normalized perpendicular vector
+        let length = sqrt(dx * dx + dy * dy)
+        guard length > 0 else {
+            // Return same points if length is zero
+            return (start, end, start, end, start, end)
+        }
+        
+        let perpX = -dy / length
+        let perpY = dx / length
+        
+        // Calculate offset points for the three parallel lines
+        // Middle line (directly on the path)
+        let startLine2 = start
+        let endLine2 = end
+        
+        // Top line
+        let startLine1 = CGPoint(
+            x: start.x + perpX * lineSpacing,
+            y: start.y + perpY * lineSpacing
+        )
+        let endLine1 = CGPoint(
+            x: end.x + perpX * lineSpacing,
+            y: end.y + perpY * lineSpacing
+        )
+        
+        // Bottom line
+        let startLine3 = CGPoint(
+            x: start.x - perpX * lineSpacing,
+            y: start.y - perpY * lineSpacing
+        )
+        let endLine3 = CGPoint(
+            x: end.x - perpX * lineSpacing,
+            y: end.y - perpY * lineSpacing
+        )
+        
+        return (startLine1, endLine1, startLine2, endLine2, startLine3, endLine3)
     }
 }
