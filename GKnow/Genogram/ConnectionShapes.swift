@@ -97,6 +97,55 @@ struct MarriageConnectionLine: Shape {
 }
 
 //
+// MARK: Dating Connection Line
+//
+
+struct DatingConnectionLine: Shape {
+    let start: CGPoint
+    let end: CGPoint
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let spacing: CGFloat = 20 // Vertical spacing for marriage connection
+        
+        // Start point
+        path.move(to: start)
+        // Down from start
+        path.addLine(to: CGPoint(x: start.x, y: start.y + spacing))
+        // Horizontal connection
+        path.addLine(to: CGPoint(x: end.x, y: start.y + spacing))
+        // Up to end
+        path.addLine(to: end)
+        
+        return path//.stroke(style: StrokeStyle(dash: [5,10]))
+    }
+}
+
+//
+// MARK: Affair Connection Line
+//
+struct AffairConnectionLine: Shape {
+    let start: CGPoint
+    let end: CGPoint
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let spacing: CGFloat = 20 // Vertical spacing for marriage connection
+        
+        // Start point
+        path.move(to: start)
+        // Down from start
+        path.addLine(to: CGPoint(x: start.x, y: start.y + spacing))
+        // Horizontal connection
+        path.addLine(to: CGPoint(x: end.x, y: start.y + spacing))
+        // Up to end
+        path.addLine(to: end)
+        
+        return path//.stroke(style: StrokeStyle(dash: [5,10]))
+    }
+}
+
+//
 // MARK: Abuse Connection Line
 //
 
@@ -178,6 +227,68 @@ struct AbuseConnectionLine: Shape {
 }
 
 //
+//MARK: Focused Connection Line - A straight line with an arrow at the end
+//
+
+struct FocusedConnectionLine : Shape {
+    
+    let start: CGPoint
+    let end: CGPoint
+    
+    func path(in rect: CGRect) -> Path {
+        
+        var path = Path()
+        
+        // Calculate direction vector
+        let dx = end.x - start.x
+        let dy = end.y - start.y
+        let distance = sqrt(dx * dx + dy * dy)
+        
+        
+        // Calculate unit vector
+        let ux = dx / distance
+        let uy = dy / distance
+        
+        let px = -uy
+        let py = ux
+        
+        // Start the path
+        path.move(to: start)
+        
+        let arrowLength: CGFloat = 60 // Increased to ensure visibility
+        let arrowBaseX = end.x - ux * arrowLength
+        let arrowBaseY = end.y - uy * arrowLength
+        
+        path.addLine(to: CGPoint(x: arrowBaseX, y: arrowBaseY))
+        
+        // Draw arrow head as a filled triangle
+        let arrowWidth: CGFloat = 15
+        
+        // Move to arrow base center
+        path.move(to: CGPoint(x: arrowBaseX, y: arrowBaseY))
+        
+        // Draw arrow head outline
+        path.addLine(to: CGPoint(
+            x: arrowBaseX + px * arrowWidth,
+            y: arrowBaseY + py * arrowWidth
+        ))
+        path.addLine(to: CGPoint(
+            x: end.x - ux * 30, // Stop short of the actual end point
+            y: end.y - uy * 30
+        ))
+        path.addLine(to: CGPoint(
+            x: arrowBaseX - px * arrowWidth,
+            y: arrowBaseY - py * arrowWidth
+        ))
+        
+        // Close the arrow head
+        path.closeSubpath()
+        
+        return path
+    }
+}
+
+//
 //MARK: Harmony Connection Line - A straight line from one shape to another
 //
 struct HarmonyConnectionLine : Shape {
@@ -202,7 +313,7 @@ struct HarmonyConnectionLine : Shape {
 struct FriendshipConnectionLine: Shape {
     let start: CGPoint
     let end: CGPoint
-    let lineSpacing: CGFloat = 2
+    let lineSpacing: CGFloat = 10
     
     func path(in rect: CGRect) -> Path {
         // Calculate offsets for the two parallel lines
@@ -260,7 +371,7 @@ struct FriendshipConnectionLine: Shape {
 struct FusionConnectionLine: Shape {
     let start: CGPoint
     let end: CGPoint
-    let lineSpacing: CGFloat = 2
+    let lineSpacing: CGFloat = 10
     
     func path(in rect: CGRect) -> Path {
         // Calculate offsets for the three parallel lines

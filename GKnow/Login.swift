@@ -10,8 +10,8 @@ import SwiftUI
 struct Login: View {
     @Environment(\.dismiss) var dismiss
     @Binding var isHome: Bool // Binding to control navigation back to home
-    @State private var email: String = ""
-    @State private var password: String = ""
+    @State private var email: String = "Candacecouch"
+    @State private var password: String = "password"
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     @State private var navigateToTherapist = false
