@@ -1,6 +1,7 @@
 import SwiftUI
 import PencilKit
 
+
 struct GenogramBuilder: View {
     @Binding var genogramData: GenogramData
     @Binding var selectedIcon: String?
@@ -427,45 +428,21 @@ struct GenogramBuilder: View {
         .navigationBarBackButtonHidden(true) // This hides the default back button
     }
     
-    private func getCenter(for symbolId: UUID) -> CGPoint {
-        if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
-            return CGPoint(
-                x: shape.position.x,
-                y: shape.position.y
-            )
-        }
-        return .zero
-    }
-    
     struct ConnectionsView: View {
         let genogramData: GenogramData
         let onConnectionTap: (Connection) -> Void
         
         var body: some View {
             ZStack {
-                // Marriage Connections
-                ForEach(genogramData.connections.filter { $0.type == .marriage }) { connection in
-                    MarriageConnectionView(connection: connection, genogramData: genogramData)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            onConnectionTap(connection)
-                        }
-                }
-                
-                // Child Connections
-                ForEach(genogramData.connections.filter { $0.type == .child }) { connection in
-                    ChildConnectionView(connection: connection,
-                                      connections: genogramData.connections,
-                                      genogramData: genogramData)
-                }
-                
-                // Abuse Connections
-                ForEach(genogramData.connections.filter { $0.type == .abuse }) { connection in
-                    if let start = getCenter(for: connection.startSymbolId),
-                       let end = getCenter(for: connection.endSymbolId) {
-                        AbuseConnectionLine(start: start, end: end)
-                            .stroke(Color.black, lineWidth: 2)
-                            //.background(AbuseConnectionLine(start: start, end: end).fill(Color.black))
+                // Handle all connections with a unified approach
+                ForEach(genogramData.connections) { connection in
+                    ConnectionLineView(
+                        connection: connection,
+                        genogramData: genogramData
+                    )
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onConnectionTap(connection)
                     }
                 }
             }
@@ -479,80 +456,127 @@ struct GenogramBuilder: View {
             return nil
         }
     }
-    
-    struct MarriageConnectionView: View {
+
+    // Unified view for rendering any type of connection
+    struct ConnectionLineView: View {
         let connection: Connection
         let genogramData: GenogramData
         
         var body: some View {
-            let start = getBottomCenter(for: connection.startSymbolId, in: genogramData)
-            let end = getBottomCenter(for: connection.endSymbolId, in: genogramData)
-            
-            MarriageConnectionLine(start: start, end: end)
-                .stroke(Color("Candace's Couch"), lineWidth: 2)
-        }
-        
-        private func getBottomCenter(for symbolId: UUID, in data: GenogramData) -> CGPoint {
-            if let shape = data.genogram.first(where: { $0.id == symbolId }) {
-                return CGPoint(
-                    x: shape.position.x,
-                    y: shape.position.y + (UIHelper.standardIconSize / 2)
-                )
-            }
-            return .zero
-        }
-    }
-    
-    struct ChildConnectionView: View {
-        let connection: Connection
-        let connections: [Connection]
-        let genogramData: GenogramData
-        
-        var body: some View {
-            if let parentConnection = connections.first(where: { $0.id == connection.parentConnectionId }) {
-                let parentStart = getBottomCenter(for: parentConnection.startSymbolId, in: genogramData)
-                let parentEnd = getBottomCenter(for: parentConnection.endSymbolId, in: genogramData)
-                let childPoint = getTopCenter(for: connection.endSymbolId, in: genogramData)
+            switch connection.type {
+            case .marriage:
+                // Marriage-type connections (horizontal line between partners)
+                let start = getBottomCenter(for: connection.startSymbolId)
+                let end = getBottomCenter(for: connection.endSymbolId)
                 
-                // Get all siblings and sort them by their x position
-                let siblings = connections.filter { $0.type == .child && $0.parentConnectionId == parentConnection.id }
-                    .sorted { (conn1, conn2) -> Bool in
-                        let pos1 = getSymbolPosition(for: conn1.endSymbolId, in: genogramData)
-                        let pos2 = getSymbolPosition(for: conn2.endSymbolId, in: genogramData)
+                MarriageConnectionLine(start: start, end: end)
+                    .stroke(Color("Candace's Couch"), lineWidth: 2)
+                    
+            case .child:
+                // Child connections (vertical line from parent marriage to child)
+                if let parentConnectionId = connection.parentConnectionId,
+                   let parentConnection = genogramData.connections.first(where: { $0.id == parentConnectionId }) {
+                    
+                    let parentStart = getBottomCenter(for: parentConnection.startSymbolId)
+                    let parentEnd = getBottomCenter(for: parentConnection.endSymbolId)
+                    let childPoint = getTopCenter(for: connection.endSymbolId)
+                    
+                    // Get all siblings with the same parent connection
+                    let siblings = genogramData.connections.filter {
+                        $0.type == .child && $0.parentConnectionId == parentConnectionId
+                    }.sorted { (conn1, conn2) -> Bool in
+                        let pos1 = getSymbolPosition(for: conn1.endSymbolId)
+                        let pos2 = getSymbolPosition(for: conn2.endSymbolId)
                         return pos1.x < pos2.x
                     }
+                    
+                    let siblingIndex = siblings.firstIndex(where: { $0.id == connection.id }) ?? 0
+                    let totalSiblings = siblings.count
+                    
+                    // Calculate position along marriage line
+                    let marriageLineLength = parentEnd.x - parentStart.x
+                    let spacing = marriageLineLength / CGFloat(totalSiblings + 1)
+                    let startX = parentStart.x + (spacing * CGFloat(siblingIndex + 1))
+                    
+                    let connectionPoint = CGPoint(
+                        x: startX,
+                        y: parentStart.y + 20
+                    )
+                    
+                    ChildConnectionLine(
+                        startPoint: connectionPoint,
+                        childPoint: childPoint
+                    )
+                    .stroke(Color("Candace's Couch"), lineWidth: 2)
+                }
                 
-                let siblingIndex = siblings.firstIndex(where: { $0.id == connection.id }) ?? 0
-                let totalSiblings = siblings.count
+            case .abuse:
+                // Abuse connections (wavy line)
+                let start = getCenter(for: connection.startSymbolId)
+                let end = getCenter(for: connection.endSymbolId)
                 
-                // Calculate position along marriage line
-                let marriageLineLength = parentEnd.x - parentStart.x
-                let spacing = marriageLineLength / CGFloat(totalSiblings + 1)
-                let startX = parentStart.x + (spacing * CGFloat(siblingIndex + 1))
+                AbuseConnectionLine(start: start, end: end)
+                    .stroke(Color.black, lineWidth: 2)
                 
-                let connectionPoint = CGPoint(
-                    x: startX,
-                    y: parentStart.y + 20
-                )
+            case .harmony:
+                let start = getCenter(for: connection.startSymbolId)
+                let end = getCenter(for: connection.endSymbolId)
                 
-                ChildConnectionLine(
-                    startPoint: connectionPoint,
-                    childPoint: childPoint
-                )
+                HarmonyConnectionLine(start: start, end: end)
+                    .stroke(Color.black, lineWidth: 2)
+                
+            case .frienship:
+                let start = getCenter(for: connection.startSymbolId)
+                let end = getCenter(for: connection.endSymbolId)
+                
+                FriendshipConnectionLine(start: start, end: end)
+                    .stroke(Color.black, lineWidth: 2)
+                
+            case .fusion:
+                let start = getCenter(for: connection.startSymbolId)
+                let end = getCenter(for: connection.endSymbolId)
+                
+                FusionConnectionLine(start: start, end: end)
+                    .stroke(Color.black, lineWidth: 2)
+                
+            case .focus:
+                let start = getCenter(for: connection.startSymbolId)
+                let end = getCenter(for: connection.endSymbolId)
+                
+                FocusedConnectionLine(start: start, end: end)
+                    .stroke(Color.black, lineWidth: 2)
+                
+            case .dating:
+                let start = getCenter(for: connection.startSymbolId)
+                let end = getCenter(for: connection.endSymbolId)
+                
+                MarriageConnectionLine(start: start, end: end)
+                    .stroke(Color.black, lineWidth: 2)//, dash: [10, 5])
+                
+                   
+                    
+            default:
+                // Default handling for any other connection types
+                let start = getCenter(for: connection.startSymbolId)
+                let end = getCenter(for: connection.endSymbolId)
+                
+                Path { path in
+                    path.move(to: start)
+                    path.addLine(to: end)
+                }
                 .stroke(Color("Candace's Couch"), lineWidth: 2)
             }
         }
-        
-        // Helper function to get symbol position
-        private func getSymbolPosition(for symbolId: UUID, in data: GenogramData) -> CGPoint {
-            if let shape = data.genogram.first(where: { $0.id == symbolId }) {
+        // Helper methods for getting positions
+        private func getCenter(for symbolId: UUID) -> CGPoint {
+            if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
                 return shape.position
             }
             return .zero
         }
         
-        private func getBottomCenter(for symbolId: UUID, in data: GenogramData) -> CGPoint {
-            if let shape = data.genogram.first(where: { $0.id == symbolId }) {
+        private func getBottomCenter(for symbolId: UUID) -> CGPoint {
+            if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
                 return CGPoint(
                     x: shape.position.x,
                     y: shape.position.y + (UIHelper.standardIconSize / 2)
@@ -561,37 +585,25 @@ struct GenogramBuilder: View {
             return .zero
         }
         
-        private func getTopCenter(for symbolId: UUID, in data: GenogramData) -> CGPoint {
-            if let shape = data.genogram.first(where: { $0.id == symbolId }) {
+        private func getTopCenter(for symbolId: UUID) -> CGPoint {
+            if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
                 return CGPoint(
                     x: shape.position.x,
                     y: shape.position.y - (UIHelper.standardIconSize / 2)
                 )
             }
-            return .zero // Returns (0,0) if shape not found
+            return .zero
         }
-    }
-    
-    private func getBottomCenter(for symbolId: UUID) -> CGPoint {
-        if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
-            return CGPoint(
-                x: shape.position.x,
-                y: shape.position.y + (UIHelper.standardIconSize / 2)
-            )
+        
+        private func getSymbolPosition(for symbolId: UUID) -> CGPoint {
+            if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
+                return shape.position
+            }
+            return .zero
         }
-        return .zero
+        
+       
     }
-    
-    private func getTopCenter(for symbolId: UUID) -> CGPoint {
-        if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
-            return CGPoint(
-                x: shape.position.x,
-                y: shape.position.y - (UIHelper.standardIconSize / 2)
-            )
-        }
-        return .zero
-    }
-    
     private func handleSymbolTap(_ shape: GenogramShape) {
         if !isConnectingMode {
             activeShape = shape
@@ -717,53 +729,6 @@ struct GenogramBuilder: View {
                 pow(shape.position.y - point.y, 2)
             )
             return distance < threshold
-        }
-    }
-    
-    struct MarriageConnectionLine: Shape {
-        let start: CGPoint
-        let end: CGPoint
-        
-        func path(in rect: CGRect) -> Path {
-            var path = Path()
-            let spacing: CGFloat = 20 // Vertical spacing for marriage connection
-            
-            // Start point
-            path.move(to: start)
-            // Down from start
-            path.addLine(to: CGPoint(x: start.x, y: start.y + spacing))
-            // Horizontal connection
-            path.addLine(to: CGPoint(x: end.x, y: start.y + spacing))
-            // Up to end
-            path.addLine(to: end)
-            
-            return path
-        }
-    }
-    
-    struct ChildConnectionLine: Shape {
-        let startPoint: CGPoint
-        let childPoint: CGPoint
-        
-        func path(in rect: CGRect) -> Path {
-            var path = Path()
-            
-            // Start from the point on marriage line
-            path.move(to: startPoint)
-            
-            // Calculate the midpoint between start and child
-            let midY = startPoint.y + ((childPoint.y - startPoint.y) / 2)
-            
-            // Draw vertical line to midpoint
-            path.addLine(to: CGPoint(x: startPoint.x, y: midY))
-            
-            // Draw horizontal line to align with child
-            path.addLine(to: CGPoint(x: childPoint.x, y: midY))
-            
-            // Draw final vertical line to child
-            path.addLine(to: childPoint)
-            
-            return path
         }
     }
 
@@ -1039,15 +1004,58 @@ struct GenogramBuilder: View {
     // Add helper function to determine connection type
     private func getConnectionType(for relationshipImage: String) -> Connection.ConnectionType {
         switch relationshipImage {
-        case "Marriage", "Engaged", "Committed Relationship", "Legal Separation", "Separation In Fact":
+        case "Marriage":
             return .marriage
-        case "Cutoff", "Divorce", "Focused On", "Normal", "Focused On Negatively":
-            return .marriage // or create new types for these if needed
-        case "Abuse": // Add your abuse-related relationship images here
+        case "Normal":
+            return .harmony
+        case "Cutoff":
+            return .frienship
+        case "Divorce":
+            return .fusion
+        case "Abuse":
             return .abuse
+        case "Focused On":
+            return .focus
+        case "Engaged":
+            return .dating
         default:
-            return .marriage
+            return .child
         }
+    }
+    
+    // Helper methods for getting positions
+    private func getCenter(for symbolId: UUID) -> CGPoint {
+        if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
+            return shape.position
+        }
+        return .zero
+    }
+    
+    private func getBottomCenter(for symbolId: UUID) -> CGPoint {
+        if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
+            return CGPoint(
+                x: shape.position.x,
+                y: shape.position.y + (UIHelper.standardIconSize / 2)
+            )
+        }
+        return .zero
+    }
+    
+    private func getTopCenter(for symbolId: UUID) -> CGPoint {
+        if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
+            return CGPoint(
+                x: shape.position.x,
+                y: shape.position.y - (UIHelper.standardIconSize / 2)
+            )
+        }
+        return .zero
+    }
+    
+    private func getSymbolPosition(for symbolId: UUID) -> CGPoint {
+        if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
+            return shape.position
+        }
+        return .zero
     }
 }
            
@@ -1159,101 +1167,6 @@ struct Bookmark: Identifiable {
 }
 
 // Move Connection struct outside of GenogramBuilder
-struct Connection: Identifiable {
-    let id: UUID
-    var start: CGPoint?
-    var end: CGPoint?
-    let startSymbolId: UUID
-    let endSymbolId: UUID
-    let type: ConnectionType
-    var parentConnectionId: UUID?
-    
-    enum ConnectionType {
-        case marriage
-        case child
-        case abuse
-    }
-    
-    var parentMiddlePoint: CGPoint? {
-        guard let start = start, let end = end else { return nil }
-        return CGPoint(x: (start.x + end.x) / 2, y: start.y)
-    }
-}
 
-// Add new shape for abuse connection
-struct AbuseConnectionLine: Shape {
-    let start: CGPoint
-    let end: CGPoint
-    var segments: Int = 12// Number of zigzag segments
-    
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        
-        // Calculate direction vector
-        let dx = end.x - start.x
-        let dy = end.y - start.y
-        let distance = sqrt(dx * dx + dy * dy)
-        
-        
-        // Calculate unit vector
-        let ux = dx / distance
-        let uy = dy / distance
-        
-        // Calculate perpendicular unit vector for zigzag
-        let px = -uy
-        let py = ux
-        
-        // Start the path
-        path.move(to: start)
-        
-        let arrowLength: CGFloat = 60 // Increased to ensure visibility
-        let arrowBaseX = end.x - ux * arrowLength
-        let arrowBaseY = end.y - uy * arrowLength
-        
-        // Draw zigzag all the way to arrow base
-        for i in 0...segments {
-            let t = CGFloat(i) / CGFloat(segments)
-            
-            // Calculate points from start to arrow base
-            let x1 = start.x + (arrowBaseX - start.x) * t
-            let y1 = start.y + (arrowBaseY - start.y) * t
-            
-            if i % 2 == 0 {
-                path.addLine(to: CGPoint(
-                    x: x1 + px * 8,
-                    y: y1 + py * 8
-                ))
-            } else {
-                path.addLine(to: CGPoint(
-                    x: x1 - px * 8,
-                    y: y1 - py * 8
-                ))
-            }
-        }
-        
-        // Draw arrow head as a filled triangle
-        let arrowWidth: CGFloat = 15
-        
-        // Move to arrow base center
-        path.move(to: CGPoint(x: arrowBaseX, y: arrowBaseY))
-        
-        // Draw arrow head outline
-        path.addLine(to: CGPoint(
-            x: arrowBaseX + px * arrowWidth,
-            y: arrowBaseY + py * arrowWidth
-        ))
-        path.addLine(to: CGPoint(
-            x: end.x - ux * 30, // Stop short of the actual end point
-            y: end.y - uy * 30
-        ))
-        path.addLine(to: CGPoint(
-            x: arrowBaseX - px * arrowWidth,
-            y: arrowBaseY - py * arrowWidth
-        ))
-        
-        // Close the arrow head
-        path.closeSubpath()
-        
-        return path
-    }
-}
+
+
