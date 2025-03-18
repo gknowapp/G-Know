@@ -525,7 +525,7 @@ struct GenogramBuilder: View {
                 HarmonyConnectionLine(start: start, end: end)
                     .stroke(Color.black, lineWidth: 2)
                 
-            case .frienship:
+            case .friendship:
                 let start = getCenter(for: connection.startSymbolId)
                 let end = getCenter(for: connection.endSymbolId)
                 
@@ -547,14 +547,30 @@ struct GenogramBuilder: View {
                     .stroke(Color.black, lineWidth: 2)
                 
             case .dating:
-                let start = getCenter(for: connection.startSymbolId)
-                let end = getCenter(for: connection.endSymbolId)
+                let start = getBottomCenter(for: connection.startSymbolId)
+                let end = getBottomCenter(for: connection.endSymbolId)
                 
                 MarriageConnectionLine(start: start, end: end)
-                    .stroke(Color.black, lineWidth: 2)//, dash: [10, 5])
+                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [5, 5]))
+                    .foregroundColor(.black)
                 
+            case .affair:
+                let start = getBottomCenter(for: connection.startSymbolId)
+                let end = getBottomCenter(for: connection.endSymbolId)
+                AffairConnectionLine(start: start, end: end)
+                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [5, 5]))
+                    .foregroundColor(.black)
+                            
+                            // Draw the filled triangle
+                AffairTriangleMarker(start: start, end: end)
+                    .fill(.black)
                    
-                    
+            case .divorce:
+                let start = getBottomCenter(for: connection.startSymbolId)
+                let end = getBottomCenter(for: connection.endSymbolId)
+                DivorceConnectionLine(start: start, end: end)
+                    .stroke(Color.black, lineWidth: 2)
+                
             default:
                 // Default handling for any other connection types
                 let start = getCenter(for: connection.startSymbolId)
@@ -1009,8 +1025,10 @@ struct GenogramBuilder: View {
         case "Normal":
             return .harmony
         case "Cutoff":
-            return .frienship
+            return .friendship
         case "Divorce":
+            return .divorce
+        case "Separation In Fact":
             return .fusion
         case "Abuse":
             return .abuse
@@ -1018,6 +1036,8 @@ struct GenogramBuilder: View {
             return .focus
         case "Engaged":
             return .dating
+        case "Legal Separation":
+            return .affair
         default:
             return .child
         }

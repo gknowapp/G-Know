@@ -26,7 +26,7 @@ struct Connection: Identifiable {
         case child
         case abuse
         case harmony
-        case frienship
+        case friendship
         case fusion
         case divorce
         case focus
@@ -130,7 +130,7 @@ struct AffairConnectionLine: Shape {
     
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let spacing: CGFloat = 20 // Vertical spacing for marriage connection
+        let spacing: CGFloat = 20 // Vertical spacing for connection
         
         // Start point
         path.move(to: start)
@@ -141,7 +141,75 @@ struct AffairConnectionLine: Shape {
         // Up to end
         path.addLine(to: end)
         
-        return path//.stroke(style: StrokeStyle(dash: [5,10]))
+        return path
+    }
+}
+
+// Triangle marker for affair connection
+struct AffairTriangleMarker: Shape {
+    let start: CGPoint
+    let end: CGPoint
+    let triangleSize: CGFloat = 10
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let spacing: CGFloat = 20 // Vertical spacing for connection
+        
+        // Calculate the middle point of the horizontal line
+        let middleX = (start.x + end.x) / 2
+        let lineY = start.y + spacing
+        
+        // Draw triangle above the middle of the horizontal line
+        path.move(to: CGPoint(x: middleX, y: lineY - triangleSize))
+        path.addLine(to: CGPoint(x: middleX - triangleSize, y: lineY))
+        path.addLine(to: CGPoint(x: middleX + triangleSize, y: lineY))
+        path.closeSubpath()
+        
+        return path
+    }
+}
+
+
+//
+// MARK: Divorce Connection Line
+//
+
+struct DivorceConnectionLine: Shape {
+    let start: CGPoint
+    let end: CGPoint
+    let gapWidth: CGFloat = 20 // Width of the gap in the horizontal line
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let spacing: CGFloat = 20 // Vertical spacing for connection
+        
+        // Calculate the midpoint of the horizontal line
+        let midX = (start.x + end.x) / 2
+        let horizontalY = start.y + spacing
+        
+        // Start point
+        path.move(to: start)
+        // Down from start
+        path.addLine(to: CGPoint(x: start.x, y: horizontalY))
+        // Horizontal line to gap start
+        path.addLine(to: CGPoint(x: midX - gapWidth/2, y: horizontalY))
+        
+        // Vertical line down at gap start
+        path.move(to: CGPoint(x: midX - gapWidth/2, y: horizontalY - spacing))
+        path.addLine(to: CGPoint(x: midX - gapWidth/2, y: horizontalY + spacing))
+        
+        // Vertical line down at gap end
+        path.move(to: CGPoint(x: midX + gapWidth/2, y: horizontalY - spacing))
+        path.addLine(to: CGPoint(x: midX + gapWidth/2, y: horizontalY + spacing))
+        
+        // Continue horizontal line from gap end to end point
+        path.move(to: CGPoint(x: midX + gapWidth/2, y: horizontalY))
+        path.addLine(to: CGPoint(x: end.x, y: horizontalY))
+        
+        // Up to end
+        path.addLine(to: end)
+        
+        return path
     }
 }
 
@@ -225,6 +293,9 @@ struct AbuseConnectionLine: Shape {
         return path
     }
 }
+
+
+
 
 //
 //MARK: Focused Connection Line - A straight line with an arrow at the end
