@@ -17,7 +17,7 @@ struct GenogramBuilder: View {
     @State private var savedDrawing = PKDrawing() // Stores the drawing to display it after exiting
     
     
-    /** Cursor first attempt at creating the function*/
+    
     @State private var isConnectingMode: Bool = false
     @State private var drawingMode: DrawingMode = .none
     @State private var selectedConnection: Connection? = nil // For child connections
@@ -353,6 +353,20 @@ struct GenogramBuilder: View {
                                             .foregroundColor(Color("Candace's Couch"))
                                     }
                                 
+                                Button("Debug Connections") {
+                                    for (index, connection) in genogramData.connections.enumerated() {
+                                        print("Connection \(index): \(connection.type)")
+                                        print("ID: \(connection.id)")
+                                        print("  Start: \(connection.start ?? .zero)")
+                                        print("  End: \(connection.end ?? .zero)")
+                                        print("  StartID: \(connection.startSymbolId)")
+                                        print("  EndID: \(connection.endSymbolId)")
+                                        if connection.type == .child {
+                                            print("  ParentConnectionID: \(connection.parentConnectionId ?? UUID())")
+                                        }
+                                    }
+                                }
+                                
                                 
                             }
                             Spacer()
@@ -476,7 +490,6 @@ struct GenogramBuilder: View {
                 // Child connections (vertical line from parent marriage to child)
                 if let parentConnectionId = connection.parentConnectionId,
                    let parentConnection = genogramData.connections.first(where: { $0.id == parentConnectionId }) {
-                    
                     let parentStart = getBottomCenter(for: parentConnection.startSymbolId)
                     let parentEnd = getBottomCenter(for: parentConnection.endSymbolId)
                     let childPoint = getTopCenter(for: connection.endSymbolId)
@@ -626,6 +639,8 @@ struct GenogramBuilder: View {
             return
         }
         
+        
+        
         if let firstSymbol = startSymbol {
             if firstSymbol.id != shape.id {
                 // Create connection between two symbols
@@ -648,18 +663,21 @@ struct GenogramBuilder: View {
     }
     
     private func handleMarriageConnectionTap(_ connection: Connection) {
-        if let firstSymbol = startSymbol, connection.type == .marriage {
-            let childConnection = Connection(
-                id: UUID(),
-                start: getTopCenter(for: firstSymbol.id),
-                end: connection.parentMiddlePoint ?? .zero,
-                startSymbolId: firstSymbol.id,
-                endSymbolId: firstSymbol.id,
-                type: .child,
-                parentConnectionId: connection.id
-            )
-            genogramData.connections.append(childConnection)
-            startSymbol = nil
+        
+        if (connection.type == .marriage) {
+            if let firstSymbol = startSymbol {
+                let childConnection = Connection(
+                    id: UUID(),
+                    start: connection.parentMiddlePoint ?? .zero,
+                    end: getTopCenter(for: firstSymbol.id),
+                    startSymbolId: connection.startSymbolId,
+                    endSymbolId: firstSymbol.id,
+                    type: .child,
+                    parentConnectionId: connection.id
+                )
+                genogramData.connections.append(childConnection)
+                startSymbol = nil
+            }
         }
     }
     
