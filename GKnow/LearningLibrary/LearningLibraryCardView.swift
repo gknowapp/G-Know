@@ -17,14 +17,26 @@ struct LearningLibraryCardView : View {
         VStack {
             Text(name)
                 .font(.headline)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+                .padding(.bottom, UIHelper.standardPadding / 2)
+            
             Image(image)
                 .resizable()
-                //.aspectRatio(.fill, contentMode: <#ContentMode#>)
-                .frame(width: 100, height: 100)
+                .aspectRatio(contentMode: .fit)
+                .frame(width: UIHelper.relativeWidth(0.15), height: UIHelper.relativeWidth(0.15))
+                .padding(.bottom, UIHelper.standardPadding / 2)
+            
             Text(description)
+                .font(.caption)
+                .multilineTextAlignment(.center)
+                .lineLimit(6)
+                .minimumScaleFactor(0.7)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .frame(width: UIHelper.relativeWidth(0.18), height: UIHelper.relativeWidth(0.28))
         .padding(UIHelper.standardPadding)
-        .clipShape(RoundedRectangle(cornerSize: (CGSize(width: 5, height: 5))))
+        .clipShape(RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius))
         .border(Color("Dark Green"))
     }
 }

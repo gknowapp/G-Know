@@ -38,18 +38,29 @@ struct TherapistView: View {
                                 .padding(.top, 50)
                                 //.padding(.bottom, 10)
                             
-                            Spacer()
+                           
                             Spacer()
                             //This is the + button, this shows the AddNewPatient i thi
-                            Button(action: {
-                                showNewPatientView = true
-                            }) {
-                                Text("+")
-                                    .font(.system(size: 72))
-                                    .padding()
-                                    .foregroundColor(Color ("Candace's Couch"))
-                                    .cornerRadius(10)
-                                    .padding(.trailing, 50)
+                            VStack {
+                                Button(action: {
+                                    showNewPatientView = true
+                                }) {
+                                    Text("+")
+                                        .font(.system(size: 72))
+                                        .padding()
+                                        .foregroundColor(Color ("Candace's Couch"))
+                                        .cornerRadius(10)
+                                        .padding(.trailing, 25)
+                                }
+                                NavigationLink(destination: LearningLibraryView(), label: {
+                                    Image(systemName: "book.fill")
+                                        .font(.system(size: 50))
+                                        .padding()
+                                        .foregroundColor(Color ("Candace's Couch"))
+                                        .padding(.trailing, 25)
+                                })
+                                    
+                
                             }
                             
                         }
