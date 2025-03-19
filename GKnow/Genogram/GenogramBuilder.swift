@@ -450,6 +450,21 @@ struct GenogramBuilder: View {
             ZStack {
                 // Handle all connections with a unified approach
                 ForEach(genogramData.connections) { connection in
+                    
+                    if (connection.type == .marriage) {
+                        MarriageConnectionView(connection: connection, genogramData: genogramData)
+                                               .contentShape(Rectangle())
+                                               .onTapGesture {
+                                                   onConnectionTap(connection)
+                                            }
+                                       
+                } else if (connection.type == .child) {
+                    
+                    ChildConnectionView(connection: connection,
+                                        connections: genogramData.connections,
+                                        genogramData: genogramData)
+                    
+                } else {
                     ConnectionLineView(
                         connection: connection,
                         genogramData: genogramData
@@ -458,6 +473,7 @@ struct GenogramBuilder: View {
                     .onTapGesture {
                         onConnectionTap(connection)
                     }
+                }
                 }
             }
         }
@@ -470,6 +486,101 @@ struct GenogramBuilder: View {
             return nil
         }
     }
+    
+    struct MarriageConnectionView: View {
+            let connection: Connection
+            let genogramData: GenogramData
+            
+            var body: some View {
+                let start = getBottomCenter(for: connection.startSymbolId, in: genogramData)
+                let end = getBottomCenter(for: connection.endSymbolId, in: genogramData)
+                
+                MarriageConnectionLine(start: start, end: end)
+                    .stroke(Color("Candace's Couch"), lineWidth: 2)
+            }
+            
+            private func getBottomCenter(for symbolId: UUID, in data: GenogramData) -> CGPoint {
+                if let shape = data.genogram.first(where: { $0.id == symbolId }) {
+                    return CGPoint(
+                        x: shape.position.x,
+                        y: shape.position.y + (UIHelper.standardIconSize / 2)
+                    )
+                }
+                return .zero
+            }
+        }
+    
+    struct ChildConnectionView: View {
+            let connection: Connection
+            let connections: [Connection]
+            let genogramData: GenogramData
+            
+            var body: some View {
+                if let parentConnection = connections.first(where: { $0.id == connection.parentConnectionId }) {
+                    let parentStart = getBottomCenter(for: parentConnection.startSymbolId, in: genogramData)
+                    let parentEnd = getBottomCenter(for: parentConnection.endSymbolId, in: genogramData)
+                    let childPoint = getTopCenter(for: connection.endSymbolId, in: genogramData)
+                    
+                    // Get all siblings and sort them by their x position
+                    let siblings = connections.filter { $0.type == .child && $0.parentConnectionId == parentConnection.id }
+                        .sorted { (conn1, conn2) -> Bool in
+                            let pos1 = getSymbolPosition(for: conn1.endSymbolId, in: genogramData)
+                            let pos2 = getSymbolPosition(for: conn2.endSymbolId, in: genogramData)
+                            return pos1.x < pos2.x
+                        }
+                    
+                    let siblingIndex = siblings.firstIndex(where: { $0.id == connection.id }) ?? 0
+                    let totalSiblings = siblings.count
+                    
+                    // Calculate position along marriage line
+                    let marriageLineLength = parentEnd.x - parentStart.x
+                    let spacing = marriageLineLength / CGFloat(totalSiblings + 1)
+                    let startX = parentStart.x + (spacing * CGFloat(siblingIndex + 1))
+                    
+                    let connectionPoint = CGPoint(
+                        x: startX,
+                        y: parentStart.y + 20
+                    )
+                    
+                    ChildConnectionLine(
+                        startPoint: connectionPoint,
+                        childPoint: childPoint
+                    )
+                    .stroke(Color("Candace's Couch"), lineWidth: 2)
+                }
+            }
+            
+            // Helper function to get symbol position
+            private func getSymbolPosition(for symbolId: UUID, in data: GenogramData) -> CGPoint {
+                if let shape = data.genogram.first(where: { $0.id == symbolId }) {
+                    return shape.position
+                }
+                return .zero
+            }
+            
+            private func getBottomCenter(for symbolId: UUID, in data: GenogramData) -> CGPoint {
+                if let shape = data.genogram.first(where: { $0.id == symbolId }) {
+                    return CGPoint(
+                        x: shape.position.x,
+                        y: shape.position.y + (UIHelper.standardIconSize / 2)
+                    )
+                }
+                return .zero
+            }
+            
+            private func getTopCenter(for symbolId: UUID, in data: GenogramData) -> CGPoint {
+                if let shape = data.genogram.first(where: { $0.id == symbolId }) {
+                    return CGPoint(
+                        x: shape.position.x,
+                        y: shape.position.y - (UIHelper.standardIconSize / 2)
+                    )
+                }
+                return .zero // Returns (0,0) if shape not found
+            }
+        }
+
+    
+    
 
     // Unified view for rendering any type of connection
     struct ConnectionLineView: View {
