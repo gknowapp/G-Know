@@ -56,7 +56,7 @@ struct ChildConnectionLine: Shape {
         path.move(to: startPoint)
         
         // Calculate the midpoint between start and child
-        let midY = startPoint.y + ((childPoint.y - startPoint.y) / 2)
+        let midY = startPoint.y + ((childPoint.y - startPoint.y) / 2) // This is also calculating where the point should be drawn?? Need to look into this a bit 
         
         // Draw vertical line to midpoint
         path.addLine(to: CGPoint(x: startPoint.x, y: midY))

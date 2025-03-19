@@ -922,7 +922,7 @@ struct GenogramBuilder: View {
             id: UUID(),
             start: getTopCenter(for: symbolIds[1][0]),
             end: marriageConnections[0].parentMiddlePoint ?? .zero,
-            startSymbolId: symbolIds[1][0],
+            startSymbolId: symbolIds[0][0],
             endSymbolId: symbolIds[1][0],
             type: .child,
             parentConnectionId: marriageConnections[0].id
@@ -934,7 +934,7 @@ struct GenogramBuilder: View {
             id: UUID(),
             start: getTopCenter(for: symbolIds[1][1]),
             end: marriageConnections[1].parentMiddlePoint ?? .zero,
-            startSymbolId: symbolIds[1][1],
+            startSymbolId: symbolIds[0][2],
             endSymbolId: symbolIds[1][1],
             type: .child,
             parentConnectionId: marriageConnections[1].id
@@ -946,7 +946,7 @@ struct GenogramBuilder: View {
             id: UUID(),
             start: getTopCenter(for: symbolIds[1][2]),
             end: marriageConnections[2].parentMiddlePoint ?? .zero,
-            startSymbolId: symbolIds[1][2],
+            startSymbolId: symbolIds[0][4],
             endSymbolId: symbolIds[1][2],
             type: .child,
             parentConnectionId: marriageConnections[2].id
@@ -958,7 +958,7 @@ struct GenogramBuilder: View {
             id: UUID(),
             start: getTopCenter(for: symbolIds[1][3]),
             end: marriageConnections[3].parentMiddlePoint ?? .zero,
-            startSymbolId: symbolIds[1][3],
+            startSymbolId: symbolIds[0][6],
             endSymbolId: symbolIds[1][3],
             type: .child,
             parentConnectionId: marriageConnections[3].id
@@ -971,7 +971,7 @@ struct GenogramBuilder: View {
             id: UUID(),
             start: getTopCenter(for: symbolIds[2][0]),
             end: gen2MarriageConnections[0].parentMiddlePoint ?? .zero,
-            startSymbolId: symbolIds[2][0],
+            startSymbolId: symbolIds[1][0],
             endSymbolId: symbolIds[2][0],
             type: .child,
             parentConnectionId: gen2MarriageConnections[0].id
@@ -983,7 +983,7 @@ struct GenogramBuilder: View {
             id: UUID(),
             start: getTopCenter(for: symbolIds[2][1]),
             end: gen2MarriageConnections[1].parentMiddlePoint ?? .zero,
-            startSymbolId: symbolIds[2][1],
+            startSymbolId: symbolIds[1][2],
             endSymbolId: symbolIds[2][1],
             type: .child,
             parentConnectionId: gen2MarriageConnections[1].id
@@ -1106,6 +1106,7 @@ struct CanvasView: UIViewRepresentable {
 struct GenogramShape: Identifiable {
     var id: UUID
     var imageName: String
+    var personName: String = ""
     var position: CGPoint
     var notes: String = ""
 }
