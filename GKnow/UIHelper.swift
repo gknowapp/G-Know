@@ -23,11 +23,11 @@ struct UIHelper {
     
     // Responsive dimensions
     static func relativeWidth(_ percentage: Double) -> CGFloat {
-        return screenSize.width * CGFloat(percentage)
+        return cachedScreenSize.width * CGFloat(percentage)
     }
     
     static func relativeHeight(_ percentage: Double) -> CGFloat {
-        return screenSize.height * CGFloat(percentage)
+        return cachedScreenSize.height * CGFloat(percentage)
     }
     
     // Common dimensions with relative sizing
@@ -42,7 +42,11 @@ struct UIHelper {
     static var toolbarHeight: CGFloat {
         return relativeHeight(0.07) // 7% of screen height
     }
-    
+    static let cachedScreenSize: CGSize = {
+        let size = UIScreen.main.bounds.size
+        return CGSize(width: max(size.width, size.height),
+                      height: min(size.width, size.height))
+    }()
     // Common modifiers
     /*static func standardShadow() -> some View {
         return AnyView(

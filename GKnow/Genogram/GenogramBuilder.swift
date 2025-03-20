@@ -203,7 +203,7 @@ struct GenogramBuilder: View {
                     ZStack {
                         HStack {
                             Rectangle()
-                                .frame(width: UIHelper.screenSize.width, height: UIHelper.screenSize.height * 0.15)
+                                .frame(width: UIHelper.cachedScreenSize.width, height: UIHelper.cachedScreenSize.height * 0.15)
                                 .foregroundColor(Color("Anti-flash White"))
                                 .foregroundStyle(
                                     .shadow(.inner(color: .black, radius: 10, x: 1, y: 4)))
@@ -312,12 +312,12 @@ struct GenogramBuilder: View {
                 }
                 
             }
-            .frame(minWidth: UIHelper.screenSize.width, minHeight: UIHelper.screenSize.height)
+            .frame(minWidth: UIHelper.cachedScreenSize.width, minHeight: UIHelper.cachedScreenSize.height)
             .background(Color("White"))
             
             .onAppear {
                 // Lock to landscape when view appears
-                lockOrientation(.landscape)
+                //lockOrientation(.landscape)
                 
                 if (genogramData.genogram.isEmpty) {
                     generateTemplate()
@@ -326,7 +326,7 @@ struct GenogramBuilder: View {
             }
             .onDisappear {
                 // Remove lock when view disappears
-                lockOrientation(.all)
+                //lockOrientation(.all)
             }
         }
         .navigationBarBackButtonHidden(true) // This hides the default back button
@@ -710,8 +710,8 @@ struct GenogramBuilder: View {
     
     private func addIconToGenogram(imageName: String) {
         // Calculate the visible center of the screen
-        let visibleCenterX = (UIHelper.screenSize.width / 2 - offset.width) / scale
-        let visibleCenterY = (UIHelper.screenSize.height / 2 - offset.height) / scale
+        let visibleCenterX = (UIHelper.cachedScreenSize.width / 2 - offset.width) / scale
+        let visibleCenterY = (UIHelper.cachedScreenSize.height / 2 - offset.height) / scale
         
         // Create new shape at the calculated center position
         let newShape = GenogramShape(
@@ -825,7 +825,7 @@ struct GenogramBuilder: View {
         
         let baseSpacing: CGFloat = 100 // Base spacing only for first generation
         let startY: CGFloat = 200
-        let startX: CGFloat = UIHelper.screenSize.width / 4
+        let startX: CGFloat = UIHelper.cachedScreenSize.width / 4
         
         // First generation (4 pairs)
         let gen1Symbols = [
@@ -1014,7 +1014,7 @@ struct GenogramBuilder: View {
     }
     
     // Helper function to manage orientation
-    private func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
+    /*private func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first
         else { return }
@@ -1034,7 +1034,7 @@ struct GenogramBuilder: View {
             // Ensure the change has effect
             UIViewController.attemptRotationToDeviceOrientation()
         }
-    }
+    }*/
     
     // Add helper function to determine connection type
     private func getConnectionType(for relationshipImage: String) -> Connection.ConnectionType {
