@@ -8,6 +8,8 @@
 
 import SwiftUI
 
+//TESTING
+
 struct SidebarView: View {
     enum ActiveView {
         case therapist
