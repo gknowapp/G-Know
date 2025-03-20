@@ -22,78 +22,61 @@ struct HomePage: View {
     
     
     var body: some View {
-        ZStack {
-            //Background Image
-            HStack {
-                backgroundImage
-                    .opacity(0.25)
-            }
-            .overlay(Color ("Overlay"))
-            .ignoresSafeArea(.container)
-            
-            VStack {
-                //Logo
-                HStack {
-                    GKnowLogo
+        NavigationStack {
+            ZStack {
+                // Clean white background
+                Color.white.ignoresSafeArea()
+                
+                VStack(spacing: 40) {
+                    // Logo
+                    Image("GKnow Logo")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                }
-                .frame(width: UIHelper.relativeWidth(0.75), height: UIHelper.relativeHeight(0.3))
-                .padding(UIHelper.standardPadding)
-                
-                
-                
-                // Subtitle
-                Text("Family Diagrams")
-                    .font(.system(size:72))
-                    .foregroundColor(.gray)
-                    .fontWeight(.bold)
-                    .padding(.bottom, 80)
-                    .padding(.top, -70)
-                
-                // Sign Up Button
-                Button(action: {
-                    // Handle sign up action
-                    showSignup = true
-                }) {
-                    Text("New to GKnow? Sign Up")
-                        .font(.largeTitle)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color ("Candace's Couch"))
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color ("Login Box"))
-                        .cornerRadius(20)
-                        .padding(.horizontal, 400)
-                }
-                .fullScreenCover(isPresented: $showSignup) {
-                    Signup(isHome: $isHome)
-                }
-                .padding(.bottom, 30)
-                .shadow(radius: 10)
-                
-                // Login Button
-                Button(action: {
-                    // Handle login action
-                    showLogin = true
-                }) {
-                    Text("Existing User? Login")
-                        .font(.largeTitle)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color ("Candace's Couch"))
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color ("Login Box"))
-                        .cornerRadius(20)
-                        .padding(.horizontal, 400)
-                        
-                }
-                .fullScreenCover(isPresented: $showLogin) {
-                    Login(isHome: $isHome)
+                        .frame(width: UIHelper.relativeWidth(0.7))
+                        .padding(.top, UIHelper.relativeHeight(0.1))
                     
+                    Spacer()
+                    
+                    // User type selection buttons
+                    VStack(spacing: 20) {
+                        Button(action: {
+                            showLogin = true
+                        }) {
+                            Text("Login")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(width: UIHelper.relativeWidth(0.6), height: 60)
+                                .background(Color("Dark Green"))
+                                .cornerRadius(10)
+                        }
+                        
+                        Button(action: {
+                            showSignup = true
+                        }) {
+                            Text("Sign Up")
+                                .font(.headline)
+                                .foregroundColor(Color("Dark Green"))
+                                .frame(width: UIHelper.relativeWidth(0.6), height: 60)
+                                .background(Color("Light Green"))
+                                .cornerRadius(10)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    // Footer text
+                    Text("© 2025 GKnow")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                        .padding(.bottom, 20)
                 }
-                .shadow(radius: 10)
-                Spacer()
+                .padding()
+            }
+            .navigationDestination(isPresented: $showLogin) {
+                Login(isHome: $isHome)
+            }
+            .navigationDestination(isPresented: $showSignup) {
+                Signup(isHome: $isHome)
             }
             .alert(isPresented: $showAlert) {
                 Alert(
@@ -105,11 +88,13 @@ struct HomePage: View {
                 )
             }
         }
+        .navigationBarHidden(true)
     }
 }
-    struct HomePage_Previews: PreviewProvider {
-        static var previews: some View {
-            HomePage(isHome: .constant(true))
-        }
+
+struct HomePage_Previews: PreviewProvider {
+    static var previews: some View {
+        HomePage(isHome: .constant(true))
     }
+}
 

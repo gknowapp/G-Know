@@ -9,7 +9,7 @@ import SwiftUI
 
 struct Login: View {
     @Environment(\.dismiss) var dismiss
-    @Binding var isHome: Bool // Binding to control navigation back to home
+    @Binding var isHome: Bool
     @State private var email: String = "Candacecouch"
     @State private var password: String = "password"
     @State private var showAlert: Bool = false
@@ -20,124 +20,97 @@ struct Login: View {
     let validUsername = "Candacecouch"
     let validPassword = "password"
     
-    let backgroundImage = Image("Therapist Background")
-        .resizable()
-    
-    let GKnowLogo = Image("GKnow Logo")
-    
-    //@Binding var isTherapistView: Bool
-
     var body: some View {
         NavigationStack {
             ZStack {
-                //Background Image
-                HStack {
-                    backgroundImage
-                        .opacity(0.25)
-                }
-                .overlay(Color ("Overlay"))
-                .ignoresSafeArea(.container)
+                // Background - clean white
+                Color("Anti-flash White").ignoresSafeArea()
                 
-                VStack {
-                    // Back Button
-                    Button(action: {
-                        dismiss() // Dismiss the view
-                        isHome = true // Update isHome to trigger navigation back home
-                    }) {
-                        HStack {
-                            Image(systemName: "chevron.left")
-                            Text("Back")
-                        }
-                        .font(.headline)
-                        .foregroundColor(.blue)
-                        .padding()
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(spacing: 30) {
+                    // Logo
+                    Image("GKnow Logo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: UIHelper.relativeWidth(0.5))
+                        .padding(.top, UIHelper.relativeHeight(0.1))
                     
-                    //Logo
-                    HStack {
-                        GKnowLogo
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    }
-                    .frame(width: UIHelper.relativeWidth(0.75), height: UIHelper.relativeHeight(0.3))
-                    .padding(UIHelper.standardPadding)
-                    
-                    // Subtitle
-                    Text("Genogram Maker")
-                        .font(.system(size:72))
-                        .foregroundColor(.gray)
-                        .fontWeight(.bold)
-                        .padding(.bottom, 50)
-                        .padding(.top, -70)
-                    
-                    // Email Field
-                    TextField("Username", text: $email)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color ("Candace's Couch"))
-                        .padding()
-                        .background(Color ("Login Box"))
-                        .cornerRadius(10)
-                        .padding(.horizontal, 400)
-                        .padding(.bottom, 20)
-                        .shadow(radius: 10)
-                    
-                    // Password Field
-                    SecureField("Password", text: $password)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color ("Candace's Couch"))
-                        .padding()
-                        .background(Color ("Login Box"))
-                        .cornerRadius(10)
-                        .padding(.horizontal, 400)
-                        .padding(.bottom, 15)
-                        .shadow(radius: 10)
-                    
-                    // Login Button
-                    Button(action: {
-                        if email.isEmpty || password.isEmpty {
-                            alertMessage = "Please fill in both fields."
-                            showAlert = true
-                        } else if email == validUsername && password == validPassword {
-                            // If credentials are correct, navigate to the TherapistView
-                            print("Logging in with \(email) and \(password)")
-                            navigateToTherapist = true
-                        } else {
-                            // Show error if credentials are wrong
-                            alertMessage = "Invalid username or password. Please try again."
-                            showAlert = true
-                        }
-                    }) {
-                        Text("Login")
-                            .font(.largeTitle)
-                            .foregroundColor(Color ("Candace's Couch"))
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color ("Light Green"))
-                            .cornerRadius(20)
-                            .padding(.horizontal, 450)
-                            .padding(.top, 50)
-                            .shadow(radius: 10)
-                    }
-                    
-                    // NavigationLink to TherapistView
-                    NavigationLink(destination: MainContainerView(), isActive: $navigateToTherapist) {
-                                            EmptyView() // Hidden link
-                            }
                     Spacer()
+                    
+                    // Login Form
+                    VStack(spacing: 20) {
+                        // Username field
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Username")
+                                .font(.headline)
+                                .foregroundColor(Color("Dark Green"))
+                            
+                            TextField("Enter your username", text: $email)
+                                .padding()
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(10)
+                                .frame(width: UIHelper.relativeWidth(0.6))
+                        }
+                        
+                        // Password field
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Password")
+                                .font(.headline)
+                                .foregroundColor(Color("Dark Green"))
+                            
+                            SecureField("Enter your password", text: $password)
+                                .padding()
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(10)
+                                .frame(width: UIHelper.relativeWidth(0.6))
+                        }
+                        
+                        // Login button
+                        Button(action: {
+                            if email == validUsername && password == validPassword {
+                                isHome = false
+                                navigateToTherapist = true
+                            } else {
+                                alertMessage = "Invalid username or password"
+                                showAlert = true
+                            }
+                        }) {
+                            Text("Login")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(width: UIHelper.relativeWidth(0.6))
+                                .background(Color("Dark Green"))
+                                .cornerRadius(10)
+                        }
+                        .padding(.top, 20)
+                    }
+                    .padding(.horizontal)
+                    
+                    Spacer()
+                    
+                    // Back to home option
+                    Button(action: {
+                        dismiss()
+                        isHome = true
+                    }) {
+                        Text("Back to Home")
+                            .foregroundColor(Color("Dark Green"))
+                    }
+                    .padding(.bottom, 30)
+                    
+                    // NavigationLink to MainContainerView
+                    NavigationLink(destination: MainContainerView(), isActive: $navigateToTherapist) {
+                        EmptyView()
+                    }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .alert(isPresented: $showAlert) {
                     Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
                 }
-                //.navigationBarHidden(true)
             }
-        } // Hide the navigation bar
-            
         }
+        .navigationBarHidden(true)
     }
+}
 
 struct Login_Previews: PreviewProvider {
     static var previews: some View {
