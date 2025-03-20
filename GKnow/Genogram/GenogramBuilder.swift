@@ -237,7 +237,7 @@ struct GenogramBuilder: View {
                                             .foregroundColor(Color("Candace's Couch"))
                                     }
                                 
-                                Button("Debug Connections") {
+                                /*Button("Debug Connections") {
                                     for (index, connection) in genogramData.connections.enumerated() {
                                         print("Connection \(index): \(connection.type)")
                                         print("ID: \(connection.id)")
@@ -249,7 +249,7 @@ struct GenogramBuilder: View {
                                             print("  ParentConnectionID: \(connection.parentConnectionId ?? UUID())")
                                         }
                                     }
-                                }
+                                }*/
                                 
                                 
                                 Button(action: {
