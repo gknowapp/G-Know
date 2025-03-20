@@ -123,9 +123,9 @@ struct Login: View {
                     }
                     
                     // NavigationLink to TherapistView
-                    NavigationLink(destination: TherapistView(), isActive: $navigateToTherapist) {
-                        EmptyView() // Hidden link
-                    }
+                    NavigationLink(destination: MainContainerView(), isActive: $navigateToTherapist) {
+                                            EmptyView() // Hidden link
+                            }
                     Spacer()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

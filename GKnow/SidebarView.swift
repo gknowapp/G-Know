@@ -19,7 +19,7 @@ struct SidebarView: View {
     var body: some View {
         VStack(spacing: 30) {
             // App logo at top
-            Image("GKnow Logo")
+            Image("G Icon")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 50, height: 50)
@@ -35,7 +35,7 @@ struct SidebarView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 30, height: 30)
-                    .foregroundColor(activeView == .therapist ? Color("Candace's Couch") : .gray)
+                    .foregroundColor(activeView == .therapist ? Color("Dark Green") : Color("Light Green"))
             }
             .padding(.vertical, 10)
             
@@ -47,7 +47,7 @@ struct SidebarView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 30, height: 30)
-                    .foregroundColor(activeView == .learningLibrary ? Color("Candace's Couch") : .gray)
+                    .foregroundColor(activeView == .learningLibrary ? Color("Dark Green") : Color("Light Green"))
             }
             .padding(.vertical, 10)
             

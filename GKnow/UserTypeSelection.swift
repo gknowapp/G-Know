@@ -14,7 +14,7 @@ struct UserTypeSelection: View {
                     .font(.largeTitle)
                     .padding()
                 
-                NavigationLink(destination: TherapistView(), isActive: $navigateToTherapist) {
+                NavigationLink(destination: MainContainerView(), isActive: $navigateToTherapist) {
                     EmptyView()
                 }
 

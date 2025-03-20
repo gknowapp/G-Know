@@ -12,19 +12,23 @@ struct MainContainerView: View {
     @State private var activeView: SidebarView.ActiveView = .therapist
     
     var body: some View {
-        HStack(spacing: 0) {
-            // Sidebar
-            SidebarView(activeView: $activeView)
-            
-            // Main content area
-            ZStack {
-                if activeView == .therapist {
-                    TherapistView()
-                } else {
-                    LearningLibraryView()
+        NavigationStack {
+            HStack(spacing: 0) {
+                // Sidebar
+                SidebarView(activeView: $activeView)
+                
+                // Main content area
+                ZStack {
+                    if activeView == .therapist {
+                        TherapistView()
+                    } else if activeView == .learningLibrary {
+                        LearningLibraryView()
+                    }
                 }
+                .frame(maxWidth: .infinity)
             }
+            .ignoresSafeArea(.container, edges: .vertical)
         }
-        .ignoresSafeArea(.container)
+        .navigationBarHidden(true)
     }
 }

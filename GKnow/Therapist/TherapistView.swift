@@ -11,15 +11,15 @@ struct TherapistView: View {
     var body: some View {
         ZStack {
             // Background
-            backgroundImage
+            /*backgroundImage
                 .opacity(0.25)
                 .overlay(Color("Overlay"))
-                .ignoresSafeArea(.container)
+                .ignoresSafeArea(.container)*/
             
             VStack(spacing: 0) {
                 // Header with search bar
                 HStack {
-                    Text("Learning Library")
+                    Text("Therapist Dashboard")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                     
