@@ -75,9 +75,12 @@ struct PatientInfoInput: View {
                         }
                         
                         // View Genogram button
-                        Button(action: {
-                            navigateToGenogramBuilder = true
-                        }) {
+                        NavigationLink(destination: GenogramBuilder(
+                            genogramData: $genogramData,
+                            selectedIcon: $selectedIcon,
+                            isSidePanelVisible: $isSidePanelVisible,
+                            isEditable: true
+                        )) {
                             HStack {
                                 Image(systemName: "chart.bar.doc.horizontal")
                                 Text("View Genogram")
@@ -257,14 +260,6 @@ struct PatientInfoInput: View {
                     .foregroundColor(Color("Dark Green"))
                 }
             )
-            .navigationDestination(isPresented: $navigateToGenogramBuilder) {
-                GenogramBuilder(
-                                                genogramData: $genogramData,
-                                                selectedIcon: $selectedIcon,
-                                                isSidePanelVisible: $isSidePanelVisible,
-                                                isEditable: true
-                    )
-            }
         }
     }
     

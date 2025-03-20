@@ -80,31 +80,33 @@ struct GenogramBuilder: View {
                             )
                             
                             ForEach(genogramData.genogram) { shape in
-                                ZStack {
-                                    // Highlight effect when selected
-                                    if isConnectingMode && (selectedShapeId == shape.id || startSymbol?.id == shape.id) {
-                                        Circle()
-                                            .stroke(Color("Dark Green"), lineWidth: 2)
-                                            .frame(width: UIHelper.standardIconSize + 20, height: UIHelper.standardIconSize + 20)
-                                    }
-                                    
-                                    Image(shape.imageName)
-                                        .resizable()
-                                        .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
-                                }
-                                .position(x: shape.position.x, y: shape.position.y)
-                                .gesture(
-                                    DragGesture()
-                                        .onChanged { value in
-                                            if isEditable {
-                                                moveShape(shape: shape, newLocation: value.location)
-                                            }
-                                        }
-                                )
-                                .onTapGesture {
-                                    handleSymbolTap(shape)
-                                }
-                            }
+                                                            ZStack {
+                                                                // Highlight effect when selected
+                                                                if isConnectingMode && (selectedShapeId == shape.id || startSymbol?.id == shape.id) {
+                                                                    Circle()
+                                                                        .stroke(Color("Dark Green"), lineWidth: 2)
+                                                                        .frame(width: UIHelper.standardIconSize + 20, height: UIHelper.standardIconSize + 20)
+                                                                }
+                                                                
+                                                                Image(shape.imageName)
+                                                                    .resizable()
+                                                                    .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
+                                                            }
+                                                            .position(x: shape.position.x, y: shape.position.y)
+                                                            .gesture(
+                                                                DragGesture()
+                                                                    .onChanged { value in
+                                                                        print("Shape Moved")
+                                                                        if isEditable {
+                                                                            moveShape(shape: shape, newLocation: value.location)
+                                                                        }
+                                                                    }
+                                                            )
+                                                            .onTapGesture {
+                                                                print("shape tapped")
+                                                                handleSymbolTap(shape)
+                                                            }
+                                                        }
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color("White"))
@@ -124,6 +126,7 @@ struct GenogramBuilder: View {
                                     },
                                 DragGesture()
                                     .onChanged { value in
+                                        print("background moved")
                                         let delta = CGSize(
                                             width: value.translation.width - lastOffset.width,
                                             height: value.translation.height - lastOffset.height
@@ -836,6 +839,7 @@ struct GenogramBuilder: View {
     
     private func moveShape(shape: GenogramShape, newLocation: CGPoint) {
         if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
+            print("moveShape called")
             genogramData.genogram[index].position = newLocation
             updateConnections(for: genogramData.genogram[index])
         }
