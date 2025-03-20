@@ -46,7 +46,7 @@ struct GenogramBuilder: View {
    
     
     let isEditable: Bool
-    var imageOptions = ["Abortion", "Miscarriage", "Male Death", "Female Death", "Male", "Female", "Unknown Gender", "Pregnancy"]
+    var imageOptions = [ "Male", "Female", "Unknown Gender", "Pregnancy", "Abortion", "Miscarriage", "Male Death", "Female Death"]
     //var imageOptionsLabel = []
     var relationshipOptions = ["Cutoff", "Divorce", "Focused On", "Normal", "Abuse", "Marriage", "Engaged", "Committed Relationship", "Legal Separation", "Separation In Fact"]
     //var relationshipOptionsLabel = []
@@ -178,7 +178,7 @@ struct GenogramBuilder: View {
                                 showTherapistView: $showTherapistView,
                                 navigateToTherapist: $navigateToTherapist
                             )
-                            .padding(.top, UIHelper.relativeHeight(0.04))
+                            .padding(UIHelper.relativeHeight(0.04))
                             .background(Color("Anti-flash White"))
                             .frame(height: UIHelper.relativeHeight(0.17))
                             .clipShape(RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius))
