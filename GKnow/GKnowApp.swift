@@ -16,7 +16,7 @@ struct GKnowApp: App {
                    HomePage(isHome: $isHome) // Pass binding to HomePage
                } else {
                    // Navigate to other views as needed
-                   HomePage(isHome: $isHome)
+                   MainContainerView()
                }
            }
        }

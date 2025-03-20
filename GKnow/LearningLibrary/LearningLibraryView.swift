@@ -1,10 +1,3 @@
-//
-//  LearningLibraryView.swift
-//  GKnow
-//
-//  Created by Curt Leonard on 3/18/25.
-//
-
 import SwiftUI
 
 struct LearningLibraryView: View {
@@ -39,6 +32,7 @@ struct LearningLibraryView: View {
                     .frame(width: UIHelper.relativeWidth(0.3))
                 }
                 .padding(.horizontal)
+                .padding(.top, 30)
                 .padding(.bottom, 20)
                 
                 ScrollView {
@@ -78,7 +72,7 @@ struct LearningLibraryView: View {
                             .padding(.horizontal)
                         }
                         
-                        // Relationship Lines section - simplify this as well
+                        // Relationship Lines section
                         VStack(alignment: .leading, spacing: 15) {
                             Text("Relationship Lines")
                                 .font(.title)
@@ -133,14 +127,6 @@ struct LearningLibraryView: View {
                     .navigationBarBackButtonHidden(true)
             }
         }
+        .navigationBarHidden(true)
     }
 }
-
-
-
-
-
-#Preview {
-    LearningLibraryView()
-}
-
