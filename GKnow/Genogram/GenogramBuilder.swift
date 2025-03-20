@@ -164,8 +164,9 @@ struct GenogramBuilder: View {
                                 onIconTap: handleIconTap,
                                 isConnectingMode: isConnectingMode,
                                 selectedIcon: selectedIcon,
-                                dismiss: dismiss,
-                                showTherapistView: $showTherapistView
+                                //dismiss: dismiss//,
+                                showTherapistView: $showTherapistView,
+                                navigateToTherapist: $navigateToTherapist
                             )
                             .padding(.top, UIHelper.relativeHeight(0.04))
                             .background(Color("Anti-flash White"))
@@ -1157,8 +1158,9 @@ struct TopToolbarView: View {
     let onIconTap: (String) -> Void
     let isConnectingMode: Bool
     let selectedIcon: String?
-    @Environment(\.dismiss) var dismiss
+    //@Environment(\.dismiss) var dismiss
     @Binding var showTherapistView: Bool
+    @Binding var navigateToTherapist: Bool
     
     var body: some View {
         HStack(spacing: 0) {
@@ -1166,7 +1168,8 @@ struct TopToolbarView: View {
             HStack(spacing: 15) {
                 Button(action: {
                     showTherapistView = true
-                    dismiss()
+                    navigateToTherapist = true
+                    //dismiss()
                 }) {
                     Image(systemName: "house.fill")
                         .resizable()
@@ -1194,14 +1197,16 @@ struct TopToolbarView: View {
                 .frame(height: 30)
             
             // Gender Section
-            HStack(spacing: UIHelper.standardPadding) {
-                ForEach(imageOptions, id: \.self) { imageName in
-                    Image(imageName)
-                        .resizable()
-                        .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
-                        .onTapGesture {
-                            onIconTap(imageName)
-                        }
+            ScrollView(.horizontal) {
+                HStack(spacing: UIHelper.standardPadding) {
+                    ForEach(imageOptions, id: \.self) { imageName in
+                        Image(imageName)
+                            .resizable()
+                            .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
+                            .onTapGesture {
+                                onIconTap(imageName)
+                            }
+                    }
                 }
             }
             .padding(.horizontal)
@@ -1210,20 +1215,23 @@ struct TopToolbarView: View {
                 .frame(height: 30)
             
             // Relationships Section
-            HStack(spacing: UIHelper.standardPadding) {
-                ForEach(relationshipOptions, id: \.self) { imageName in
-                    Image(imageName)
-                        .resizable()
-                        .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius)
-                                .stroke(isConnectingMode && selectedIcon == imageName ?
-                                       Color("Dark Green") : Color.clear,
-                                       lineWidth: 2)
-                        )
-                        .onTapGesture {
-                            onIconTap(imageName)
-                        }
+            
+            ScrollView(.horizontal) {
+                HStack(spacing: UIHelper.standardPadding) {
+                    ForEach(relationshipOptions, id: \.self) { imageName in
+                        Image(imageName)
+                            .resizable()
+                            .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius)
+                                    .stroke(isConnectingMode && selectedIcon == imageName ?
+                                            Color("Dark Green") : Color.clear,
+                                            lineWidth: 2)
+                            )
+                            .onTapGesture {
+                                onIconTap(imageName)
+                            }
+                    }
                 }
             }
             .padding(.horizontal)
@@ -1232,14 +1240,16 @@ struct TopToolbarView: View {
                 .frame(height: 30)
             
             // Symptoms Section
-            HStack(spacing: UIHelper.standardPadding) {
-                ForEach(symptomOptions, id: \.self) { imageName in
-                    Image(imageName)
-                        .resizable()
-                        .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
-                        .onTapGesture {
-                            onIconTap(imageName)
-                        }
+            ScrollView(.horizontal) {
+                HStack(spacing: UIHelper.standardPadding) {
+                    ForEach(symptomOptions, id: \.self) { imageName in
+                        Image(imageName)
+                            .resizable()
+                            .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
+                            .onTapGesture {
+                                onIconTap(imageName)
+                            }
+                    }
                 }
             }
             .padding(.horizontal)
