@@ -74,7 +74,7 @@ struct GenogramBuilder: View {
                                 .background(Color.clear)
                                 .border(Color("Dark Green"))
                             
-                            ConnectionsView(
+                            ConnectionsView( // I AM LOSING MY MIND OVER THIS IMPLEMENTATION
                                 genogramData: genogramData,
                                 onConnectionTap: handleMarriageConnectionTap
                             )
