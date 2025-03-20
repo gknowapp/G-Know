@@ -6,8 +6,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct AddNewPatient: View {
     @Environment(\.dismiss) var dismiss
     
@@ -18,7 +16,6 @@ struct AddNewPatient: View {
     @State private var dob: Date = Date()
     @State private var selectedRole: Set<String> = []
     @State private var selectedBirthOrder: Set<String> = []
-    @State private var additionalInfo: String = ""
     @State private var showRoleOptions: Bool = false
     @State private var showBirthOrderOptions: Bool = false
     
@@ -60,6 +57,19 @@ struct AddNewPatient: View {
                                     .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
                             }
                             
+                            // Middle Name
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Middle Name")
+                                    .font(.headline)
+                                    .foregroundColor(Color("Dark Green"))
+                                
+                                TextField("", text: $middleName)
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(10)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                            }
+                            
                             // Last Name
                             VStack(alignment: .leading, spacing: 10) {
                                 Text("Last Name")
@@ -73,34 +83,17 @@ struct AddNewPatient: View {
                                     .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
                             }
                             
-                            // Date of Birth
+                            // Date of Birth - Fixed styling
                             VStack(alignment: .leading, spacing: 10) {
                                 Text("Date of Birth")
                                     .font(.headline)
                                     .foregroundColor(Color("Dark Green"))
                                 
-                                HStack {
-                                    // Month, Day, Year fields
-                                    DatePicker("", selection: $dob, displayedComponents: .date)
-                                        .datePickerStyle(CompactDatePickerStyle())
-                                        .labelsHidden()
-                                        .frame(maxWidth: .infinity)
-                                }
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(10)
-                                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
-                            }
-                            
-                            // Info
-                            VStack(alignment: .leading, spacing: 10) {
-                                Text("Info")
-                                    .font(.headline)
-                                    .foregroundColor(Color("Dark Green"))
-                                
-                                TextEditor(text: $additionalInfo)
-                                    .frame(height: 100)
-                                    .padding(10)
+                                DatePicker("", selection: $dob, displayedComponents: .date)
+                                    .datePickerStyle(WheelDatePickerStyle())
+                                    .labelsHidden()
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
                                     .background(Color.white)
                                     .cornerRadius(10)
                                     .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
@@ -114,10 +107,11 @@ struct AddNewPatient: View {
                                     HStack {
                                         Image(systemName: "plus.circle.fill")
                                             .foregroundColor(Color("Dark Green"))
-                                        Text("Add Info")
+                                        Text("Add Role")
                                             .foregroundColor(Color("Dark Green"))
-                                            .fontWeight(.medium)
+                                            .font(.headline)
                                     }
+                                    .padding(.vertical, 5)
                                 }
                                 
                                 if showRoleOptions {
@@ -126,29 +120,22 @@ struct AddNewPatient: View {
                                             .font(.headline)
                                             .foregroundColor(Color("Dark Green"))
                                         
-                                        AddPatientMultiSelectField(
-                                            options: roleOptions,
-                                            selections: Binding(
-                                                get: { selectedRole },
-                                                set: { selectedRole = $0 }
-                                            )
-                                        )
+                                        AddPatientMultiSelectField(options: roleOptions, selections: $selectedRole)
+                                            .padding(.vertical, 5)
                                     }
-                                    .padding(.vertical, 10)
                                 }
                                 
-                                if showRoleOptions {
-                                    Button(action: {
-                                        showBirthOrderOptions.toggle()
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "plus.circle.fill")
-                                                .foregroundColor(Color("Dark Green"))
-                                            Text("Add Birth Order")
-                                                .foregroundColor(Color("Dark Green"))
-                                                .fontWeight(.medium)
-                                        }
+                                Button(action: {
+                                    showBirthOrderOptions.toggle()
+                                }) {
+                                    HStack {
+                                        Image(systemName: "plus.circle.fill")
+                                            .foregroundColor(Color("Dark Green"))
+                                        Text("Add Birth Order")
+                                            .foregroundColor(Color("Dark Green"))
+                                            .font(.headline)
                                     }
+                                    .padding(.vertical, 5)
                                 }
                                 
                                 if showBirthOrderOptions {
@@ -157,15 +144,9 @@ struct AddNewPatient: View {
                                             .font(.headline)
                                             .foregroundColor(Color("Dark Green"))
                                         
-                                        AddPatientMultiSelectField(
-                                            options: birthOrderOptions,
-                                            selections: Binding(
-                                                get: { selectedBirthOrder },
-                                                set: { selectedBirthOrder = $0 }
-                                            )
-                                        )
+                                        AddPatientMultiSelectField(options: birthOrderOptions, selections: $selectedBirthOrder)
+                                            .padding(.vertical, 5)
                                     }
-                                    .padding(.vertical, 10)
                                 }
                             }
                             
@@ -174,10 +155,12 @@ struct AddNewPatient: View {
                                 Spacer()
                                 
                                 // Save Patient Button
-                                Button(action: savePatient) {
+                                Button(action: {
+                                    savePatient()
+                                }) {
                                     Text("Save Patient")
                                         .font(.headline)
-                                        .foregroundColor(Color("Dark Green"))
+                                        .foregroundColor(.white)
                                         .padding(.vertical, 15)
                                         .padding(.horizontal, 25)
                                         .background(Color("Light Green"))
@@ -186,9 +169,7 @@ struct AddNewPatient: View {
                                 
                                 // Create Diagram Button
                                 Button(action: {
-                                    // First save the patient, then navigate to diagram
-                                    savePatient()
-                                    // Navigation to diagram would be added here
+                                    // Action for creating diagram
                                 }) {
                                     Text("Create Diagram")
                                         .font(.headline)
