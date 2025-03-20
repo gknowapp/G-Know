@@ -6,6 +6,8 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct AddNewPatient: View {
     @Environment(\.dismiss) var dismiss
     
@@ -13,69 +15,208 @@ struct AddNewPatient: View {
     @State private var firstName: String = ""
     @State private var middleName: String = ""
     @State private var lastName: String = ""
-    @State private var dob: Date = Date() // Date of Birth field
-    @State private var selectedRole: Set<String> = [] // Multi-select for roles
-    @State private var selectedBirthOrder: Set<String> = [] // Multi-select for birth order
-
+    @State private var dob: Date = Date()
+    @State private var selectedRole: Set<String> = []
+    @State private var selectedBirthOrder: Set<String> = []
+    @State private var additionalInfo: String = ""
+    @State private var showRoleOptions: Bool = false
+    @State private var showBirthOrderOptions: Bool = false
+    
     var onSave: (String) -> Void
-    private let airtableService = AirTableService() // Instantiate the Airtable service
+    private let airtableService = AirTableService()
     
     // Role and Birth Order options
     let roleOptions = ["Hero", "Peacekeeper", "Clown", "Lost Child", "Rebel", "Scapegoat"]
     let birthOrderOptions = ["Oldest", "Youngest", "Only", "Middle", "Twin"]
-
+    
     var body: some View {
-        
-            NavigationStack { // I think I may need to add a scroll view to this, as right now I can't see the bottom of the page
-                ScrollView{
-                VStack(alignment: .leading, spacing: 20) {
-                    /*Text("Add New Patient")  I dont know if we need two things saying add new patient
-                     .font(.headline) */
+        NavigationStack {
+            ZStack {
+                // Background
+                Color("Anti-flash White").ignoresSafeArea()
+                
+                VStack(alignment: .leading, spacing: 0) {
+                    // Header
+                    Text("Add Patient")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color("Dark Green"))
+                        .padding(.horizontal, 30)
+                        .padding(.top, 30)
+                        .padding(.bottom, 20)
                     
-                    // First Name Field
-                    TextField("First Name", text: $firstName)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    // Middle Name Field
-                    TextField("Middle Name", text: $middleName)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    // Last Name Field
-                    TextField("Last Name", text: $lastName)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    // Date of Birth Picker
-                    DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
-                        .datePickerStyle(WheelDatePickerStyle())
-                    
-                    // Role Multi-select Picker
-                    Text("Select Role(s):")
-                    MultiSelectPicker(options: roleOptions, selections: $selectedRole)
-                    
-                    // Birth Order Multi-select Picker
-                    Text("Select Birth Order:")
-                    MultiSelectPicker(options: birthOrderOptions, selections: $selectedBirthOrder)
-                    
-                    // Save Button
-                    Button(action: savePatient) {
-                        Text("Save")
-                            .padding()
-                            .background(Color.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                    .padding(.top)
-                    
-                    //Spacer()
-                }
-                .padding()
-                .navigationTitle("Add New Patient Details")
-                .padding()
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button("Cancel") {
-                            dismiss()
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 25) {
+                            // First Name
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("First Name")
+                                    .font(.headline)
+                                    .foregroundColor(Color("Dark Green"))
+                                
+                                TextField("", text: $firstName)
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(10)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                            }
+                            
+                            // Last Name
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Last Name")
+                                    .font(.headline)
+                                    .foregroundColor(Color("Dark Green"))
+                                
+                                TextField("", text: $lastName)
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(10)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                            }
+                            
+                            // Date of Birth
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Date of Birth")
+                                    .font(.headline)
+                                    .foregroundColor(Color("Dark Green"))
+                                
+                                HStack {
+                                    // Month, Day, Year fields
+                                    DatePicker("", selection: $dob, displayedComponents: .date)
+                                        .datePickerStyle(CompactDatePickerStyle())
+                                        .labelsHidden()
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(10)
+                                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                            }
+                            
+                            // Info
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Info")
+                                    .font(.headline)
+                                    .foregroundColor(Color("Dark Green"))
+                                
+                                TextEditor(text: $additionalInfo)
+                                    .frame(height: 100)
+                                    .padding(10)
+                                    .background(Color.white)
+                                    .cornerRadius(10)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                            }
+                            
+                            // Add Info Button (Role and Birth Order)
+                            VStack(alignment: .leading, spacing: 15) {
+                                Button(action: {
+                                    showRoleOptions.toggle()
+                                }) {
+                                    HStack {
+                                        Image(systemName: "plus.circle.fill")
+                                            .foregroundColor(Color("Dark Green"))
+                                        Text("Add Info")
+                                            .foregroundColor(Color("Dark Green"))
+                                            .fontWeight(.medium)
+                                    }
+                                }
+                                
+                                if showRoleOptions {
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        Text("Select Role(s)")
+                                            .font(.headline)
+                                            .foregroundColor(Color("Dark Green"))
+                                        
+                                        AddPatientMultiSelectField(
+                                            options: roleOptions,
+                                            selections: Binding(
+                                                get: { selectedRole },
+                                                set: { selectedRole = $0 }
+                                            )
+                                        )
+                                    }
+                                    .padding(.vertical, 10)
+                                }
+                                
+                                if showRoleOptions {
+                                    Button(action: {
+                                        showBirthOrderOptions.toggle()
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "plus.circle.fill")
+                                                .foregroundColor(Color("Dark Green"))
+                                            Text("Add Birth Order")
+                                                .foregroundColor(Color("Dark Green"))
+                                                .fontWeight(.medium)
+                                        }
+                                    }
+                                }
+                                
+                                if showBirthOrderOptions {
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        Text("Select Birth Order")
+                                            .font(.headline)
+                                            .foregroundColor(Color("Dark Green"))
+                                        
+                                        AddPatientMultiSelectField(
+                                            options: birthOrderOptions,
+                                            selections: Binding(
+                                                get: { selectedBirthOrder },
+                                                set: { selectedBirthOrder = $0 }
+                                            )
+                                        )
+                                    }
+                                    .padding(.vertical, 10)
+                                }
+                            }
+                            
+                            // Action Buttons
+                            HStack(spacing: 15) {
+                                Spacer()
+                                
+                                // Save Patient Button
+                                Button(action: savePatient) {
+                                    Text("Save Patient")
+                                        .font(.headline)
+                                        .foregroundColor(Color("Dark Green"))
+                                        .padding(.vertical, 15)
+                                        .padding(.horizontal, 25)
+                                        .background(Color("Light Green"))
+                                        .cornerRadius(10)
+                                }
+                                
+                                // Create Diagram Button
+                                Button(action: {
+                                    // First save the patient, then navigate to diagram
+                                    savePatient()
+                                    // Navigation to diagram would be added here
+                                }) {
+                                    Text("Create Diagram")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 15)
+                                        .padding(.horizontal, 25)
+                                        .background(Color("Dark Green"))
+                                        .cornerRadius(10)
+                                }
+                            }
+                            .padding(.top, 20)
                         }
+                        .padding(.horizontal, 30)
+                        .padding(.bottom, 30)
+                    }
+                }
+            }
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                            Text("Cancel")
+                        }
+                        .foregroundColor(Color("Dark Green"))
                     }
                 }
             }
@@ -93,52 +234,61 @@ struct AddNewPatient: View {
         airtableService.addPatient(firstName: firstName, middleName: middleName, lastName: lastName, dob: dob, role: roleArray, birthOrder: birthOrderArray) { success in
             if success {
                 DispatchQueue.main.async {
-                    onSave(trimmedPatient) // Call the onSave closure
-                    print("Patient saved successfully: \(trimmedPatient)") // Debugging print
-                    dismiss() // Dismiss the view
+                    onSave(trimmedPatient)
+                    print("Patient saved successfully: \(trimmedPatient)")
+                    dismiss()
                 }
             } else {
                 DispatchQueue.main.async {
-                    print("Error saving patient.") // Debugging print
+                    print("Error saving patient.")
                 }
             }
         }
     }
 }
 
-// Multi-select picker component
-struct MultiSelectPicker: View {
+// Enhanced multi-select field
+struct AddPatientMultiSelectField: View {
     let options: [String]
     @Binding var selections: Set<String>
-
+    
     var body: some View {
-        List(options, id: \.self) { option in
-            MultipleSelectionRow(title: option, isSelected: selections.contains(option)) {
-                if selections.contains(option) {
-                    selections.remove(option)
-                } else {
-                    selections.insert(option)
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 12) {
+            ForEach(options, id: \.self) { option in
+                Button(action: {
+                    toggleSelection(option)
+                }) {
+                    HStack {
+                        Image(systemName: selections.contains(option) ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(selections.contains(option) ? Color("Dark Green") : Color.gray.opacity(0.5))
+                        
+                        Text(option)
+                            .foregroundColor(Color("Dark Green"))
+                        
+                        Spacer()
+                    }
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 15)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(selections.contains(option) ? Color("Dark Green") : Color.gray.opacity(0.3), lineWidth: 1)
+                            .background(
+                                selections.contains(option) ?
+                                    Color("Light Green").opacity(0.2) :
+                                    Color.white
+                            )
+                    )
                 }
+                .buttonStyle(PlainButtonStyle())
             }
         }
     }
-}
-
-// Row for each option in multi-select picker
-struct MultipleSelectionRow: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Text(title)
-                if isSelected {
-                    Spacer()
-                    Image(systemName: "checkmark")
-                }
-            }
+    
+    private func toggleSelection(_ option: String) {
+        if selections.contains(option) {
+            selections.remove(option)
+        } else {
+            selections.insert(option)
         }
     }
 }
