@@ -26,7 +26,7 @@ struct LearningLibraryView: View {
                         .padding(.horizontal)
                     
                     LazyVGrid(columns: [
-                        GridItem(.adaptive(minimum: 150, maximum: 200), spacing: 16)
+                        GridItem(.adaptive(minimum: UIHelper.relativeWidth(0.20), maximum: UIHelper.relativeWidth(0.25)), spacing: 16)
                     ], spacing: 16) {
                         // Symbol cards
                         LearningLibraryCardView(name: symbols.male[0], image: symbols.male[1], description: symbols.male[2])
@@ -43,7 +43,7 @@ struct LearningLibraryView: View {
                         .padding(.top)
                     
                     LazyVGrid(columns: [
-                        GridItem(.adaptive(minimum: 150, maximum: 200), spacing: 16)
+                        GridItem(.adaptive(minimum: UIHelper.relativeWidth(0.20), maximum: UIHelper.relativeWidth(0.25)), spacing: 16)
                     ], spacing: 16) {
                         // Relationship cards
                         LearningLibraryCardView(name: relationships.marriage[0], image: relationships.marriage[1], description: relationships.marriage[2])
@@ -55,6 +55,7 @@ struct LearningLibraryView: View {
                         LearningLibraryCardView(name: relationships.focus[0], image: relationships.focus[1], description: relationships.focus[2])
                         LearningLibraryCardView(name: relationships.dating[0], image: relationships.dating[1], description: relationships.dating[2])
                         LearningLibraryCardView(name: relationships.affair[0], image: relationships.affair[1], description: relationships.affair[2])
+                        LearningLibraryCardView(name: relationships.divorce[0], image: relationships.divorce[1], description: relationships.divorce[2])
                     }
                     .padding(.horizontal)
                 }

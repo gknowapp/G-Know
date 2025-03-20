@@ -57,9 +57,11 @@ struct Login: View {
                     //Logo
                     HStack {
                         GKnowLogo
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
                     }
-                    .frame(height: 450.0)
-                    .padding(.top, -20)
+                    .frame(width: UIHelper.relativeWidth(0.75), height: UIHelper.relativeHeight(0.3))
+                    .padding(UIHelper.standardPadding)
                     
                     // Subtitle
                     Text("Genogram Maker")

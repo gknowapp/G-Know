@@ -30,6 +30,7 @@ struct LibraryContents {
         let focus = ["Focused On", "Focused On", "This indicates that the person at the base of the arrow is focused on the person at the tip of the arrow"]
         let dating = ["Dating", "Dating", "This indicates that two people are dating"]
         let affair = ["Affair", "Affair", "This indicates that two people are having an affair"]
+        let divorce = ["Divorce", "Divorce", "This indicates that two people have divorced"]
         //case engaged = "Engaged"
         
     }
