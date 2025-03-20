@@ -164,21 +164,9 @@ struct AddNewPatient: View {
                                         .padding(.vertical, 15)
                                         .padding(.horizontal, 25)
                                         .background(Color("Light Green"))
-                                        .cornerRadius(10)
+                                        .cornerRadius(UIHelper.standardCornerRadius)
                                 }
                                 
-                                // Create Diagram Button
-                                Button(action: {
-                                    // Action for creating diagram
-                                }) {
-                                    Text("Create Diagram")
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                        .padding(.vertical, 15)
-                                        .padding(.horizontal, 25)
-                                        .background(Color("Dark Green"))
-                                        .cornerRadius(10)
-                                }
                             }
                             .padding(.top, 20)
                         }

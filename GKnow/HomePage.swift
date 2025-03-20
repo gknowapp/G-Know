@@ -25,7 +25,7 @@ struct HomePage: View {
         NavigationStack {
             ZStack {
                 // Clean white background
-                Color.white.ignoresSafeArea()
+                Color("Anti-flash White").ignoresSafeArea()
                 
                 VStack(spacing: 40) {
                     // Logo
@@ -88,6 +88,7 @@ struct HomePage: View {
                 )
             }
         }
+        .environment(\.font, Font.custom("Satoshi-Variable", size: 20, relativeTo: .caption))
         .navigationBarHidden(true)
     }
 }

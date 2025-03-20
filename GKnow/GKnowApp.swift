@@ -14,9 +14,11 @@ struct GKnowApp: App {
            WindowGroup {
                if isHome {
                    HomePage(isHome: $isHome) // Pass binding to HomePage
+                       .environment(\.font, Font.custom("Satoshi-Variable", size: 20, relativeTo: .caption))
                } else {
                    // Navigate to other views as needed
                    MainContainerView()
+                       .environment(\.font, Font.custom("Satoshi-Variable", size: 20, relativeTo: .caption))
                }
            }
        }
