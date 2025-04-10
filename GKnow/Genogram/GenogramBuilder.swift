@@ -48,9 +48,9 @@ struct GenogramBuilder: View {
     let isEditable: Bool
     var imageOptions = [ "Male", "Female", "Unknown Gender", "Pregnancy", "Abortion", "Miscarriage"]
     //var imageOptionsLabel = []
-    var relationshipOptions = ["Child", "Marriage", "Focused On", "Abuse", "Affair", "Marriage", "Engaged", "Dating", "Harmony", "Friendship", "Fusion"]
+    var relationshipOptions = ["Child", "Marriage", "Focused On", "Abuse", "Affair", "Engaged", "Dating", "Harmony", "Friendship", "Fusion"]
     //var relationshipOptionsLabel = []
-    var symptomOptions = ["Male AD Recovery", "Male Illness Recovery", "Male Illness Recovery"]
+    var symptomOptions = ["Male AD Recovery", "Male Illness Recovery"]
     //var symptomOptionsLabel = ["Male AD Abuse", "Male Illness", "Male Illness Recovery"]
     
     @Environment(\.dismiss) var dismiss
@@ -1041,13 +1041,13 @@ struct GenogramBuilder: View {
         switch relationshipImage {
         case "Marriage":
             return .marriage
-        case "Normal":
+        case "Harmony":
             return .harmony
-        case "Cutoff":
+        case "Friendship":
             return .friendship
         case "Divorce":
             return .divorce
-        case "Separation In Fact":
+        case "Fusion":
             return .fusion
         case "Abuse":
             return .abuse
@@ -1055,8 +1055,10 @@ struct GenogramBuilder: View {
             return .focus
         case "Engaged":
             return .dating
-        case "Legal Separation":
+        case "Affair":
             return .affair
+        case "Child":
+            return .child
         default:
             return .child
         }
@@ -1191,7 +1193,7 @@ struct TopToolbarView: View {
                     .foregroundColor(.black)
                     .font(.headline)
                 
-                Image(systemName: "square.and.arrow.up")
+                /*Image(systemName: "square.and.arrow.up")
                     .resizable()
                     .frame(width: 20, height: 25)
                     .foregroundColor(Color("Candace's Couch"))
@@ -1199,7 +1201,7 @@ struct TopToolbarView: View {
                 Image(systemName: "bookmark")
                     .resizable()
                     .frame(width: 15, height: 25)
-                    .foregroundColor(Color("Candace's Couch"))
+                    .foregroundColor(Color("Candace's Couch")) */
             }
             .padding(.horizontal)
             
@@ -1250,7 +1252,7 @@ struct TopToolbarView: View {
                 .frame(height: 30)
             
             // Symptoms Section
-            ScrollView(.horizontal) {
+            /*ScrollView(.horizontal) {
                 HStack(spacing: UIHelper.standardPadding) {
                     ForEach(symptomOptions, id: \.self) { imageName in
                         Image(imageName)
@@ -1263,7 +1265,7 @@ struct TopToolbarView: View {
                 }
             }
             .padding(.horizontal)
-            
+            */
             Divider()
                 .frame(height: 30)
             
