@@ -48,7 +48,7 @@ struct GenogramBuilder: View {
     let isEditable: Bool
     var imageOptions = [ "Male", "Female",  "Pregnancy", "Abortion", "Miscarriage", "Unknown Gender"]
     //var imageOptionsLabel = []
-    var relationshipOptions = ["Child", "Marriage", "Focused On", "Abuse", "Affair", "Engaged", "Dating", "Harmony", "Friendship", "Fusion"]
+    var relationshipOptions = ["Child", "Marriage", "Focused On", "Abuse", "Divorce", "Affair", "Engaged", "Dating", "Harmony", "Friendship", "Fusion"]
     //var relationshipOptionsLabel = []
     var symptomOptions = ["Male AD Recovery", "Male Illness Recovery"]
     //var symptomOptionsLabel = ["Male AD Abuse", "Male Illness", "Male Illness Recovery"]
@@ -174,7 +174,7 @@ struct GenogramBuilder: View {
                                 onIconTap: handleIconTap,
                                 isConnectingMode: isConnectingMode,
                                 selectedIcon: selectedIcon,
-                                //dismiss: dismiss//,
+                                dismiss: dismiss,
                                 showTherapistView: $showTherapistView,
                                 navigateToTherapist: $navigateToTherapist
                             )
@@ -198,7 +198,7 @@ struct GenogramBuilder: View {
                     }
                 }
                 // Top layer - Bottom toolbar
-                VStack {
+                /*VStack {
                     Spacer()
                     ZStack {
                         HStack {
@@ -278,7 +278,7 @@ struct GenogramBuilder: View {
                             }
                         }
                     }
-                }
+                } */
             }
             
             .padding(.top)
@@ -1204,7 +1204,7 @@ struct TopToolbarView: View {
     let onIconTap: (String) -> Void
     let isConnectingMode: Bool
     let selectedIcon: String?
-    //@Environment(\.dismiss) var dismiss
+    var dismiss: DismissAction
     @Binding var showTherapistView: Bool
     @Binding var navigateToTherapist: Bool
     
@@ -1214,8 +1214,8 @@ struct TopToolbarView: View {
             HStack(spacing: 15) {
                 Button(action: {
                     showTherapistView = true
+                    dismiss()
                     navigateToTherapist = true
-                    //dismiss()
                 }) {
                     Image(systemName: "house.fill")
                         .resizable()
