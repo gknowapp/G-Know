@@ -46,7 +46,7 @@ struct GenogramBuilder: View {
    
     
     let isEditable: Bool
-    var imageOptions = [ "Male", "Female", "Unknown Gender", "Pregnancy", "Abortion", "Miscarriage"]
+    var imageOptions = [ "Male", "Female",  "Pregnancy", "Abortion", "Miscarriage", "Unknown Gender"]
     //var imageOptionsLabel = []
     var relationshipOptions = ["Child", "Marriage", "Focused On", "Abuse", "Affair", "Engaged", "Dating", "Harmony", "Friendship", "Fusion"]
     //var relationshipOptionsLabel = []
@@ -340,264 +340,292 @@ struct GenogramBuilder: View {
             ZStack {
                 // Handle all connections with a unified approach
                 ForEach(genogramData.connections) { connection in
+                    switch connection.type {
+                    case .marriage:
+                        // Marriage connections
+                        let start = getBottomCenter(for: connection.startSymbolId)
+                        let end = getBottomCenter(for: connection.endSymbolId)
+                        
+                        MarriageConnectionLine(start: start, end: end)
+                            .stroke(Color("Candace's Couch"), lineWidth: 2)
+                            // Use a more precise shape for the touch area - just the line itself
+                            .contentShape(Path { path in
+                                path.move(to: start)
+                                path.addLine(to: end)
+                                // Add a slight thickness to make it easier to tap
+                                let lineVector = CGVector(dx: end.x - start.x, dy: end.y - start.y)
+                                let perpVector = CGVector(dx: -lineVector.dy/10, dy: lineVector.dx/10)
+                                
+                                // Create a thin rectangle around the line for better touch area
+                                path.addLine(to: CGPoint(x: end.x + perpVector.dx, y: end.y + perpVector.dy))
+                                path.addLine(to: CGPoint(x: start.x + perpVector.dx, y: start.y + perpVector.dy))
+                                path.closeSubpath()
+                            })
+                            .onTapGesture {
+                                print("Marriage connection tapped: \(connection.id)")
+                                onConnectionTap(connection)
+                            }
+                            .zIndex(10) // Make sure marriage connections are on top for tap priority
                     
-                    if (connection.type == .marriage) {
-                        MarriageConnectionView(connection: connection, genogramData: genogramData)
-                                               .contentShape(Rectangle())
-                                               .onTapGesture {
-                                                   onConnectionTap(connection)
-                                            }
-                                       
-                } else if (connection.type == .child) {
-                    
-                    ChildConnectionView(connection: connection,
-                                        connections: genogramData.connections,
-                                        genogramData: genogramData)
-                    
-                } else {
-                    ConnectionLineView(
-                        connection: connection,
-                        genogramData: genogramData
-                    )
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        onConnectionTap(connection)
-                    }
-                }
-                }
-            }
-        }
-        
-        // Helper function to get center point of a symbol
-        private func getCenter(for symbolId: UUID) -> CGPoint? {
-            if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
-                return shape.position
-            }
-            return nil
-        }
-    }
-    
-    struct MarriageConnectionView: View {
-            let connection: Connection
-            let genogramData: GenogramData
-            
-            var body: some View {
-                let start = getBottomCenter(for: connection.startSymbolId, in: genogramData)
-                let end = getBottomCenter(for: connection.endSymbolId, in: genogramData)
-                
-                MarriageConnectionLine(start: start, end: end)
-                    .stroke(Color("Candace's Couch"), lineWidth: 2)
-            }
-            
-            private func getBottomCenter(for symbolId: UUID, in data: GenogramData) -> CGPoint {
-                if let shape = data.genogram.first(where: { $0.id == symbolId }) {
-                    return CGPoint(
-                        x: shape.position.x,
-                        y: shape.position.y + (UIHelper.standardIconSize / 2)
-                    )
-                }
-                return .zero
-            }
-        }
-    
-    struct ChildConnectionView: View {
-            let connection: Connection
-            let connections: [Connection]
-            let genogramData: GenogramData
-            
-            var body: some View {
-                if let parentConnection = connections.first(where: { $0.id == connection.parentConnectionId }) {
-                    let parentStart = getBottomCenter(for: parentConnection.startSymbolId, in: genogramData)
-                    let parentEnd = getBottomCenter(for: parentConnection.endSymbolId, in: genogramData)
-                    let childPoint = getTopCenter(for: connection.endSymbolId, in: genogramData)
-                    
-                    // Get all siblings and sort them by their x position
-                    let siblings = connections.filter { $0.type == .child && $0.parentConnectionId == parentConnection.id }
-                        .sorted { (conn1, conn2) -> Bool in
-                            let pos1 = getSymbolPosition(for: conn1.endSymbolId, in: genogramData)
-                            let pos2 = getSymbolPosition(for: conn2.endSymbolId, in: genogramData)
-                            return pos1.x < pos2.x
+                    case .child:
+                        // Child connections
+                        if let parentConnectionId = connection.parentConnectionId,
+                           let parentConnection = genogramData.connections.first(where: { $0.id == parentConnectionId }) {
+                            let parentStart = getBottomCenter(for: parentConnection.startSymbolId)
+                            let parentEnd = getBottomCenter(for: parentConnection.endSymbolId)
+                            let childPoint = getTopCenter(for: connection.endSymbolId)
+                            
+                            // Get all siblings and sort them by their x position
+                            let siblings = genogramData.connections.filter { $0.type == .child && $0.parentConnectionId == parentConnectionId }
+                                .sorted { (conn1, conn2) -> Bool in
+                                    let pos1 = getSymbolPosition(for: conn1.endSymbolId)
+                                    let pos2 = getSymbolPosition(for: conn2.endSymbolId)
+                                    return pos1.x < pos2.x
+                                }
+                            
+                            let siblingIndex = siblings.firstIndex(where: { $0.id == connection.id }) ?? 0
+                            let totalSiblings = siblings.count
+                            
+                            // Calculate position along marriage line
+                            let marriageLineLength = parentEnd.x - parentStart.x
+                            let spacing = marriageLineLength / CGFloat(totalSiblings + 1)
+                            let startX = parentStart.x + (spacing * CGFloat(siblingIndex + 1))
+                            
+                            let connectionPoint = CGPoint(
+                                x: startX,
+                                y: parentStart.y + 20
+                            )
+                            
+                            ChildConnectionLine(
+                                startPoint: connectionPoint,
+                                childPoint: childPoint
+                            )
+                            .stroke(Color("Candace's Couch"), lineWidth: 2)
                         }
                     
-                    let siblingIndex = siblings.firstIndex(where: { $0.id == connection.id }) ?? 0
-                    let totalSiblings = siblings.count
+                    case .abuse:
+                        // Abuse connections (wavy line)
+                        // Adjust the connection points to stop short of the symbol centers
+                        let startPos = getCenter(for: connection.startSymbolId)
+                        let endPos = getCenter(for: connection.endSymbolId)
+                        // Calculate vector between start and end
+                        let dx = endPos.x - startPos.x
+                        let dy = endPos.y - startPos.y
+                        let distance = sqrt(dx*dx + dy*dy)
+                        let unitX = dx / distance
+                        let unitY = dy / distance
+                        // Calculate new points that stop short of the symbols
+                        // Use a smaller buffer for arrow types
+                        let startBuffer: CGFloat = UIHelper.standardIconSize / 2 - 5
+                       // let endBuffer: CGFloat = UIHelper.standardIconSize / 4  // Smaller buffer for arrow end
+                        let start = CGPoint(
+                            x: startPos.x + unitX * startBuffer,
+                            y: startPos.y + unitY * startBuffer
+                        )
+                        let end = CGPoint(
+                            x: endPos.x - unitX ,
+                            y: endPos.y - unitY
+                        )
+                        
+                        AbuseConnectionLine(start: start, end: end)
+                            .stroke(Color.black, lineWidth: 2)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                onConnectionTap(connection)
+                            }
                     
-                    // Calculate position along marriage line
-                    let marriageLineLength = parentEnd.x - parentStart.x
-                    let spacing = marriageLineLength / CGFloat(totalSiblings + 1)
-                    let startX = parentStart.x + (spacing * CGFloat(siblingIndex + 1))
+                    case .harmony:
+                        // Harmony connections with adjusted endpoints
+                        let startPos = getCenter(for: connection.startSymbolId)
+                        let endPos = getCenter(for: connection.endSymbolId)
+                        // Calculate vector
+                        let dx = endPos.x - startPos.x
+                        let dy = endPos.y - startPos.y
+                        let distance = sqrt(dx*dx + dy*dy)
+                        let unitX = dx / distance
+                        let unitY = dy / distance
+                        // Adjusted points
+                        let buffer: CGFloat = UIHelper.standardIconSize / 2 - 5
+                        let start = CGPoint(
+                            x: startPos.x + unitX * buffer,
+                            y: startPos.y + unitY * buffer
+                        )
+                        let end = CGPoint(
+                            x: endPos.x - unitX * buffer,
+                            y: endPos.y - unitY * buffer
+                        )
+                        
+                        HarmonyConnectionLine(start: start, end: end)
+                            .stroke(Color.black, lineWidth: 2)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                onConnectionTap(connection)
+                            }
                     
-                    let connectionPoint = CGPoint(
-                        x: startX,
-                        y: parentStart.y + 20
-                    )
+                    case .friendship:
+                        // Friendship connections with adjusted endpoints
+                        let startPos = getCenter(for: connection.startSymbolId)
+                        let endPos = getCenter(for: connection.endSymbolId)
+                        // Calculate vector
+                        let dx = endPos.x - startPos.x
+                        let dy = endPos.y - startPos.y
+                        let distance = sqrt(dx*dx + dy*dy)
+                        let unitX = dx / distance
+                        let unitY = dy / distance
+                        // Adjusted points
+                        let buffer: CGFloat = UIHelper.standardIconSize / 2 - 5
+                        let start = CGPoint(
+                            x: startPos.x + unitX * buffer,
+                            y: startPos.y + unitY * buffer
+                        )
+                        let end = CGPoint(
+                            x: endPos.x - unitX * buffer,
+                            y: endPos.y - unitY * buffer
+                        )
+                        
+                        FriendshipConnectionLine(start: start, end: end)
+                            .stroke(Color.black, lineWidth: 2)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                onConnectionTap(connection)
+                            }
                     
-                    ChildConnectionLine(
-                        startPoint: connectionPoint,
-                        childPoint: childPoint
-                    )
-                    .stroke(Color("Candace's Couch"), lineWidth: 2)
-                }
-            }
-            
-            // Helper function to get symbol position
-            private func getSymbolPosition(for symbolId: UUID, in data: GenogramData) -> CGPoint {
-                if let shape = data.genogram.first(where: { $0.id == symbolId }) {
-                    return shape.position
-                }
-                return .zero
-            }
-            
-            private func getBottomCenter(for symbolId: UUID, in data: GenogramData) -> CGPoint {
-                if let shape = data.genogram.first(where: { $0.id == symbolId }) {
-                    return CGPoint(
-                        x: shape.position.x,
-                        y: shape.position.y + (UIHelper.standardIconSize / 2)
-                    )
-                }
-                return .zero
-            }
-            
-            private func getTopCenter(for symbolId: UUID, in data: GenogramData) -> CGPoint {
-                if let shape = data.genogram.first(where: { $0.id == symbolId }) {
-                    return CGPoint(
-                        x: shape.position.x,
-                        y: shape.position.y - (UIHelper.standardIconSize / 2)
-                    )
-                }
-                return .zero // Returns (0,0) if shape not found
-            }
-        }
-
-    
-    
-
-    // Unified view for rendering any type of connection
-    struct ConnectionLineView: View {
-        let connection: Connection
-        let genogramData: GenogramData
-        
-        var body: some View {
-            switch connection.type {
-            case .marriage:
-                // Marriage-type connections (horizontal line between partners)
-                let start = getBottomCenter(for: connection.startSymbolId)
-                let end = getBottomCenter(for: connection.endSymbolId)
-                
-                MarriageConnectionLine(start: start, end: end)
-                    .stroke(Color("Candace's Couch"), lineWidth: 2)
+                    case .fusion:
+                        // Fusion connections with adjusted endpoints
+                        let startPos = getCenter(for: connection.startSymbolId)
+                        let endPos = getCenter(for: connection.endSymbolId)
+                        // Calculate vector
+                        let dx = endPos.x - startPos.x
+                        let dy = endPos.y - startPos.y
+                        let distance = sqrt(dx*dx + dy*dy)
+                        let unitX = dx / distance
+                        let unitY = dy / distance
+                        // Adjusted points
+                        let buffer: CGFloat = UIHelper.standardIconSize / 2 - 5
+                        let start = CGPoint(
+                            x: startPos.x + unitX * buffer,
+                            y: startPos.y + unitY * buffer
+                        )
+                        let end = CGPoint(
+                            x: endPos.x - unitX * buffer,
+                            y: endPos.y - unitY * buffer
+                        )
+                        
+                        FusionConnectionLine(start: start, end: end)
+                            .stroke(Color.black, lineWidth: 2)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                onConnectionTap(connection)
+                            }
                     
-            case .child:
-                // Child connections (vertical line from parent marriage to child)
-                if let parentConnectionId = connection.parentConnectionId,
-                   let parentConnection = genogramData.connections.first(where: { $0.id == parentConnectionId }) {
-                    let parentStart = getBottomCenter(for: parentConnection.startSymbolId)
-                    let parentEnd = getBottomCenter(for: parentConnection.endSymbolId)
-                    let childPoint = getTopCenter(for: connection.endSymbolId)
+                    case .focus:
+                        // Focus connections with adjusted endpoints
+                        let startPos = getCenter(for: connection.startSymbolId)
+                        let endPos = getCenter(for: connection.endSymbolId)
+                        // Calculate vector
+                        let dx = endPos.x - startPos.x
+                        let dy = endPos.y - startPos.y
+                        let distance = sqrt(dx*dx + dy*dy)
+                        let unitX = dx / distance
+                        let unitY = dy / distance
+                        // Adjusted points with smaller buffer for arrow end
+                        let startBuffer: CGFloat = UIHelper.standardIconSize / 2 - 5
+                        //let endBuffer: CGFloat = UIHelper.standardIconSize / 4  // Smaller buffer for arrow end
+                        let start = CGPoint(
+                            x: startPos.x + unitX * startBuffer,
+                            y: startPos.y + unitY * startBuffer
+                        )
+                        let end = CGPoint(
+                            x: endPos.x - unitX ,
+                            y: endPos.y - unitY
+                        )
+                        
+                        FocusedConnectionLine(start: start, end: end)
+                            .stroke(Color.black, lineWidth: 2)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                onConnectionTap(connection)
+                            }
                     
-                    // Get all siblings with the same parent connection
-                    let siblings = genogramData.connections.filter {
-                        $0.type == .child && $0.parentConnectionId == parentConnectionId
-                    }.sorted { (conn1, conn2) -> Bool in
-                        let pos1 = getSymbolPosition(for: conn1.endSymbolId)
-                        let pos2 = getSymbolPosition(for: conn2.endSymbolId)
-                        return pos1.x < pos2.x
-                    }
+                    case .dating:
+                        // Dating connections (dashed line)
+                        let start = getBottomCenter(for: connection.startSymbolId)
+                        let end = getBottomCenter(for: connection.endSymbolId)
+                        
+                        MarriageConnectionLine(start: start, end: end)
+                            .stroke(style: StrokeStyle(lineWidth: 2, dash: [5, 5]))
+                            .foregroundColor(.black)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                onConnectionTap(connection)
+                            }
                     
-                    let siblingIndex = siblings.firstIndex(where: { $0.id == connection.id }) ?? 0
-                    let totalSiblings = siblings.count
-                    
-                    // Calculate position along marriage line
-                    let marriageLineLength = parentEnd.x - parentStart.x
-                    let spacing = marriageLineLength / CGFloat(totalSiblings + 1)
-                    let startX = parentStart.x + (spacing * CGFloat(siblingIndex + 1))
-                    
-                    let connectionPoint = CGPoint(
-                        x: startX,
-                        y: parentStart.y + 20
-                    )
-                    
-                    ChildConnectionLine(
-                        startPoint: connectionPoint,
-                        childPoint: childPoint
-                    )
-                    .stroke(Color("Candace's Couch"), lineWidth: 2)
-                }
-                
-            case .abuse:
-                // Abuse connections (wavy line)
-                let start = getCenter(for: connection.startSymbolId)
-                let end = getCenter(for: connection.endSymbolId)
-                
-                AbuseConnectionLine(start: start, end: end)
-                    .stroke(Color.black, lineWidth: 2)
-                
-            case .harmony:
-                let start = getCenter(for: connection.startSymbolId)
-                let end = getCenter(for: connection.endSymbolId)
-                
-                HarmonyConnectionLine(start: start, end: end)
-                    .stroke(Color.black, lineWidth: 2)
-                
-            case .friendship:
-                let start = getCenter(for: connection.startSymbolId)
-                let end = getCenter(for: connection.endSymbolId)
-                
-                FriendshipConnectionLine(start: start, end: end)
-                    .stroke(Color.black, lineWidth: 2)
-                
-            case .fusion:
-                let start = getCenter(for: connection.startSymbolId)
-                let end = getCenter(for: connection.endSymbolId)
-                
-                FusionConnectionLine(start: start, end: end)
-                    .stroke(Color.black, lineWidth: 2)
-                
-            case .focus:
-                let start = getCenter(for: connection.startSymbolId)
-                let end = getCenter(for: connection.endSymbolId)
-                
-                FocusedConnectionLine(start: start, end: end)
-                    .stroke(Color.black, lineWidth: 2)
-                
-            case .dating:
-                let start = getBottomCenter(for: connection.startSymbolId)
-                let end = getBottomCenter(for: connection.endSymbolId)
-                
-                MarriageConnectionLine(start: start, end: end)
-                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [5, 5]))
-                    .foregroundColor(.black)
-                
-            case .affair:
-                let start = getBottomCenter(for: connection.startSymbolId)
-                let end = getBottomCenter(for: connection.endSymbolId)
-                AffairConnectionLine(start: start, end: end)
-                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [5, 5]))
-                    .foregroundColor(.black)
+                    case .affair:
+                        // Affair connections (dashed with triangle)
+                        let start = getBottomCenter(for: connection.startSymbolId)
+                        let end = getBottomCenter(for: connection.endSymbolId)
+                        ZStack {
+                            AffairConnectionLine(start: start, end: end)
+                                .stroke(style: StrokeStyle(lineWidth: 2, dash: [5, 5]))
+                                .foregroundColor(.black)
                             
                             // Draw the filled triangle
-                AffairTriangleMarker(start: start, end: end)
-                    .fill(.black)
-                   
-            case .divorce:
-                let start = getBottomCenter(for: connection.startSymbolId)
-                let end = getBottomCenter(for: connection.endSymbolId)
-                DivorceConnectionLine(start: start, end: end)
-                    .stroke(Color.black, lineWidth: 2)
-                
-            default:
-                // Default handling for any other connection types
-                let start = getCenter(for: connection.startSymbolId)
-                let end = getCenter(for: connection.endSymbolId)
-                
-                Path { path in
-                    path.move(to: start)
-                    path.addLine(to: end)
+                            AffairTriangleMarker(start: start, end: end)
+                                .fill(.black)
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            onConnectionTap(connection)
+                        }
+                    
+                    case .divorce:
+                        // Divorce connections
+                        let start = getBottomCenter(for: connection.startSymbolId)
+                        let end = getBottomCenter(for: connection.endSymbolId)
+                        
+                        DivorceConnectionLine(start: start, end: end)
+                            .stroke(Color.black, lineWidth: 2)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                onConnectionTap(connection)
+                            }
+                    
+                    default:
+                        // Default handling for any other connection types
+                        let startPos = getCenter(for: connection.startSymbolId)
+                        let endPos = getCenter(for: connection.endSymbolId)
+                        // Calculate vector
+                        let dx = endPos.x - startPos.x
+                        let dy = endPos.y - startPos.y
+                        let distance = sqrt(dx*dx + dy*dy)
+                        let unitX = dx / distance
+                        let unitY = dy / distance
+                        // Adjusted points
+                        let buffer: CGFloat = UIHelper.standardIconSize / 2 - 5
+                        let start = CGPoint(
+                            x: startPos.x + unitX * buffer,
+                            y: startPos.y + unitY * buffer
+                        )
+                        let end = CGPoint(
+                            x: endPos.x - unitX * buffer,
+                            y: endPos.y - unitY * buffer
+                        )
+                        
+                        Path { path in
+                            path.move(to: start)
+                            path.addLine(to: end)
+                        }
+                        .stroke(Color("Candace's Couch"), lineWidth: 2)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            onConnectionTap(connection)
+                        }
+                    }
                 }
-                .stroke(Color("Candace's Couch"), lineWidth: 2)
             }
         }
-        // Helper methods for getting positions
+        
+        // Helper functions for getting positions
         private func getCenter(for symbolId: UUID) -> CGPoint {
             if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
                 return shape.position
@@ -609,7 +637,7 @@ struct GenogramBuilder: View {
             if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
                 return CGPoint(
                     x: shape.position.x,
-                    y: shape.position.y + (UIHelper.standardIconSize / 2)
+                    y: shape.position.y + (UIHelper.standardIconSize / 2) - 5 // Stop 5 points before edge
                 )
             }
             return .zero
@@ -619,7 +647,7 @@ struct GenogramBuilder: View {
             if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
                 return CGPoint(
                     x: shape.position.x,
-                    y: shape.position.y - (UIHelper.standardIconSize / 2)
+                    y: shape.position.y - (UIHelper.standardIconSize / 2) + 5 // Stop 5 points before edge
                 )
             }
             return .zero
@@ -631,9 +659,8 @@ struct GenogramBuilder: View {
             }
             return .zero
         }
-        
-       
     }
+    
     private func handleSymbolTap(_ shape: GenogramShape) {
         if !isConnectingMode {
             activeShape = shape
@@ -664,9 +691,11 @@ struct GenogramBuilder: View {
     }
     
     private func handleMarriageConnectionTap(_ connection: Connection) {
+        print("Handling marriage connection tap - connection ID: \(connection.id)")
         
         if (connection.type == .marriage) {
             if let firstSymbol = startSymbol {
+                print("Creating child connection from symbol \(firstSymbol.id) to marriage \(connection.id)")
                 let childConnection = Connection(
                     id: UUID(),
                     start: connection.parentMiddlePoint ?? .zero,
@@ -678,7 +707,12 @@ struct GenogramBuilder: View {
                 )
                 genogramData.connections.append(childConnection)
                 startSymbol = nil
+                selectedShapeId = nil
+            } else {
+                print("No symbol selected to connect as child")
             }
+        } else {
+            print("Tapped connection is not a marriage type: \(connection.type)")
         }
     }
     
@@ -1076,7 +1110,7 @@ struct GenogramBuilder: View {
         if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
             return CGPoint(
                 x: shape.position.x,
-                y: shape.position.y + (UIHelper.standardIconSize / 2)
+                y: shape.position.y + (UIHelper.standardIconSize / 2) - 5 // Stop 5 points before edge
             )
         }
         return .zero
@@ -1086,7 +1120,7 @@ struct GenogramBuilder: View {
         if let shape = genogramData.genogram.first(where: { $0.id == symbolId }) {
             return CGPoint(
                 x: shape.position.x,
-                y: shape.position.y - (UIHelper.standardIconSize / 2)
+                y: shape.position.y - (UIHelper.standardIconSize / 2) + 5 // Stop 5 points before edge
             )
         }
         return .zero
