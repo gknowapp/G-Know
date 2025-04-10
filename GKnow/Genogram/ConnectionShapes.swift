@@ -12,6 +12,22 @@ import SwiftUI
 // MARK: Connection Struct
 //
 
+
+enum ConnectionType: String {
+    case marriage = "marriage"
+    case child = "child"
+    case abuse = "abuse"
+    case harmony = "harmony"
+    case friendship = "friendship"
+    case fusion = "fusion"
+    case divorce = "divorce"
+    case focus = "focus"
+    case dating = "dating"
+    case affair = "affair"
+    case engaged = "engaged"
+}
+
+
 struct Connection: Identifiable {
     let id: UUID
     var start: CGPoint?
@@ -21,19 +37,6 @@ struct Connection: Identifiable {
     let type: ConnectionType
     var parentConnectionId: UUID?
     
-    enum ConnectionType {
-        case marriage
-        case child
-        case abuse
-        case harmony
-        case friendship
-        case fusion
-        case divorce
-        case focus
-        case dating
-        case affair
-        case engaged
-    }
     
     var parentMiddlePoint: CGPoint? {
         guard let start = start, let end = end else { return nil }

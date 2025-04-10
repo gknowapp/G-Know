@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24C101" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Connection_test" representedClassName="Connection_test" syncable="YES" codeGenerationType="class">
+        <attribute name="connection_id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="connectionType" attributeType="String"/>
+        <attribute name="end_x" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="end_y" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="start_x" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="start_y" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="endSymbolId" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GenogramShape_test"/>
+        <relationship name="parentSymbolId" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GenogramShape_test"/>
+        <relationship name="startSymbolId" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GenogramShape_test"/>
+    </entity>
+    <entity name="GenogramShape_test" representedClassName="GenogramShape_test" syncable="YES" codeGenerationType="class">
+        <attribute name="imageName" attributeType="String"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="personName" optional="YES" attributeType="String"/>
+        <attribute name="shape_id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="x" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="y" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+    </entity>
+</model>

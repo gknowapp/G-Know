@@ -36,7 +36,7 @@ struct GenogramBuilder: View {
     
     @State private var hasGeneratedTemplate: Bool = false
     
-    @State private var selectedConnectionType: Connection.ConnectionType = .marriage
+    @State private var selectedConnectionType: ConnectionType = .marriage
     
     enum DrawingMode {
            case none
@@ -46,9 +46,9 @@ struct GenogramBuilder: View {
    
     
     let isEditable: Bool
-    var imageOptions = [ "Male", "Female", "Unknown Gender", "Pregnancy", "Abortion", "Miscarriage", "Male Death", "Female Death"]
+    var imageOptions = [ "Male", "Female", "Unknown Gender", "Pregnancy", "Abortion", "Miscarriage"]
     //var imageOptionsLabel = []
-    var relationshipOptions = ["Cutoff", "Divorce", "Focused On", "Normal", "Abuse", "Marriage", "Engaged", "Committed Relationship", "Legal Separation", "Separation In Fact"]
+    var relationshipOptions = ["Child", "Marriage", "Focused On", "Abuse", "Affair", "Marriage", "Engaged", "Dating", "Harmony", "Friendship", "Fusion"]
     //var relationshipOptionsLabel = []
     var symptomOptions = ["Male AD Recovery", "Male Illness Recovery", "Male Illness Recovery"]
     //var symptomOptionsLabel = ["Male AD Abuse", "Male Illness", "Male Illness Recovery"]
@@ -1037,7 +1037,7 @@ struct GenogramBuilder: View {
     }*/
     
     // Add helper function to determine connection type
-    private func getConnectionType(for relationshipImage: String) -> Connection.ConnectionType {
+    private func getConnectionType(for relationshipImage: String) -> ConnectionType {
         switch relationshipImage {
         case "Marriage":
             return .marriage
