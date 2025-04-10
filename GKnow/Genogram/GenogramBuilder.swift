@@ -49,7 +49,7 @@ struct GenogramBuilder: View {
     let isEditable: Bool
     var imageOptions = [ "Male", "Female",  "Pregnancy", "Abortion", "Miscarriage", "Unknown Gender"]
     //var imageOptionsLabel = []
-    var relationshipOptions = ["Child", "Marriage", "Focused On", "Abuse", "Affair", "Engaged", "Dating", "Harmony", "Friendship", "Fusion"]
+    var relationshipOptions = ["Child", "Marriage", "Focused On", "Abuse", "Conflict", "Affair", "Engaged", "Dating", "Harmony", "Friendship", "Fusion"]
     //var relationshipOptionsLabel = []
     var symptomOptions = ["Male AD Recovery", "Male Illness Recovery"]
     //var symptomOptionsLabel = ["Male AD Abuse", "Male Illness", "Male Illness Recovery"]
@@ -458,6 +458,34 @@ struct GenogramBuilder: View {
                         )
                         
                         HarmonyConnectionLine(start: start, end: end)
+                            .stroke(Color.black, lineWidth: 2)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                onConnectionTap(connection)
+                            }
+                        
+                    case .conflict:
+                        // Harmony connections with adjusted endpoints
+                        let startPos = getCenter(for: connection.startSymbolId)
+                        let endPos = getCenter(for: connection.endSymbolId)
+                        // Calculate vector
+                        let dx = endPos.x - startPos.x
+                        let dy = endPos.y - startPos.y
+                        let distance = sqrt(dx*dx + dy*dy)
+                        let unitX = dx / distance
+                        let unitY = dy / distance
+                        // Adjusted points
+                        let buffer: CGFloat = UIHelper.standardIconSize / 2 - 5
+                        let start = CGPoint(
+                            x: startPos.x + unitX * buffer,
+                            y: startPos.y + unitY * buffer
+                        )
+                        let end = CGPoint(
+                            x: endPos.x - unitX * buffer,
+                            y: endPos.y - unitY * buffer
+                        )
+                        
+                        ConflictConnectionLine(start: start, end: end)
                             .stroke(Color.black, lineWidth: 2)
                             .contentShape(Rectangle())
                             .onTapGesture {
@@ -1095,6 +1123,8 @@ struct GenogramBuilder: View {
             return .affair
         case "Child":
             return .child
+        case "Conflict":
+            return .conflict
         default:
             return .child
         }

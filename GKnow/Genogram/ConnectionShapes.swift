@@ -25,6 +25,7 @@ enum ConnectionType: String {
     case dating = "dating"
     case affair = "affair"
     case engaged = "engaged"
+    case conflict = "conflict"
 }
 
 
@@ -297,7 +298,63 @@ struct AbuseConnectionLine: Shape {
     }
 }
 
-
+//
+//MARK: Conflict Connection Line - A jagged line from one symbol to another
+//
+struct ConflictConnectionLine : Shape {
+    let start: CGPoint
+    let end: CGPoint
+    let segments = 12
+    
+    
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        // Calculate direction vector
+        let dx = end.x - start.x
+        let dy = end.y - start.y
+        let distance = sqrt(dx * dx + dy * dy)
+        
+        
+        // Calculate unit vector
+        let ux = dx / distance
+        let uy = dy / distance
+        
+        // Calculate perpendicular unit vector for zigzag
+        let px = -uy
+        let py = ux
+        
+        // Start the path
+        path.move(to: start)
+        
+        // Draw zigzag all the way to arrow base
+        for i in 0...segments {
+            let t = CGFloat(i) / CGFloat(segments)
+            
+            // Calculate points from start to arrow base
+            let x1 = start.x + (end.x - start.x) * t
+            let y1 = start.y + (end.y - start.y) * t
+            
+            if i % 2 == 0 {
+                path.addLine(to: CGPoint(
+                    x: x1 + px * 8,
+                    y: y1 + py * 8
+                ))
+            } else {
+                path.addLine(to: CGPoint(
+                    x: x1 - px * 8,
+                    y: y1 - py * 8
+                ))
+            }
+        }
+        
+        return path
+    }
+    
+    
+    
+}
 
 
 //

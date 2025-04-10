@@ -91,6 +91,7 @@ struct LearningLibraryView: View {
                                     relationships.friendship,
                                     relationships.child,
                                     relationships.abuse,
+                                    relationships.conflict,
                                     relationships.fusion,
                                     relationships.focus,
                                     relationships.affair,
