@@ -79,7 +79,9 @@ struct PatientInfoInput: View {
                             genogramData: $genogramData,
                             selectedIcon: $selectedIcon,
                             isSidePanelVisible: $isSidePanelVisible,
-                            isEditable: true
+                            patientName: "\(firstName) \(lastName)",
+                            isEditable: true,
+                            
                         )) {
                             HStack {
                                 Image(systemName: "chart.bar.doc.horizontal")

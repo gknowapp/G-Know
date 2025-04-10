@@ -17,6 +17,7 @@ struct GenogramBuilder: View {
     @State private var canvasView = PKCanvasView() // PencilKit canvas view
     @State private var savedDrawing = PKDrawing() // Stores the drawing to display it after exiting
     
+    var patientName: String = "Patient" // Default name if none provided
     
     
     @State private var isConnectingMode: Bool = false
@@ -48,7 +49,7 @@ struct GenogramBuilder: View {
     let isEditable: Bool
     var imageOptions = [ "Male", "Female",  "Pregnancy", "Abortion", "Miscarriage", "Unknown Gender"]
     //var imageOptionsLabel = []
-    var relationshipOptions = ["Child", "Marriage", "Focused On", "Abuse", "Divorce", "Affair", "Engaged", "Dating", "Harmony", "Friendship", "Fusion"]
+    var relationshipOptions = ["Child", "Marriage", "Focused On", "Abuse", "Affair", "Engaged", "Dating", "Harmony", "Friendship", "Fusion"]
     //var relationshipOptionsLabel = []
     var symptomOptions = ["Male AD Recovery", "Male Illness Recovery"]
     //var symptomOptionsLabel = ["Male AD Abuse", "Male Illness", "Male Illness Recovery"]
@@ -176,7 +177,8 @@ struct GenogramBuilder: View {
                                 selectedIcon: selectedIcon,
                                 dismiss: dismiss,
                                 showTherapistView: $showTherapistView,
-                                navigateToTherapist: $navigateToTherapist
+                                navigateToTherapist: $navigateToTherapist,
+                                patientName: patientName
                             )
                             .padding(UIHelper.relativeHeight(0.04))
                             .background(Color("Anti-flash White"))
@@ -198,7 +200,7 @@ struct GenogramBuilder: View {
                     }
                 }
                 // Top layer - Bottom toolbar
-                /*VStack {
+                VStack {
                     Spacer()
                     ZStack {
                         HStack {
@@ -278,7 +280,7 @@ struct GenogramBuilder: View {
                             }
                         }
                     }
-                } */
+                }
             }
             
             .padding(.top)
@@ -1207,6 +1209,7 @@ struct TopToolbarView: View {
     var dismiss: DismissAction
     @Binding var showTherapistView: Bool
     @Binding var navigateToTherapist: Bool
+    let patientName: String
     
     var body: some View {
         HStack(spacing: 0) {
@@ -1223,7 +1226,7 @@ struct TopToolbarView: View {
                         .foregroundColor(Color("Candace's Couch"))
                 }
                 
-                Text("Jane Doe")
+                Text(patientName)
                     .foregroundColor(.black)
                     .font(.headline)
                 
