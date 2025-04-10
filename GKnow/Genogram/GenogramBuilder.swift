@@ -200,7 +200,7 @@ struct GenogramBuilder: View {
                     }
                 }
                 // Top layer - Bottom toolbar
-                VStack {
+                /*VStack {
                     Spacer()
                     ZStack {
                         HStack {
@@ -280,7 +280,7 @@ struct GenogramBuilder: View {
                             }
                         }
                     }
-                }
+                }*/
             }
             
             .padding(.top)
