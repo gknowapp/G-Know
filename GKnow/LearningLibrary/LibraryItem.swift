@@ -10,6 +10,6 @@
 // Model to represent a library item
 struct LibraryItem {
     let title: String
-    let image: String
+    let image: String?
     let description: String
 }

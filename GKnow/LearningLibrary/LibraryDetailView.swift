@@ -49,22 +49,22 @@ struct LibraryDetailView: View {
                             Text(item.title)
                                 .font(.title)
                                 .fontWeight(.bold)
-                            
-                            Image(item.image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: UIHelper.relativeWidth(0.2), height: UIHelper.relativeWidth(0.2))
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(5)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius)
-                                        .stroke(Color.black, lineWidth: 1)
-                                )
-                            
-                            
+                            if (item.image != nil) {
+                                Image(item.image!)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: UIHelper.relativeWidth(0.15), height: UIHelper.relativeWidth(0.15))
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(5)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: UIHelper.standardCornerRadius)
+                                            .stroke(Color.black, lineWidth: 1)
+                                    )
+                                
+                            }
                         }
-                        .frame(width: UIHelper.relativeWidth(0.25))
+                        .frame(width: UIHelper.relativeWidth(0.2))
                         Spacer()
                         // Right side - Detailed description with scroll view
                         ScrollView {
@@ -80,23 +80,23 @@ struct LibraryDetailView: View {
                                 .padding(.trailing, 10)
                             }
                         }
-                        .padding(20)
+                        .padding(15)
                         .background(Color("Anti-flash White"))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         
                     }
-                    .padding(50)
+                    .padding(20)
                     
                     .cornerRadius(10)
                 }
                 
-                .padding(30)
+                .padding(20)
             }
             
         }
         .background(LinearGradient(colors: [Color("Light Green"), Color("Anti-flash White")], startPoint: .topLeading, endPoint: .bottomTrailing))
         //.ignoresSafeArea(.all)
-        .frame(width: UIHelper.relativeWidth(1), height: UIHelper.relativeHeight(1))
+        .frame(width: UIHelper.relativeWidth(0.95), height: UIHelper.relativeHeight(1))
         Spacer()
        
     }

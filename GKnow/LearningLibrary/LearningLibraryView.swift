@@ -112,6 +112,43 @@ struct LearningLibraryView: View {
                             }
                             .padding(.horizontal)
                         }
+                        
+                        // Roles section
+                        VStack(alignment: .leading, spacing: 15) {
+                            Text("Family Roles")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .padding(.horizontal)
+                            
+                            LazyVGrid(columns: [
+                                GridItem(.adaptive(minimum: UIHelper.relativeWidth(0.25), maximum: UIHelper.relativeWidth(0.3)), spacing: 16)
+                            ], spacing: 16) {
+                                // Create roles array
+                                let roles = LibraryContents.roles()
+                                let rolesArray = [
+                                    roles.hero,
+                                    roles.peacekeeper,
+                                    roles.lostChild,
+                                    roles.scapegoat,
+                                    roles.clown,
+                                    roles.rebel
+                                ]
+                                
+                                ForEach(0..<rolesArray.count, id: \.self) { index in
+                                    let role = rolesArray[index]
+                                    EnhancedCardView(
+                                        title: role[0],
+                                        image: nil, // Using title as image name since roles don't have images
+                                        description: role[1],
+                                        onReadMore: {
+                                            selectedItem = LibraryItem(title: role[0], image: nil, description: role[1])
+                                            showDetailView = true
+                                        }
+                                    )
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
                     }
                     .padding(.bottom, 30)
                 }

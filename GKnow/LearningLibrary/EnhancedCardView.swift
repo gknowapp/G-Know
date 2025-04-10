@@ -12,7 +12,7 @@ import SwiftUI
 // Enhanced card view to match the design in the image
 struct EnhancedCardView: View {
     let title: String
-    let image: String
+    let image: String?
     let description: String
     let onReadMore: () -> Void
     
@@ -26,22 +26,37 @@ struct EnhancedCardView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
             
+            Spacer()
+            
             // Image in the middle
-            Image(image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: UIHelper.relativeWidth(0.15), height: UIHelper.relativeWidth(0.15))
-                .padding()
-                .background(Color.white)
-                .cornerRadius(5)
+            if (image != nil) {
+                Image(image!)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: UIHelper.relativeWidth(0.15), height: UIHelper.relativeWidth(0.15))
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(5)
+            }
             
             // Description at the bottom
-            Text(description.prefix(100) + "...")
-                .font(.caption)
-                .multilineTextAlignment(.leading)
-                .padding(.horizontal, 10)
-                .padding(.bottom, 5)
             
+            Spacer()
+            if (image != nil) {
+                Text(description.prefix(100) + "...")
+                    .font(.caption)
+                    .multilineTextAlignment(.leading)
+                    .padding(.horizontal, 10)
+                    .padding(.bottom, 5)
+            } else {
+                Text(description.prefix(400) + "...")
+                    .font(.caption)
+                    .multilineTextAlignment(.leading)
+                    .padding(.horizontal, 10)
+                    .padding(.bottom, 5)
+            }
+            
+            Spacer()
             // Read more button
             Button(action: onReadMore) {
                 Text("read more")
