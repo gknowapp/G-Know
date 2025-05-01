@@ -166,6 +166,6 @@ struct LearningLibraryView: View {
                     .navigationBarBackButtonHidden(true)
             }
         }
-        .navigationBarHidden(true)
+        //.navigationBarHidden(true)
     }
 }

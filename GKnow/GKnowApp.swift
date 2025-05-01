@@ -9,17 +9,12 @@ import SwiftUI
 
 @main
 struct GKnowApp: App {
-    @State private var isHome: Bool = true
+    let persistenceController = CoreDataManager.shared
+    
     var body: some Scene {
-           WindowGroup {
-               if isHome {
-                   HomePage(isHome: $isHome) // Pass binding to HomePage
-                       .environment(\.font, Font.custom("Satoshi-Variable", size: 20, relativeTo: .caption))
-               } else {
-                   // Navigate to other views as needed
-                   MainContainerView()
-                       .environment(\.font, Font.custom("Satoshi-Variable", size: 20, relativeTo: .caption))
-               }
-           }
-       }
-   }
+        WindowGroup {
+            ContentView()
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+        }
+    }
+}

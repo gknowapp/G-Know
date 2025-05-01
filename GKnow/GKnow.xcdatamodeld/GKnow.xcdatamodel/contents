@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22522" systemVersion="24C5029f" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Patient" representedClassName="Patient" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="genograms" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Genogram" inverseName="patient" inverseEntity="Genogram"/>
+    </entity>
+    <entity name="Genogram" representedClassName="Genogram" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="lastModified" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="connections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Connection" inverseName="genogram" inverseEntity="Connection"/>
+        <relationship name="drawing" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Drawing" inverseName="genogram" inverseEntity="Drawing"/>
+        <relationship name="patient" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Patient" inverseName="genograms" inverseEntity="Patient"/>
+        <relationship name="shapes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="GenogramShape" inverseName="genogram" inverseEntity="GenogramShape"/>
+    </entity>
+    <entity name="GenogramShape" representedClassName="GenogramShape" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="imageName" optional="YES" attributeType="String"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="personName" optional="YES" attributeType="String"/>
+        <attribute name="positionX" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="positionY" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="genogram" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Genogram" inverseName="shapes" inverseEntity="Genogram"/>
+    </entity>
+    <entity name="Connection" representedClassName="Connection" syncable="YES" codeGenerationType="class">
+        <attribute name="connectionType" optional="YES" attributeType="String"/>
+        <attribute name="endSymbolId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="parentConnectionId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="startSymbolId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="genogram" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Genogram" inverseName="connections" inverseEntity="Genogram"/>
+    </entity>
+    <entity name="Drawing" representedClassName="Drawing" syncable="YES" codeGenerationType="class">
+        <attribute name="data" optional="YES" attributeType="Binary"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="genogram" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Genogram" inverseName="drawing" inverseEntity="Genogram"/>
+    </entity>
+</model> 
