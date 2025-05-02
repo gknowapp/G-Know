@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 @main
 struct GKnowApp: App {
@@ -22,6 +21,6 @@ struct GKnowApp: App {
                        .environment(\.font, Font.custom("Satoshi-Variable", size: 20, relativeTo: .caption))
                }
            }
-           .modelContainer(for: [Patient.self, GenogramShape.self, Connection.self, PatientGenogram.self])
+           .modelContainer(for: [Patient.self])
        }
    }

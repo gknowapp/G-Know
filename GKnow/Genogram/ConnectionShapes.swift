@@ -7,13 +7,43 @@
 
 import Foundation
 import SwiftUI
-import SwiftData
 
 //
-// MARK: Connection Shapes
+// MARK: Connection Struct
 //
 
-// The Connection and ConnectionType are now defined in GenogramModels.swift
+
+enum ConnectionType: String {
+    case marriage = "marriage"
+    case child = "child"
+    case abuse = "abuse"
+    case harmony = "harmony"
+    case friendship = "friendship"
+    case fusion = "fusion"
+    case divorce = "divorce"
+    case focus = "focus"
+    case dating = "dating"
+    case affair = "affair"
+    case engaged = "engaged"
+    case conflict = "conflict"
+}
+
+
+struct Connection: Identifiable {
+    let id: UUID
+    var start: CGPoint?
+    var end: CGPoint?
+    let startSymbolId: UUID
+    let endSymbolId: UUID
+    let type: ConnectionType
+    var parentConnectionId: UUID?
+    
+    
+    var parentMiddlePoint: CGPoint? {
+        guard let start = start, let end = end else { return nil }
+        return CGPoint(x: (start.x + end.x) / 2, y: start.y)
+    }
+}
 
 //
 // MARK: Child Connection Line
@@ -30,7 +60,7 @@ struct ChildConnectionLine: Shape {
         path.move(to: startPoint)
         
         // Calculate the midpoint between start and child
-        let midY = startPoint.y + ((childPoint.y - startPoint.y) / 2) // This is also calculating where the point should be drawn?? Need to look into this a bit 
+        let midY = startPoint.y + ((childPoint.y - startPoint.y) / 2) // This is also calculating where the point should be drawn?? Need to look into this a bit
         
         // Draw vertical line to midpoint
         path.addLine(to: CGPoint(x: startPoint.x, y: midY))
