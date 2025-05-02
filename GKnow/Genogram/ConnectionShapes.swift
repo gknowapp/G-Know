@@ -7,43 +7,13 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 //
-// MARK: Connection Struct
+// MARK: Connection Shapes
 //
 
-
-enum ConnectionType: String {
-    case marriage = "marriage"
-    case child = "child"
-    case abuse = "abuse"
-    case harmony = "harmony"
-    case friendship = "friendship"
-    case fusion = "fusion"
-    case divorce = "divorce"
-    case focus = "focus"
-    case dating = "dating"
-    case affair = "affair"
-    case engaged = "engaged"
-    case conflict = "conflict"
-}
-
-
-struct Connection: Identifiable {
-    let id: UUID
-    var start: CGPoint?
-    var end: CGPoint?
-    let startSymbolId: UUID
-    let endSymbolId: UUID
-    let type: ConnectionType
-    var parentConnectionId: UUID?
-    
-    
-    var parentMiddlePoint: CGPoint? {
-        guard let start = start, let end = end else { return nil }
-        return CGPoint(x: (start.x + end.x) / 2, y: start.y)
-    }
-}
+// The Connection and ConnectionType are now defined in GenogramModels.swift
 
 //
 // MARK: Child Connection Line

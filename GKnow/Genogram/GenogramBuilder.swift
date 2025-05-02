@@ -1191,22 +1191,6 @@ struct CanvasView: UIViewRepresentable {
     }
 }
 
-// Model to represent each shape with an image and notes
-//@Model
-struct GenogramShape: Identifiable {
-    var id: UUID
-    var imageName: String
-    var personName: String = ""
-    var position: CGPoint
-    var notes: String = ""
-}
-
-//@Model
-struct GenogramData {
-    var genogram: [GenogramShape]
-    var connections: [Connection]
-}
-
 // View for editing notes for a selected shape in the genogram
 struct NotesPopupView: View {
     @Binding var shape: GenogramShape

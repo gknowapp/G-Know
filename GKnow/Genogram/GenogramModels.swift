@@ -105,6 +105,10 @@ class Connection {
         }
     }
     
+    // For compatibility with existing code
+    var startSymbolId: UUID { startShapeId }
+    var endSymbolId: UUID { endShapeId }
+    
     var parentMiddlePoint: CGPoint? {
         guard let start = start, let end = end else { return nil }
         return CGPoint(x: (start.x + end.x) / 2, y: start.y)
@@ -129,6 +133,15 @@ class Connection {
             self.endX = end.x
             self.endY = end.y
         }
+    }
+    
+    // Compatibility initializer to match ConnectionShapes.swift
+    convenience init(id: UUID = UUID(), start: CGPoint? = nil, end: CGPoint? = nil, 
+                    startSymbolId: UUID, endSymbolId: UUID, type: ConnectionType, 
+                    parentConnectionId: UUID? = nil) {
+        self.init(id: id, start: start, end: end, 
+                 startShapeId: startSymbolId, endShapeId: endSymbolId, 
+                 type: type, parentConnectionId: parentConnectionId)
     }
 }
 
@@ -184,7 +197,7 @@ struct GenogramData {
     var genogram: [GenogramShape]
     var connections: [Connection]
     
-    init(genogram: [GenogramShape], connections: [Connection]) {
+    init(genogram: [GenogramShape] = [], connections: [Connection] = []) {
         self.genogram = genogram
         self.connections = connections
     }
@@ -197,5 +210,51 @@ struct GenogramData {
     func toPatientGenogram(for patient: Patient) -> PatientGenogram {
         let newGenogram = PatientGenogram(shapes: genogram, connections: connections, patient: patient)
         return newGenogram
+    }
+    
+    // Collection-like operations for easier transition
+    mutating func append(shape: GenogramShape) {
+        genogram.append(shape)
+    }
+    
+    mutating func append(connection: Connection) {
+        connections.append(connection)
+    }
+    
+    // Find functions to help with lookups
+    func shape(withId id: UUID) -> GenogramShape? {
+        return genogram.first { $0.id == id }
+    }
+    
+    func connection(withId id: UUID) -> Connection? {
+        return connections.first { $0.id == id }
+    }
+    
+    // For immutable lookups
+    var isEmpty: Bool {
+        return genogram.isEmpty && connections.isEmpty
+    }
+    
+    // Convenience methods for common operations
+    mutating func remove(shapeWithId id: UUID) {
+        genogram.removeAll { $0.id == id }
+        // Also remove any connections involving this shape
+        connections.removeAll { $0.startShapeId == id || $0.endShapeId == id }
+    }
+    
+    mutating func remove(connectionWithId id: UUID) {
+        connections.removeAll { $0.id == id }
+    }
+    
+    mutating func update(shape: GenogramShape) {
+        if let index = genogram.firstIndex(where: { $0.id == shape.id }) {
+            genogram[index] = shape
+        }
+    }
+    
+    mutating func update(connection: Connection) {
+        if let index = connections.firstIndex(where: { $0.id == connection.id }) {
+            connections[index] = connection
+        }
     }
 } 
