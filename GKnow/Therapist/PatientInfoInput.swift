@@ -257,6 +257,11 @@ struct PatientInfoInput: View {
                     if isEditing {
                         savePatientData()
                     }
+                    
+                    // Also save genogram data
+                    Task {
+                        await saveGenogramData()
+                    }
                 }
             }
             .navigationBarBackButtonHidden(true)
@@ -267,8 +272,13 @@ struct PatientInfoInput: View {
                         savePatientData()
                     }
                     // Save genogram if it has been modified
-                    saveGenogramData()
-                    dismiss()
+                    Task {
+                        await saveGenogramData()
+                        // Dismiss must be called on main thread after async operation
+                        await MainActor.run {
+                            dismiss()
+                        }
+                    }
                 }) {
                     HStack {
                         Image(systemName: "chevron.left")
@@ -279,13 +289,16 @@ struct PatientInfoInput: View {
             )
             .onAppear {
                 // Load the patient's genogram or create a new one if it doesn't exist
-                loadPatientGenogram()
+                Task {
+                    await loadPatientGenogram()
+                }
             }
         }
     }
     
     // Helper function to load the patient's genogram
-    private func loadPatientGenogram() {
+    @MainActor
+    private func loadPatientGenogram() async {
         patientGenogram = patient.getOrCreateGenogram()
         
         // Convert to temporary GenogramData structure for compatibility with existing code
@@ -295,6 +308,7 @@ struct PatientInfoInput: View {
     }
     
     // Helper function to save genogram data back to SwiftData
+    @MainActor
     private func saveGenogramData() {
         if let patientGenogram = patientGenogram {
             // Update existing genogram with current data

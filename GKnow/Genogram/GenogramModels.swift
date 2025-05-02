@@ -2,9 +2,18 @@
 import SwiftUI
 import SwiftData
 
-// Add extension to access shared model context
+// Add extension to access shared model context - fix actor isolation issue
 extension ModelContext {
     static var shared: ModelContext {
+        get async {
+            let container = try! ModelContainer(for: Patient.self, GenogramShape.self, Connection.self, PatientGenogram.self)
+            return container.mainContext
+        }
+    }
+    
+    // Non-async version for compatibility (uses MainActor)
+    @MainActor
+    static func getShared() -> ModelContext {
         let container = try! ModelContainer(for: Patient.self, GenogramShape.self, Connection.self, PatientGenogram.self)
         return container.mainContext
     }
@@ -168,21 +177,39 @@ extension Patient {
     var genogram: PatientGenogram? {
         get {
             let descriptor = FetchDescriptor<PatientGenogram>(predicate: #Predicate { $0.patient?.id == self.id })
-            let modelContext = ModelContext.shared
-            let genograms = try? modelContext.fetch(descriptor)
-            return genograms?.first
+            
+            // Use @MainActor function instead of direct access
+            let modelContext = Task { @MainActor in
+                return ModelContext.getShared()
+            }.result
+            
+            // Handle the Result type
+            guard case .success(let context) = modelContext else {
+                print("Failed to get model context")
+                return nil
+            }
+            
+            do {
+                let genograms = try context.fetch(descriptor)
+                return genograms.first
+            } catch {
+                print("Error fetching genogram: \(error)")
+                return nil
+            }
         }
     }
     
     // Method to create a new genogram for this patient
+    @MainActor
     func createGenogram() -> PatientGenogram {
         let newGenogram = PatientGenogram(patient: self)
-        let modelContext = ModelContext.shared
+        let modelContext = ModelContext.getShared()
         modelContext.insert(newGenogram)
         return newGenogram
     }
     
     // Method to get or create a genogram for this patient
+    @MainActor
     func getOrCreateGenogram() -> PatientGenogram {
         if let existingGenogram = genogram {
             return existingGenogram
@@ -202,48 +229,26 @@ struct GenogramData {
         self.connections = connections
     }
     
-    // Convert to/from PatientGenogram
+    // Convert from a PatientGenogram to GenogramData
     static func from(patientGenogram: PatientGenogram) -> GenogramData {
-        return GenogramData(genogram: patientGenogram.shapes, connections: patientGenogram.connections)
+        return GenogramData(
+            genogram: patientGenogram.shapes,
+            connections: patientGenogram.connections
+        )
     }
     
+    // Convert to PatientGenogram
     func toPatientGenogram(for patient: Patient) -> PatientGenogram {
-        let newGenogram = PatientGenogram(shapes: genogram, connections: connections, patient: patient)
-        return newGenogram
+        return PatientGenogram(
+            patient: patient,
+            shapes: genogram,
+            connections: connections
+        )
     }
     
-    // Collection-like operations for easier transition
+    // Helper methods to modify the genogram data
     mutating func append(shape: GenogramShape) {
         genogram.append(shape)
-    }
-    
-    mutating func append(connection: Connection) {
-        connections.append(connection)
-    }
-    
-    // Find functions to help with lookups
-    func shape(withId id: UUID) -> GenogramShape? {
-        return genogram.first { $0.id == id }
-    }
-    
-    func connection(withId id: UUID) -> Connection? {
-        return connections.first { $0.id == id }
-    }
-    
-    // For immutable lookups
-    var isEmpty: Bool {
-        return genogram.isEmpty && connections.isEmpty
-    }
-    
-    // Convenience methods for common operations
-    mutating func remove(shapeWithId id: UUID) {
-        genogram.removeAll { $0.id == id }
-        // Also remove any connections involving this shape
-        connections.removeAll { $0.startShapeId == id || $0.endShapeId == id }
-    }
-    
-    mutating func remove(connectionWithId id: UUID) {
-        connections.removeAll { $0.id == id }
     }
     
     mutating func update(shape: GenogramShape) {
@@ -252,9 +257,27 @@ struct GenogramData {
         }
     }
     
-    mutating func update(connection: Connection) {
-        if let index = connections.firstIndex(where: { $0.id == connection.id }) {
-            connections[index] = connection
+    mutating func remove(shapeWithId id: UUID) {
+        if let index = genogram.firstIndex(where: { $0.id == id }) {
+            genogram.remove(at: index)
+            
+            // Also remove any connections involving this shape
+            connections.removeAll { connection in
+                connection.startShapeId == id || connection.endShapeId == id
+            }
         }
+    }
+    
+    mutating func addConnection(_ connection: Connection) {
+        connections.append(connection)
+    }
+    
+    mutating func removeConnection(withId id: UUID) {
+        connections.removeAll { $0.id == id }
+    }
+    
+    // Find a shape by id
+    func findShape(withId id: UUID) -> GenogramShape? {
+        return genogram.first { $0.id == id }
     }
 } 

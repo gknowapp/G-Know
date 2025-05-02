@@ -3,6 +3,11 @@ import PencilKit
 import UIKit
 import SwiftData
 
+// Selection mode for handling connections
+enum SelectionMode {
+    case none
+    case selectingForConnection(first: GenogramShape, type: ConnectionType)
+}
 
 struct GenogramBuilder: View {
     @Binding var genogramData: GenogramData
@@ -39,6 +44,8 @@ struct GenogramBuilder: View {
     @State private var hasGeneratedTemplate: Bool = false
     
     @State private var selectedConnectionType: ConnectionType = .marriage
+    
+    @State private var activeSelectionMode: SelectionMode = .none
     
     enum DrawingMode {
            case none
@@ -84,37 +91,63 @@ struct GenogramBuilder: View {
                             
                             ForEach(genogramData.genogram) { shape in
                                 ZStack {
-                                    if isConnectingMode && (selectedShapeId == shape.id || startSymbol?.id == shape.id) {
+                                    // Highlight if in connection selection mode
+                                    if case .selectingForConnection(let firstShape, _) = activeSelectionMode, 
+                                       firstShape.id == shape.id {
                                         Circle()
                                             .stroke(Color("Dark Green"), lineWidth: 2)
                                             .frame(width: UIHelper.standardIconSize + 20, height: UIHelper.standardIconSize + 20)
                                     }
                                     
+                                    // Highlight if active
+                                    if activeShape?.id == shape.id {
+                                        Rectangle()
+                                            .stroke(Color.blue, lineWidth: 2)
+                                            .frame(width: UIHelper.standardIconSize + 10, height: UIHelper.standardIconSize + 10)
+                                    }
+                                    
                                     Image(shape.imageName)
                                         .resizable()
                                         .frame(width: UIHelper.standardIconSize, height: UIHelper.standardIconSize)
+                                        
+                                    // Person name if available
+                                    if !shape.personName.isEmpty {
+                                        Text(shape.personName)
+                                            .font(.caption)
+                                            .foregroundColor(.black)
+                                            .padding(4)
+                                            .background(Color.white.opacity(0.7))
+                                            .cornerRadius(4)
+                                            .offset(y: UIHelper.standardIconSize / 2 + 10)
+                                    }
                                 }
                                 .position(x: shape.position.x, y: shape.position.y)
                                 .gesture(
                                     DragGesture()
                                         .onChanged { value in
                                             if isEditable {
-                                                // Create a local copy to modify
-                                                var updatedShape = shape
-                                                updatedShape.position = value.location
+                                                // Make this shape active
+                                                activeShape = shape
                                                 
-                                                // Update the shape in the array
-                                                if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
-                                                    genogramData.genogram[index] = updatedShape
-                                                    
-                                                    // Update connections related to this shape
-                                                    updateConnections(for: genogramData.genogram[index])
-                                                }
+                                                // Calculate new position based on scale
+                                                let newLocation = CGPoint(
+                                                    x: value.location.x,
+                                                    y: value.location.y
+                                                )
+                                                
+                                                // Update shape position
+                                                moveShape(shape: shape, newLocation: newLocation)
                                             }
                                         }
                                 )
                                 .onTapGesture {
-                                    handleSymbolTap(shape)
+                                    // Handle connection creation if in selection mode
+                                    if case .selectingForConnection(let firstShape, let type) = activeSelectionMode {
+                                        completeConnectionCreation(from: firstShape, to: shape, type: type)
+                                    } else {
+                                        // Otherwise just select the shape
+                                        activeShape = shape
+                                    }
                                 }
                             }
                         }
@@ -749,15 +782,19 @@ struct GenogramBuilder: View {
     }
     
     private func updateConnections(for shape: GenogramShape) {
-        genogramData.connections = genogramData.connections.map { connection in
-            var updatedConnection = connection
-            if connection.startSymbolId == shape.id {
-                updatedConnection.start = shape.position
+        // Update all connections related to this shape
+        for i in 0..<genogramData.connections.count {
+            if genogramData.connections[i].startShapeId == shape.id || genogramData.connections[i].endShapeId == shape.id {
+                // Get the start and end shapes
+                let startShape = genogramData.genogram.first(where: { $0.id == genogramData.connections[i].startShapeId })
+                let endShape = genogramData.genogram.first(where: { $0.id == genogramData.connections[i].endShapeId })
+                
+                // Update connection endpoints if shapes exist
+                if let startShape = startShape, let endShape = endShape {
+                    genogramData.connections[i].start = startShape.position
+                    genogramData.connections[i].end = endShape.position
+                }
             }
-            if connection.endSymbolId == shape.id {
-                updatedConnection.end = shape.position
-            }
-            return updatedConnection
         }
     }
     
@@ -785,19 +822,27 @@ struct GenogramBuilder: View {
             imageName: imageName,
             position: CGPoint(x: visibleCenterX, y: visibleCenterY)
         )
-        genogramData.genogram.append(newShape)
+        
+        // Use the append method of GenogramData
+        genogramData.append(shape: newShape)
     }
     
     private func moveShape(shape: GenogramShape, newLocation: CGPoint) {
-        if let index = genogramData.genogram.firstIndex(where: { $0.id == shape.id }) {
-            genogramData.genogram[index].position = newLocation
-            updateConnections(for: genogramData.genogram[index])
-        }
+        // Update the shape with the new position
+        var updatedShape = shape
+        updatedShape.position = newLocation
+        
+        // Update the shape in GenogramData
+        genogramData.update(shape: updatedShape)
+        
+        // Update connections related to this shape
+        updateConnections(for: updatedShape)
     }
     
     private func deleteActiveShape() {
-        if let activeShape = activeShape, let index = genogramData.genogram.firstIndex(where: { $0.id == activeShape.id }) {
-            genogramData.genogram.remove(at: index)
+        if let activeShape = activeShape {
+            // Use the remove method of GenogramData
+            genogramData.remove(shapeWithId: activeShape.id)
             self.activeShape = nil
         }
     }
@@ -1165,6 +1210,34 @@ struct GenogramBuilder: View {
             return shape.position
         }
         return .zero
+    }
+    
+    private func addConnection(type: ConnectionType) {
+        guard let selectedShape = activeShape,
+              let selectedShapeIndex = genogramData.genogram.firstIndex(where: { $0.id == selectedShape.id }) else {
+            return
+        }
+        
+        // Ask for second shape selection to create connection
+        activeSelectionMode = .selectingForConnection(first: selectedShape, type: type)
+    }
+    
+    private func completeConnectionCreation(from firstShape: GenogramShape, to secondShape: GenogramShape, type: ConnectionType) {
+        if firstShape.id != secondShape.id {
+            let connection = Connection(
+                start: firstShape.position, 
+                end: secondShape.position,
+                startShapeId: firstShape.id, 
+                endShapeId: secondShape.id,
+                type: type
+            )
+            
+            // Add the connection
+            genogramData.addConnection(connection)
+            
+            // Reset selection mode
+            activeSelectionMode = .none
+        }
     }
 }
            
