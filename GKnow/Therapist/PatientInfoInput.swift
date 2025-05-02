@@ -17,6 +17,7 @@ struct PatientInfoInput: View {
     
     @State private var showPatientCard: Bool = false
     @State private var isEditing: Bool = false
+    @State private var patientGenogram: PatientGenogram?
     @State private var genogramData = GenogramData(genogram: [], connections: [])
     
     @State private var selectedIcon: String? = nil
@@ -265,6 +266,8 @@ struct PatientInfoInput: View {
                     if isEditing {
                         savePatientData()
                     }
+                    // Save genogram if it has been modified
+                    saveGenogramData()
                     dismiss()
                 }) {
                     HStack {
@@ -274,6 +277,34 @@ struct PatientInfoInput: View {
                     .foregroundColor(Color("Dark Green"))
                 }
             )
+            .onAppear {
+                // Load the patient's genogram or create a new one if it doesn't exist
+                loadPatientGenogram()
+            }
+        }
+    }
+    
+    // Helper function to load the patient's genogram
+    private func loadPatientGenogram() {
+        patientGenogram = patient.getOrCreateGenogram()
+        
+        // Convert to temporary GenogramData structure for compatibility with existing code
+        if let genogram = patientGenogram {
+            genogramData = GenogramData.from(patientGenogram: genogram)
+        }
+    }
+    
+    // Helper function to save genogram data back to SwiftData
+    private func saveGenogramData() {
+        if let patientGenogram = patientGenogram {
+            // Update existing genogram with current data
+            patientGenogram.shapes = genogramData.genogram
+            patientGenogram.connections = genogramData.connections
+        } else {
+            // Create a new genogram if needed
+            let newGenogram = genogramData.toPatientGenogram(for: patient)
+            context.insert(newGenogram)
+            patientGenogram = newGenogram
         }
     }
     
