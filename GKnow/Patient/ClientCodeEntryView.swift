@@ -38,9 +38,9 @@ struct ClientCodeEntryView: View {
             Spacer()
             
             // Navigation to ContentView if connected
-            NavigationLink(destination: ContentView(isTherapist: false), isActive: $isConnected) {
-                EmptyView()
-            }
+//            NavigationLink(destination: ContentView(isTherapist: false), isActive: $isConnected) {
+//                EmptyView()
+//            }
         }
         .padding()
         .navigationTitle("Client")

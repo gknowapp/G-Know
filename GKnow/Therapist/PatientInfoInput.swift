@@ -1,9 +1,11 @@
 import SwiftUI
+import SwiftData
 
 struct PatientInfoInput: View {
+    @Environment(\.modelContext) var context
     @Environment(\.dismiss) private var dismiss
     let isTherapist: Bool
-    let patient: PatientInformation
+    @Bindable var patient: Patient
     
     @State private var firstName: String
     @State private var middleName: String
@@ -21,16 +23,16 @@ struct PatientInfoInput: View {
     @State private var isSidePanelVisible: Bool = false
     @State private var navigateToGenogramBuilder = false
     
-    init(isTherapist: Bool, patient: PatientInformation) {
+    init(isTherapist: Bool, patient: Patient) {
         self.isTherapist = isTherapist
         self.patient = patient
         
-        _firstName = State(initialValue: patient.fields.firstName ?? "")
-        _middleName = State(initialValue: patient.fields.middleName ?? "")
-        _lastName = State(initialValue: patient.fields.lastName ?? "")
-        _dob = State(initialValue: patient.fields.dob ?? Date())
-        _role = State(initialValue: patient.fields.role ?? [])
-        _birthOrder = State(initialValue: patient.fields.birthOrder ?? [])
+        _firstName = State(initialValue: patient.firstName ?? "")
+        _middleName = State(initialValue: patient.middleName ?? "")
+        _lastName = State(initialValue: patient.lastName ?? "")
+        _dob = State(initialValue: patient.dob ?? Date())
+        _role = State(initialValue: patient.role ?? [])
+        _birthOrder = State(initialValue: patient.birthOrder ?? [])
     }
     
     var body: some View {
@@ -59,7 +61,8 @@ struct PatientInfoInput: View {
                         Button(action: {
                             isEditing.toggle()
                             if isEditing == false {
-                                // Save logic would go here
+                                // Save logic when exiting edit mode
+                                savePatientData()
                                 showPatientCard = true
                             }
                         }) {
@@ -80,8 +83,7 @@ struct PatientInfoInput: View {
                             selectedIcon: $selectedIcon,
                             isSidePanelVisible: $isSidePanelVisible,
                             patientName: "\(firstName) \(lastName)",
-                            isEditable: true,
-                            
+                            isEditable: true
                         )) {
                             HStack {
                                 Image(systemName: "chart.bar.doc.horizontal")
@@ -249,10 +251,20 @@ struct PatientInfoInput: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .onDisappear {
+                    // Save data when view disappears
+                    if isEditing {
+                        savePatientData()
+                    }
+                }
             }
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading:
                 Button(action: {
+                    // Save data before dismissing if in edit mode
+                    if isEditing {
+                        savePatientData()
+                    }
                     dismiss()
                 }) {
                     HStack {
@@ -263,6 +275,19 @@ struct PatientInfoInput: View {
                 }
             )
         }
+    }
+    
+    // Helper function to save data to the Patient model
+    private func savePatientData() {
+        patient.firstName = firstName
+        patient.middleName = middleName
+        patient.lastName = lastName
+        patient.dob = dob
+        patient.role = role
+        patient.birthOrder = birthOrder
+        
+        // No need to call context.save() explicitly as SwiftData automatically
+        // detects changes to managed objects
     }
     
     // Helper function to format date

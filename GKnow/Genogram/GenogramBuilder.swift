@@ -1,6 +1,7 @@
 import SwiftUI
 import PencilKit
 import UIKit
+import SwiftData
 
 
 struct GenogramBuilder: View {
@@ -1191,6 +1192,7 @@ struct CanvasView: UIViewRepresentable {
 }
 
 // Model to represent each shape with an image and notes
+//@Model
 struct GenogramShape: Identifiable {
     var id: UUID
     var imageName: String
@@ -1199,6 +1201,7 @@ struct GenogramShape: Identifiable {
     var notes: String = ""
 }
 
+//@Model
 struct GenogramData {
     var genogram: [GenogramShape]
     var connections: [Connection]

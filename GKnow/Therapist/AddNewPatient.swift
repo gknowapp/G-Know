@@ -5,8 +5,10 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AddNewPatient: View {
+    @Environment(\.modelContext) var context
     @Environment(\.dismiss) var dismiss
     
     // Patient fields
@@ -20,7 +22,7 @@ struct AddNewPatient: View {
     @State private var showBirthOrderOptions: Bool = false
     
     var onSave: (String) -> Void
-    private let airtableService = AirTableService()
+    //private let airtableService = AirTableService()
     
     // Role and Birth Order options
     let roleOptions = ["Hero", "Peacekeeper", "Clown", "Lost Child", "Rebel", "Scapegoat"]
@@ -156,6 +158,7 @@ struct AddNewPatient: View {
                                 
                                 // Save Patient Button
                                 Button(action: {
+                                    
                                     savePatient()
                                 }) {
                                     Text("Save Patient")
@@ -194,30 +197,35 @@ struct AddNewPatient: View {
     
     // Save patient function
     private func savePatient() {
-        let newPatient = "\(firstName) \(middleName) \(lastName)"
-        let trimmedPatient = newPatient.trimmingCharacters(in: .whitespaces)
         
-        let roleArray = Array(selectedRole)
-        let birthOrderArray = Array(selectedBirthOrder)
-        
-        airtableService.addPatient(firstName: firstName, middleName: middleName, lastName: lastName, dob: dob, role: roleArray, birthOrder: birthOrderArray) { success in
-            if success {
-                DispatchQueue.main.async {
-                    onSave(trimmedPatient)
-                    print("Patient saved successfully: \(trimmedPatient)")
-                    dismiss()
-                }
-            } else {
-                DispatchQueue.main.async {
-                    print("Error saving patient.")
-                }
-            }
-        }
+        let patient = Patient(firstName: firstName, middleName: middleName, lastName: lastName, dob: dob, birthOrder: Array(selectedBirthOrder), role: Array(selectedRole))
+        context.insert(patient)
+        dismiss()
+//        let newPatient = "\(firstName) \(middleName) \(lastName)"
+//        let trimmedPatient = newPatient.trimmingCharacters(in: .whitespaces)
+//        
+//        let roleArray = Array(selectedRole)
+//        let birthOrderArray = Array(selectedBirthOrder)
+//        
+//        airtableService.addPatient(firstName: firstName, middleName: middleName, lastName: lastName, dob: dob, role: roleArray, birthOrder: birthOrderArray) { success in
+//            if success {
+//                DispatchQueue.main.async {
+//                    onSave(trimmedPatient)
+//                    print("Patient saved successfully: \(trimmedPatient)")
+//                    dismiss()
+//                }
+//            } else {
+//                DispatchQueue.main.async {
+//                    print("Error saving patient.")
+//                }
+//            }
+//        }
     }
 }
 
 // Enhanced multi-select field
 struct AddPatientMultiSelectField: View {
+    @Environment(\.modelContext) var context
     let options: [String]
     @Binding var selections: Set<String>
     

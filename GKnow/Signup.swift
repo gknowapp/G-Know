@@ -85,9 +85,9 @@ struct Signup: View {
                 .shadow(radius: 10)
                 
                 // Full screen cover for TempTherapistView
-                .fullScreenCover(isPresented: $showTempTherapistView) {
-                    TempTherapistView()
-                }
+//                .fullScreenCover(isPresented: $showTempTherapistView) {
+//                    TempTherapistView()
+//                }
                 
                 // Patient Sign Up Button
                     Button(action: {

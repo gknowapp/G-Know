@@ -21,5 +21,6 @@ struct GKnowApp: App {
                        .environment(\.font, Font.custom("Satoshi-Variable", size: 20, relativeTo: .caption))
                }
            }
+           .modelContainer(for: [Patient.self])
        }
    }
