@@ -1,6 +1,7 @@
 import SwiftUI
 import PencilKit
 import UIKit
+
 import SwiftData
 
 
@@ -19,6 +20,7 @@ struct GenogramBuilder: View {
     @State private var savedDrawing = PKDrawing() // Stores the drawing to display it after exiting
     
     var patientName: String = "Patient" // Default name if none provided
+    var patient: Patient? // Reference to the current patient
     
     // Add SwiftData environment
     @Environment(\.modelContext) private var modelContext
@@ -777,20 +779,29 @@ struct GenogramBuilder: View {
                 genogramData.connections.append(connection)
                 
                 // Save to SwiftData
-                let swiftDataConnection = Connection(
-                    id: connection.id,
-                    startSymbolId: connection.startSymbolId,
-                    endSymbolId: connection.endSymbolId,
-                    type: selectedConnectionType,
-                    start: connection.start,
-                    end: connection.end
-                )
-                modelContext.insert(swiftDataConnection)
-                
-                do {
-                    try modelContext.save()
-                } catch {
-                    print("Error saving new connection: \(error)")
+                if let patient = patient {
+                    let swiftDataConnection = Connection(
+                        id: connection.id,
+                        startSymbolId: connection.startSymbolId,
+                        endSymbolId: connection.endSymbolId,
+                        type: selectedConnectionType,
+                        start: connection.start,
+                        end: connection.end,
+                        patient: patient
+                    )
+                    modelContext.insert(swiftDataConnection)
+                    
+                    // Add to patient's connections collection
+                    if patient.connections == nil {
+                        patient.connections = []
+                    }
+                    patient.connections?.append(swiftDataConnection)
+                    
+                    do {
+                        try modelContext.save()
+                    } catch {
+                        print("Error saving new connection: \(error)")
+                    }
                 }
             }
             startSymbol = nil
@@ -820,21 +831,30 @@ struct GenogramBuilder: View {
                 genogramData.connections.append(childConnection)
                 
                 // Save to SwiftData
-                let swiftDataConnection = Connection(
-                    id: childConnection.id,
-                    startSymbolId: childConnection.startSymbolId,
-                    endSymbolId: childConnection.endSymbolId,
-                    type: .child,
-                    parentConnectionId: childConnection.parentConnectionId,
-                    start: childConnection.start,
-                    end: childConnection.end
-                )
-                modelContext.insert(swiftDataConnection)
-                
-                do {
-                    try modelContext.save()
-                } catch {
-                    print("Error saving new child connection: \(error)")
+                if let patient = patient {
+                    let swiftDataConnection = Connection(
+                        id: childConnection.id,
+                        startSymbolId: childConnection.startSymbolId,
+                        endSymbolId: childConnection.endSymbolId,
+                        type: .child,
+                        parentConnectionId: childConnection.parentConnectionId,
+                        start: childConnection.start,
+                        end: childConnection.end,
+                        patient: patient
+                    )
+                    modelContext.insert(swiftDataConnection)
+                    
+                    // Add to patient's connections collection
+                    if patient.connections == nil {
+                        patient.connections = []
+                    }
+                    patient.connections?.append(swiftDataConnection)
+                    
+                    do {
+                        try modelContext.save()
+                    } catch {
+                        print("Error saving new child connection: \(error)")
+                    }
                 }
                 
                 startSymbol = nil
@@ -914,19 +934,28 @@ struct GenogramBuilder: View {
         genogramData.genogram.append(newShape)
         
         // Save to SwiftData
-        let swiftDataShape = GenogramShape(
-            id: newShape.id,
-            imageName: newShape.imageName,
-            personName: newShape.personName,
-            position: newShape.position,
-            notes: newShape.notes
-        )
-        modelContext.insert(swiftDataShape)
-        
-        do {
-            try modelContext.save()
-        } catch {
-            print("Error saving new shape: \(error)")
+        if let patient = patient {
+            let swiftDataShape = GenogramShape(
+                id: newShape.id,
+                imageName: newShape.imageName,
+                personName: newShape.personName,
+                position: newShape.position,
+                notes: newShape.notes,
+                patient: patient
+            )
+            modelContext.insert(swiftDataShape)
+            
+            // Add to patient's shapes collection
+            if patient.shapes == nil {
+                patient.shapes = []
+            }
+            patient.shapes?.append(swiftDataShape)
+            
+            do {
+                try modelContext.save()
+            } catch {
+                print("Error saving new shape: \(error)")
+            }
         }
     }
     
@@ -1100,7 +1129,7 @@ struct GenogramBuilder: View {
     // Modify the generateTemplate function
     private func generateTemplate() {
         // Check if template has already been generated
-        guard !hasGeneratedTemplate else { return }
+        guard !hasGeneratedTemplate && patient != nil else { return }
         
         let baseSpacing: CGFloat = 100 // Base spacing only for first generation
         let startY: CGFloat = 200
@@ -1152,21 +1181,21 @@ struct GenogramBuilder: View {
         
         // Add first generation
         for (icon, position) in gen1Symbols {
-            let shape = GenogramShape(id: UUID(), imageName: icon, position: position)
+            let shape = GenogramShape(id: UUID(), imageName: icon, position: position, patient: patient)
             genogramData.genogram.append(shape)
             symbolIds[0].append(shape.id)
         }
         
         // Add second generation
         for (icon, position) in gen2Symbols {
-            let shape = GenogramShape(id: UUID(), imageName: icon, position: position)
+            let shape = GenogramShape(id: UUID(), imageName: icon, position: position, patient: patient)
             genogramData.genogram.append(shape)
             symbolIds[1].append(shape.id)
         }
         
         // Add third generation
         for (icon, position) in gen3Symbols {
-            let shape = GenogramShape(id: UUID(), imageName: icon, position: position)
+            let shape = GenogramShape(id: UUID(), imageName: icon, position: position, patient: patient)
             genogramData.genogram.append(shape)
             symbolIds[2].append(shape.id)
         }
@@ -1182,7 +1211,7 @@ struct GenogramBuilder: View {
                 type: .marriage,
                 start: getBottomCenter(for: symbolIds[0][i]),
                 end: getBottomCenter(for: symbolIds[0][i + 1]),
-                
+                patient: patient
             )
             genogramData.connections.append(connection)
             marriageConnections.append(connection)
@@ -1198,7 +1227,7 @@ struct GenogramBuilder: View {
                 type: .marriage,
                 start: getBottomCenter(for: symbolIds[1][i]),
                 end: getBottomCenter(for: symbolIds[1][i + 1]),
-                
+                patient: patient
             )
             genogramData.connections.append(connection)
             gen2MarriageConnections.append(connection)
@@ -1211,8 +1240,8 @@ struct GenogramBuilder: View {
             endSymbolId: symbolIds[2][1],
             type: .marriage,
             start: getBottomCenter(for: symbolIds[2][0]),
-            end: getBottomCenter(for: symbolIds[2][1])
-           
+            end: getBottomCenter(for: symbolIds[2][1]),
+            patient: patient
         )
         genogramData.connections.append(finalMarriage)
 
@@ -1226,8 +1255,8 @@ struct GenogramBuilder: View {
             type: .child,
             parentConnectionId: marriageConnections[0].id,
             start: getTopCenter(for: symbolIds[1][0]),
-            end: marriageConnections[0].parentMiddlePoint ?? .zero
-            
+            end: marriageConnections[0].parentMiddlePoint ?? .zero,
+            patient: patient
         )
         genogramData.connections.append(childConnection1)
         
@@ -1240,7 +1269,7 @@ struct GenogramBuilder: View {
             parentConnectionId: marriageConnections[1].id,
             start: getTopCenter(for: symbolIds[1][1]),
             end: marriageConnections[1].parentMiddlePoint ?? .zero,
-            
+            patient: patient
         )
         genogramData.connections.append(childConnection2)
 
@@ -1253,7 +1282,7 @@ struct GenogramBuilder: View {
             parentConnectionId: marriageConnections[2].id,
             start: getTopCenter(for: symbolIds[1][2]),
             end: marriageConnections[2].parentMiddlePoint ?? .zero,
-            
+            patient: patient
         )
         genogramData.connections.append(childConnection3)
         
@@ -1266,7 +1295,7 @@ struct GenogramBuilder: View {
             parentConnectionId: marriageConnections[3].id,
             start: getTopCenter(for: symbolIds[1][3]),
             end: marriageConnections[3].parentMiddlePoint ?? .zero,
-            
+            patient: patient
         )
         genogramData.connections.append(childConnection4)
 
@@ -1280,7 +1309,7 @@ struct GenogramBuilder: View {
             parentConnectionId: gen2MarriageConnections[0].id,
             start: getTopCenter(for: symbolIds[2][0]),
             end: gen2MarriageConnections[0].parentMiddlePoint ?? .zero,
-            
+            patient: patient
         )
         genogramData.connections.append(childConnection5)
         
@@ -1293,7 +1322,7 @@ struct GenogramBuilder: View {
             parentConnectionId: gen2MarriageConnections[1].id,
             start: getTopCenter(for: symbolIds[2][1]),
             end: gen2MarriageConnections[1].parentMiddlePoint ?? .zero,
-            
+            patient: patient
         )
         genogramData.connections.append(childConnection6)
         
@@ -1630,19 +1659,55 @@ struct TopToolbarView: View {
 extension GenogramBuilder {
     // Save genogram data to SwiftData
     func saveGenogramToSwiftData() {
-        // First save all shapes
+        guard let patient = patient else {
+            print("Error: Cannot save genogram without patient reference")
+            return
+        }
+        
+        // First delete any existing shapes/connections for this patient
+        do {
+            // Fetch all shapes and connections
+            let shapesDescriptor = FetchDescriptor<GenogramShape>()
+            let connectionsDescriptor = FetchDescriptor<Connection>()
+            
+            let allShapes = try modelContext.fetch(shapesDescriptor)
+            let allConnections = try modelContext.fetch(connectionsDescriptor)
+            
+            // Filter for this patient
+            let existingShapes = allShapes.filter { $0.patient?.id == patient.id }
+            let existingConnections = allConnections.filter { $0.patient?.id == patient.id }
+            
+            for shape in existingShapes {
+                modelContext.delete(shape)
+            }
+            
+            for connection in existingConnections {
+                modelContext.delete(connection)
+            }
+        } catch {
+            print("Error cleaning up existing genogram data: \(error)")
+        }
+        
+        // Now save all current shapes and associate with patient
         for shape in genogramData.genogram {
             let swiftDataShape = GenogramShape(
                 id: shape.id,
                 imageName: shape.imageName,
                 personName: shape.personName,
                 position: shape.position,
-                notes: shape.notes
+                notes: shape.notes,
+                patient: patient
             )
             modelContext.insert(swiftDataShape)
+            
+            // Add to patient's shapes collection if it exists
+            if patient.shapes == nil {
+                patient.shapes = []
+            }
+            patient.shapes?.append(swiftDataShape)
         }
         
-        // Then save all connections
+        // Then save all connections and associate with patient
         for connection in genogramData.connections {
             let connectionType = ConnectionType(rawValue: connection.type.rawValue) ?? .marriage
             
@@ -1653,9 +1718,16 @@ extension GenogramBuilder {
                 type: connectionType,
                 parentConnectionId: connection.parentConnectionId,
                 start: connection.start,
-                end: connection.end
+                end: connection.end,
+                patient: patient
             )
             modelContext.insert(swiftDataConnection)
+            
+            // Add to patient's connections collection if it exists
+            if patient.connections == nil {
+                patient.connections = []
+            }
+            patient.connections?.append(swiftDataConnection)
         }
         
         do {
@@ -1667,27 +1739,28 @@ extension GenogramBuilder {
     
     // Load genogram data from SwiftData
     func loadGenogramFromSwiftData() {
+        guard let patient = patient else {
+            print("Error: Cannot load genogram without patient reference")
+            return
+        }
+        
         do {
+            // Fetch only shapes and connections for this specific patient
             let shapesDescriptor = FetchDescriptor<GenogramShape>()
             let connectionsDescriptor = FetchDescriptor<Connection>()
             
-            let swiftDataShapes = try modelContext.fetch(shapesDescriptor)
-            let swiftDataConnections = try modelContext.fetch(connectionsDescriptor)
+            // Fetch all for now
+            let allShapes = try modelContext.fetch(shapesDescriptor)
+            let allConnections = try modelContext.fetch(connectionsDescriptor)
             
-            // Convert SwiftData shapes to local model
-            var shapes: [GenogramShape] = []
-            for shape in swiftDataShapes {
-                shapes.append(shape)
-            }
+            // Filter in memory instead of using predicates
+            let patientShapes = allShapes.filter { $0.patient?.id == patient.id }
+            let patientConnections = allConnections.filter { $0.patient?.id == patient.id }
             
-            // Convert SwiftData connections to local model
-            var connections: [Connection] = []
-            for connection in swiftDataConnections {
-                connections.append(connection)
-            }
+            print("Loaded \(patientShapes.count) shapes and \(patientConnections.count) connections for patient \(patient.firstName ?? "") \(patient.lastName ?? "")")
             
-            // Update genogramData
-            genogramData = GenogramData(genogram: shapes, connections: connections)
+            // Update genogramData with filtered results
+            genogramData = GenogramData(genogram: patientShapes, connections: patientConnections)
         } catch {
             print("Error loading genogram data: \(error)")
         }

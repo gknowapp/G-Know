@@ -130,15 +130,13 @@ struct TherapistView: View {
                 // Main content area
                 VStack(alignment: .leading, spacing: 30) {
                     // Welcome text
-                    Text("Hello, Candace")
-                        .font(.system(size: 48))
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color("Candace's Couch"))
-                    
-                    Text("Select a Patient to View Genogram")
-                        .font(.headline)
-                        .foregroundColor(Color("Candace's Couch"))
-                        .padding(.top, 20)
+                    HStack {
+                        Text("Select a Patient to View Genogram")
+                            .font(.system(size: 48))
+                            .fontWeight(.semibold)
+                            .foregroundColor(Color("Candace's Couch"))
+                        Spacer()
+                    }
                     
                     // Patient list
                     PatientListView(patients: filteredPatients)

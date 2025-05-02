@@ -83,6 +83,7 @@ struct PatientInfoInput: View {
                             selectedIcon: $selectedIcon,
                             isSidePanelVisible: $isSidePanelVisible,
                             patientName: "\(firstName) \(lastName)",
+                            patient: patient,
                             isEditable: true
                         )) {
                             HStack {

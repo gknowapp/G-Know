@@ -12,6 +12,7 @@ struct HomePage: View {
     @State private var showAlert = true
     @State private var showSignup = false
     @State private var showLogin = false
+    @State private var navigateToTherapist: Bool = false
     
     let backgroundImage = Image("Therapist Background")
         .resizable()
@@ -22,8 +23,16 @@ struct HomePage: View {
     
     
     var body: some View {
+        
+        
+        
         NavigationStack {
             ZStack {
+                
+                NavigationLink(destination: MainContainerView(), isActive: $navigateToTherapist) {
+                    EmptyView()
+                }
+            
                 // Clean white background
                 Color("Anti-flash White").ignoresSafeArea()
                 
@@ -40,9 +49,9 @@ struct HomePage: View {
                     // User type selection buttons
                     VStack(spacing: 20) {
                         Button(action: {
-                            showLogin = true
+                            navigateToTherapist = true
                         }) {
-                            Text("Login")
+                            Text("Dashboard")
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .frame(width: UIHelper.relativeWidth(0.6), height: 60)
@@ -50,16 +59,16 @@ struct HomePage: View {
                                 .cornerRadius(10)
                         }
                         
-                        Button(action: {
-                            showSignup = true
-                        }) {
-                            Text("Sign Up")
-                                .font(.headline)
-                                .foregroundColor(Color("Dark Green"))
-                                .frame(width: UIHelper.relativeWidth(0.6), height: 60)
-                                .background(Color("Light Green"))
-                                .cornerRadius(10)
-                        }
+//                        Button(action: {
+//                            showSignup = true
+//                        }) {
+//                            Text("Sign Up")
+//                                .font(.headline)
+//                                .foregroundColor(Color("Dark Green"))
+//                                .frame(width: UIHelper.relativeWidth(0.6), height: 60)
+//                                .background(Color("Light Green"))
+//                                .cornerRadius(10)
+//                        }
                     }
                     
                     Spacer()
@@ -81,7 +90,7 @@ struct HomePage: View {
             .alert(isPresented: $showAlert) {
                 Alert(
                     title: Text("Disclaimer"),
-                    message: Text("The information provided by the GKnow app is for educational and informational purposes only. It is not a substitute for professional advice, diagnosis, or treatment. The app does not account for the full complexity of individual cases, and any insights offered should be considered as general patterns, rather than specific indicators of personal circumstances."),
+                    message: Text("The information provided by the GKnow app is for educational and informational purposes only. It is not a substitute for professional advice, diagnosis, or treatment. The app does not account for the full complexity of individual cases, and any insights offered should be considered as general patterns, rather than specific indicators of personal circumstances. This is a beta build of GKnow, and we are still gathering feedback. Please let us know if you encounter any issues or have any suggestions."),
                     dismissButton: .default(Text("I understand")) {
                         showAlert = false // Dismiss the alert when the button is pressed
                     }

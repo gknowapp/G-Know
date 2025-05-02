@@ -35,6 +35,9 @@ class Patient {
     var birthOrder: [String]?
     var role: [String]?
     
+    // Add relationships to genogram elements
+    @Relationship(deleteRule: .cascade) var shapes: [GenogramShape]?
+    @Relationship(deleteRule: .cascade) var connections: [Connection]?
     
     init(firstName: String? = nil, middleName: String? = nil, lastName: String? = nil, dob: Date? = nil, birthOrder: [String]? = nil, role: [String]? = nil) {
         
@@ -44,11 +47,13 @@ class Patient {
         self.dob = dob
         self.birthOrder = birthOrder
         self.role = role
+        self.shapes = []
+        self.connections = []
     }
 }
 
 @Model
-class GenogramShape: Identifiable {
+class GenogramShape {
     @Attribute(.unique) var id = UUID()
     var idString: String
     var imageName: String = ""
@@ -56,6 +61,9 @@ class GenogramShape: Identifiable {
     var positionX: Double = 0
     var positionY: Double = 0
     var notes: String = ""
+    
+    // Add relationship back to patient
+    var patient: Patient?
     
     var position: CGPoint {
         get {
@@ -67,7 +75,7 @@ class GenogramShape: Identifiable {
         }
     }
     
-    init(id: UUID = UUID(), imageName: String = "", personName: String = "", position: CGPoint = .zero, notes: String = "") {
+    init(id: UUID = UUID(), imageName: String = "", personName: String = "", position: CGPoint = .zero, notes: String = "", patient: Patient? = nil) {
         self.id = id
         self.idString = id.uuidString
         self.imageName = imageName
@@ -75,11 +83,12 @@ class GenogramShape: Identifiable {
         self.positionX = position.x
         self.positionY = position.y
         self.notes = notes
+        self.patient = patient
     }
 }
 
 @Model
-class Connection: Identifiable {
+class Connection {
     @Attribute(.unique) var id = UUID()
     var startSymbolIdString: String = UUID().uuidString
     var endSymbolIdString: String = UUID().uuidString
@@ -89,6 +98,9 @@ class Connection: Identifiable {
     var startY: Double?
     var endX: Double?
     var endY: Double?
+    
+    // Add relationship back to patient
+    var patient: Patient?
     
     var startSymbolId: UUID {
         get { UUID(uuidString: startSymbolIdString) ?? UUID() }
@@ -152,7 +164,7 @@ class Connection: Identifiable {
     }
     
     // Initialize from ConnectionType enum
-    init(id: UUID = UUID(), startSymbolId: UUID, endSymbolId: UUID, type: ConnectionType, parentConnectionId: UUID? = nil, start: CGPoint? = nil, end: CGPoint? = nil) {
+    init(id: UUID = UUID(), startSymbolId: UUID, endSymbolId: UUID, type: ConnectionType, parentConnectionId: UUID? = nil, start: CGPoint? = nil, end: CGPoint? = nil, patient: Patient? = nil) {
         self.id = id
         self.startSymbolIdString = startSymbolId.uuidString
         self.endSymbolIdString = endSymbolId.uuidString
@@ -160,10 +172,11 @@ class Connection: Identifiable {
         self.parentConnectionIdString = parentConnectionId?.uuidString
         self.start = start
         self.end = end
+        self.patient = patient
     }
     
     // Convenience initializer with string type
-    init(id: UUID = UUID(), startSymbolId: UUID, endSymbolId: UUID, typeString: String, parentConnectionId: UUID? = nil, start: CGPoint? = nil, end: CGPoint? = nil) {
+    init(id: UUID = UUID(), startSymbolId: UUID, endSymbolId: UUID, typeString: String, parentConnectionId: UUID? = nil, start: CGPoint? = nil, end: CGPoint? = nil, patient: Patient? = nil) {
         self.id = id
         self.startSymbolIdString = startSymbolId.uuidString
         self.endSymbolIdString = endSymbolId.uuidString
@@ -171,5 +184,6 @@ class Connection: Identifiable {
         self.parentConnectionIdString = parentConnectionId?.uuidString
         self.start = start
         self.end = end
+        self.patient = patient
     }
 }
