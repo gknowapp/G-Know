@@ -17,9 +17,9 @@ struct PatientListItemView: View {
                 
                 Spacer()
                 
-                Image(systemName: "chevron.right")
-                    .foregroundColor(Color("Candace's Couch"))
-                    .padding(.trailing)
+//                Image(systemName: "chevron.right")
+//                    .foregroundColor(Color("Candace's Couch"))
+//                    .padding(.trailing)
             }
             .frame(maxWidth: .infinity)
             .background(Color("Anti-flash White"))
@@ -67,15 +67,34 @@ struct TherapistHeaderView: View {
 // MARK: - Patient List View
 struct PatientListView: View {
     var patients: [Patient]
+    @Environment(\.modelContext) private var modelContext
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 15) {
-                ForEach(patients) { patient in
-                    PatientListItemView(patient: patient)
-                }
+        List {
+            ForEach(patients) { patient in
+                PatientListItemView(patient: patient)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .padding(.bottom, 5)
             }
-            .padding(.bottom, 20)
+            .onDelete(perform: deletePatients)
+        }
+        .listStyle(PlainListStyle())
+        .scrollContentBackground(.hidden)
+    }
+    
+    private func deletePatients(at offsets: IndexSet) {
+        for index in offsets {
+            let patientToDelete = patients[index]
+            modelContext.delete(patientToDelete)
+        }
+        
+        // Save changes
+        do {
+            try modelContext.save()
+        } catch {
+            print("Error deleting patient: \(error)")
         }
     }
 }
