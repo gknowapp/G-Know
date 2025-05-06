@@ -19,6 +19,6 @@ GKnow is a native Swift app designed for family therapists to create and store t
 - Swift
 - SwiftUI
 - PencilKit for drawing capabilities
-- Airtable for backend database
+- SwiftData for on-device data persistence. 
 
 ##### Keep an eye out for the official GKnow TestFlight launch! Coming Soon
